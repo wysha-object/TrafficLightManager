@@ -5,7 +5,14 @@
 <p align="center">
   Languages:
   <a href="./README.md">English</a>
+  |
   <a href="./docs/README_zh_HANS.md">简体中文</a>
+</p>
+
+<p align="center">
+  <img src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg"/>&nbsp;
+  <img src="https://img.shields.io/badge/C%23-239120"/>&nbsp;
+  <img src="https://img.shields.io/badge/TypeScript-3178C6"/>
 </p>
 
 ## Feature
