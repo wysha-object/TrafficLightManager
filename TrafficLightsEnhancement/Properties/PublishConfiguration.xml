@@ -19,18 +19,14 @@ A traffic light management mod based on Cities2-TrafficLightsEnhancement (Traffi
     <!--Tag, can be set multiple times-->
     <Tag Value="" />
     <!--Version of the mod-->
-    <ModVersion Value="0.3.0" />
+    <ModVersion Value="1.0.0" />
     <!--Recommended version of the base game to use the mod-->
-    <GameVersion Value="1.3.*" />
+    <GameVersion Value="1.5.*" />
     <!--Dependency for the mod, can be set multiple times-->
     <Dependency Id="" />
     <!--Change log for new version. Single line or multi line. Supports minimal markdown subset-->
     <ChangeLog>
-* Fixed error: Invalid host locations map
-
-* Removed LDT retirement notification
-
-* Translation updates (Credit: TwotoolusFLY_LSh.st, KIRFEDO, Edou24, Amazing Amazon, PoxiiHD, karmel68, Leo Han, RilkeXS)
+    Initial release
     </ChangeLog>
     <!--External link. supported types are discord, github, youtube, twitch, x, paypal, patreon-->
     <ExternalLink Type="github" Url="https://github.com/wysha-object/TrafficLightManager" />
