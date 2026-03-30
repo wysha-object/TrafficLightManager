@@ -3,6 +3,7 @@ export default {
   ModDefault: "Standard",
   Vanilla: "Vanilla",
   SplitPhasing: "Aufgeteilte Phase",
+  CustomPhase: "Custom Phase",
   ProtectedRightTurns: "Geschützes rechts abbiegen",
   ProtectedLeftTurns: "Geschützes links abbiegen",
   Options: "Optionen",
@@ -18,6 +19,7 @@ export default {
   CustomPedestrianDurationMultiplier: "Dauer der Fußgängerphase",
   CustomPedestrianDurationMultiplierSuffix: "x",
   AllowTurningOnRed: "Erlaube abbiegen bei Rot",
+  CustomPhaseEditor: "Custom Phase Editor",
   CanaryBuildWarning: "Bitte beachte, dass du ein Canary-Build verwenden, das mit größerer Wahrscheinlichkeit spiel- oder speicherschädigende Bugs enthält und nur zum Testen gedacht ist. Verwenden Sie diesen Build NICHT für den normalen Spielbetrieb.",
   LdtMigrationNotice: "Lane Direction Tool has now been retired and succeeded by Traffic mod from krzychu124. Please install the Traffic mod, and it will automatically transfer your current lane settings to it. Click for more details (Open in a web browser).",
   LdtRetirementNotice: "Lane Direction Tool has now been retired and succeeded by Traffic mod from krzychu124. Thank you for using LDT."

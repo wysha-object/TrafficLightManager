@@ -3,6 +3,7 @@ export default {
   ModDefault: "デフォルト",
   Vanilla: "バニラ",
   SplitPhasing: "分割式",
+  CustomPhase: "Custom Phase",
   ProtectedRightTurns: "右折信号",
   ProtectedLeftTurns: "左折信号",
   Options: "オプション",
@@ -18,6 +19,7 @@ export default {
   CustomPedestrianDurationMultiplier: "歩行者通行時間",
   CustomPedestrianDurationMultiplierSuffix: "倍",
   AllowTurningOnRed: "赤信号を許容する",
+  CustomPhaseEditor: "Custom Phase Editor",
   CanaryBuildWarning: "Canary buildが実行されていることに注意してください。canary buildは正式版ではないため、ゲームを壊すバグやセーブデータを破壊するバグが含まれている可能性が高いテスト版です。このバージョンは通常のゲームプレイには使用しないでください。",
   LdtMigrationNotice: "車線方向ツールは廃止され、krzychu124氏のTraffic modに引き継がれました。Traffic modをインストールすると、現在の車線設定が自動的に移行されます。詳しくはこちらをクリックしてください。（ウェブブラウザで開きます）",
   LdtRetirementNotice: "車線方向ツールは廃止され、krzychu124氏のTraffic modに引き継がれました。これまで当機能をご利用いただきありがとうございました。"

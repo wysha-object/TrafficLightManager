@@ -3,6 +3,7 @@ export default {
   ModDefault: "預設",
   Vanilla: "原版",
   SplitPhasing: "區隔式信號",
+  CustomPhase: "自定义",
   ProtectedRightTurns: "專屬右轉",
   ProtectedLeftTurns: "專屬左轉",
   Options: "選項",
@@ -18,6 +19,7 @@ export default {
   CustomPedestrianDurationMultiplier: "行人過路時段長短",
   CustomPedestrianDurationMultiplierSuffix: "倍",
   AllowTurningOnRed: "容許於紅燈時轉彎",
+  CustomPhaseEditor: "相位编辑器",
   CanaryBuildWarning: "請注意，你正在使用Canary版。此版本僅供測試之用，很可能會導致遊戲崩潰或存檔損壞。敬請避免使用此版本進行遊戲。",
   LdtMigrationNotice: "行車線方向設定工具現已退役，並由 krzychu124 的 Traffic Mod 接替。請安裝 Traffic Mod，它將自動轉移你的車道設置。點擊查看更多詳情（在網頁瀏覽器中開啟）",
   LdtRetirementNotice: "行車線方向設定工具現已退役，並由 krzychu124 的 Traffic Mod 接替。感謝你使用本工具。"

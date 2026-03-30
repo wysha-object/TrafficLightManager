@@ -3,6 +3,7 @@ export default {
   ModDefault: "Domyślna",
   Vanilla: "Z gry",
   SplitPhasing: "Bezkolizyjna",
+  CustomPhase: "Custom Phase",
   ProtectedRightTurns: "Dedykowany prawoskręt",
   ProtectedLeftTurns: "Dedykowany lewoskręt",
   Options: "Opcje",
@@ -18,6 +19,7 @@ export default {
   CustomPedestrianDurationMultiplier: "Czas trwania fazy dla pieszych",
   CustomPedestrianDurationMultiplierSuffix: "x",
   AllowTurningOnRed: "Pozwalaj na skręcanie na czerwonym",
+  CustomPhaseEditor: "Custom Phase Editor",
   CanaryBuildWarning: "Pamiętaj, że używasz wersji canary, która może zawiera błędy psujące grę lub powodujące uszkodzenie zapisu i jest przeznaczona wyłącznie do testowania gry. NIE używaj tej wersji do normalnej rozgrywki.",
   LdtMigrationNotice: "Narzędzie zmiany strzałek pasów zostało wycofane i zastąpione modem Traffic od krzychu124. Zainstaluj moda Traffic i on automatycznie przeniesie ustawienia pasów. Kliknij tutaj, aby przeczytać. (Otwórz w przeglądarce).",
   LdtRetirementNotice: "Narzędzie zmiany strzałek pasów zostało wycofane i zastąpione modem Traffic od krzychu124. Dziękuje za skorzystanie z narzędzia zmiany strzałek pasów."

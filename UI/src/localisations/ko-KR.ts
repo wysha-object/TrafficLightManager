@@ -3,6 +3,7 @@ export default {
   ModDefault: "모드 기본 값",
   Vanilla: "바닐라 값",
   SplitPhasing: "분할 신호",
+  CustomPhase: "Custom Phase",
   ProtectedRightTurns: "우회전 단계 보호",
   ProtectedLeftTurns: "좌회전 단계 보호",
   Options: "추가 기능",
@@ -18,6 +19,7 @@ export default {
   CustomPedestrianDurationMultiplier: "보행 신호 지속 시간",
   CustomPedestrianDurationMultiplierSuffix: "x",
   AllowTurningOnRed: "적신호시 우회전 (우측통행 기준) 허용",
+  CustomPhaseEditor: "Custom Phase Editor",
   CanaryBuildWarning: "canary build 사용 전 유의사항, 해당 빌드는 테스트 전용이므로 저장 파일이 망가지거나 버그가 발생 할 수 있습니다. 일반적인 경우에는 사용하지 마십시오.",
   LdtMigrationNotice: "차선 방향 도구는 이제 폐기되었으며 krzychu124의 Traffic 모드로 계승되었습니다. Traffic 모드를 설치하면 현재 차선 설정이 자동으로 전송됩니다. 자세한 내용을 보려면 클릭하세요(웹 브라우저에서 열기).",
   LdtRetirementNotice: "차로 방향 도구는 이제 폐기되었으며 krzychu124의 Traffic 모드로 계승되었습니다. LDT를 이용해 주셔서 감사합니다."
