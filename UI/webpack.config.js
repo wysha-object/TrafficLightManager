@@ -5,7 +5,13 @@ const { CSSPresencePlugin } = require("./tools/css-presence");
 const TerserPlugin = require("terser-webpack-plugin");
 const gray = (text) => `\x1b[90m${text}\x1b[0m`;
 
-const OUTPUT_DIR = "./dist/";
+const CSII_USERDATAPATH = process.env.CSII_USERDATAPATH;
+
+if (!CSII_USERDATAPATH) {
+  throw "CSII_USERDATAPATH environment variable is not set, ensure the CSII Modding Toolchain is installed correctly";
+}
+
+const OUTPUT_DIR = `${CSII_USERDATAPATH}\\Mods\\TrafficLightManager.Code`;
 
 const banner = `
  * Cities: Skylines II UI Module

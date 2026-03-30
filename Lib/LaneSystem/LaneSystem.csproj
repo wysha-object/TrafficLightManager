@@ -6,8 +6,8 @@
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
         <LangVersion>12.0</LangVersion>
 
-        <AssemblyName>C2VM.CommonLibraries.LaneSystem</AssemblyName>
-        <RootNamespace>C2VM.CommonLibraries.LaneSystem</RootNamespace>
+        <AssemblyName>TrafficLightManager.Lib.LaneSystem</AssemblyName>
+        <RootNamespace>TrafficLightManager.Lib.LaneSystem</RootNamespace>
         <Version>0.0.17</Version>
         
         <!--The folder where Game.dll is located. Set it only if the game is not installed in the default location, otherwise keep it empty-->

@@ -96,7 +96,7 @@ namespace C2VM.TrafficLightsEnhancement.Systems.Overlay
             foreach (Icon icon in iconValues)
             {
                 var iconTexture = new Texture2D(kIconWidth, kIconHeight);
-                string imageResourceName = $"C2VM.TrafficLightsEnhancement.Resources.Textures.Icons.{System.Enum.GetName(typeof(Icon), icon)}.png";
+                string imageResourceName = $"TrafficLightManager.Code.Resources.Textures.Icons.{System.Enum.GetName(typeof(Icon), icon)}.png";
                 using Stream imageStream = System.Reflection.Assembly.GetExecutingAssembly().GetManifestResourceStream(imageResourceName);
                 if (imageStream != null)
                 {

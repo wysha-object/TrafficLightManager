@@ -5,8 +5,8 @@
         <Configurations>Debug;Release</Configurations>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 
-        <AssemblyName>C2VM.TrafficLightsEnhancement</AssemblyName>
-        <RootNamespace>C2VM.TrafficLightsEnhancement</RootNamespace>
+        <AssemblyName>TrafficLightManager.Code</AssemblyName>
+        <RootNamespace>TrafficLightManager.Code</RootNamespace>
         <Version>0.3.0</Version>
 
         <!--The file where mod information which is required for publishing mod on PDX mods are stored-->
@@ -103,18 +103,17 @@
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\CommonLibraries\LaneSystem\LaneSystem.csproj" />
+        <ProjectReference Include="..\Lib\LaneSystem\LaneSystem.csproj" />
     </ItemGroup>
 
     <Target Name="BuildFrontend" BeforeTargets="CoreCompile" Condition="'$(DisableBuildFrontend)' != 'true'">
-        <Exec Command="npm install --prefer-offline --no-audit" WorkingDirectory="..\TLEFrontend\" />
-        <Exec Command="npm run build" WorkingDirectory="..\TLEFrontend\" />
-        <Copy SourceFiles="..\TLEFrontend\dist\C2VM.TLEFrontend.mjs" DestinationFolder="$(OutDir)\" />
+        <Exec Command="npm install --prefer-offline --no-audit" WorkingDirectory="..\UI\" />
+        <Exec Command="npm run build" WorkingDirectory="..\UI\" />
     </Target>
 
     <Target Name="CopyLaneSystem" BeforeTargets="CoreCompile">
         <ItemGroup>
-            <LaneSystemFiles Include="..\CommonLibraries\LaneSystem\bin\$(Configuration)\$(TargetFramework)\*.*" />
+            <LaneSystemFiles Include="..\Lib\LaneSystem\bin\$(Configuration)\$(TargetFramework)\*.*" />
         </ItemGroup>
         <Copy SourceFiles="@(LaneSystemFiles)" DestinationFolder="$(OutDir)\" />
     </Target>
