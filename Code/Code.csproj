@@ -106,16 +106,15 @@
         <ProjectReference Include="..\Lib\LaneSystem\LaneSystem.csproj" />
     </ItemGroup>
 
-    <Target Name="BuildFrontend" BeforeTargets="CoreCompile" Condition="'$(DisableBuildFrontend)' != 'true'">
-        <Exec Command="npm install --prefer-offline --no-audit" WorkingDirectory="..\UI\" />
-        <Exec Command="npm run build" WorkingDirectory="..\UI\" />
-    </Target>
-
     <Target Name="CopyLaneSystem" BeforeTargets="CoreCompile">
         <ItemGroup>
             <LaneSystemFiles Include="..\Lib\LaneSystem\bin\$(Configuration)\$(TargetFramework)\*.*" />
         </ItemGroup>
         <Copy SourceFiles="@(LaneSystemFiles)" DestinationFolder="$(OutDir)\" />
+    </Target>
+
+    <Target Name="BuildUI" AfterTargets="Build" Condition="'$(DisableBuildFrontend)' != 'true'">
+        <Exec Command="npm run build" WorkingDirectory="..\UI\" />
     </Target>
 
     <PropertyGroup Condition="'$(Verbosity)' == 'Verbose'">
