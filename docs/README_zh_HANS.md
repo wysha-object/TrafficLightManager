@@ -1,6 +1,6 @@
 <h1 align="center">信号灯管理器</h1>
 
-<h3 align="center">一个基于<a href="https://github.com/slyh/Cities2-TrafficLightsEnhancement">slyh/Cities2-TrafficLightsEnhancement</a>的信号灯管理器</h4>
+<h3 align="center">一个基于<a href="https://github.com/slyh/Cities2-TrafficLightsEnhancement">slyh/Cities2-TrafficLightsEnhancement</a>的信号灯管理器</h3>
 
 <p align="center">
   语言:
