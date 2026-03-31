@@ -9,25 +9,15 @@
     <!--LongDescription Value="This is a long description" /-->
     <LongDescription>
 
-        <h1 align="center">Traffic Light Manager</h1>
+# Traffic Light Manager
+A traffic light management mod based on slyh/Cities2-TrafficLightsEnhancement
 
-        <h3 align="center">A traffic light management mod based on <a href="https://github.com/slyh/Cities2-TrafficLightsEnhancement">slyh/Cities2-TrafficLightsEnhancement</a></h3>
+## Feature
+* Set traffic lights to various predefined signal modes
+* Create fully customized signal phases
 
-        <p align="center">
-        <img src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg"/>&nbsp;
-        <img src="https://img.shields.io/badge/C%23-239120"/>&nbsp;
-        <img src="https://img.shields.io/badge/TypeScript-3178C6"/>
-        </p>
-
-        ## Feature
-        
-        * Set traffic lights to various predefined signal modes
-
-        * Create fully customized signal phases
-
-        ## Support
-
-        If you find this mod helpful, please consider giving it a star !
+## Support
+If you find this mod helpful, please consider giving it a star !
 
     </LongDescription>
     <!--Thumbnail-->
