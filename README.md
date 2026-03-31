@@ -20,3 +20,7 @@
 * Set traffic lights to various predefined signal modes
 
 * Create fully customized signal phases
+
+## Support
+
+If you find this mod helpful, please consider giving it a star !
