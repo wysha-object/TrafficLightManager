@@ -1,3 +1,4 @@
+import { useContext } from "react";
 import deDE from "./de-DE";
 import enUS from "./en-US";
 import esES from "./es-ES";
@@ -13,6 +14,7 @@ import zhHANS from "./zh-HANS";
 import zhHANT from "./zh-HANT";
 import zhHK from "./zh-HK";
 import zhTW from "./zh-TW";
+import { LocaleContext } from "@/context";
 
 const defaultLocale = "en-US";
 
@@ -47,8 +49,17 @@ const getString = (locale: string, key: string) => {
   return key;
 }
 
+const useTranslate = () => {
+  let locale = useContext(LocaleContext);
+  let t = (key: string) => getString(locale, key);
+  return {
+    t
+  }
+}
+
 export {
   defaultLocale,
   getString,
+  useTranslate,  
   localisations
 };

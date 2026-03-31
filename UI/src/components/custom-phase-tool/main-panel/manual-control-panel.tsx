@@ -41,7 +41,7 @@ const BackButton = () => {
   };
   return (
     <Row hoverEffect={true} onClick={clickHandler}>
-      <Button label="Back" />
+      <Button label="CustomPhaseEditor.Back" />
     </Row>
   );
 };
@@ -67,7 +67,7 @@ export default function ManualControlPanel(props: {items: MainPanelItem[]}) {
     <>
       <Scrollable style={{flex: 1}} contentStyle={ItemContainerStyle}>
         <Row>
-          <Label dim={false}>{getString(locale, "ManualControl")}</Label>
+          <Label dim={false}>{getString(locale, "CustomPhaseEditor.ManualControl")}</Label>
         </Row>
         {props.items.map(item => item.itemType == "customPhase" && <Item data={item} />)}
       </Scrollable>

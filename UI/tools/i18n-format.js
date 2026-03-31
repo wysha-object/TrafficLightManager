@@ -34,6 +34,7 @@ function escapeString(str) {
 
 /**
  * 解析 TypeScript 导出对象，保持 key 顺序
+ * 支持标识符 key 和字符串 key 两种格式
  * @param {string} content 
  * @returns {{ keys: string[], values: Record<string, string> }}
  */
@@ -46,12 +47,17 @@ function parseExport(content) {
   const values = {};
 
   // 匹配每个 key-value 对
-  const regex = /(\w+):\s*["'`]((?:[^"'`\\]|\\.)*)["\'`]/g;
+  // 支持两种 key 格式：
+  // 1. 标识符格式: keyName: "value"
+  // 2. 字符串格式: "key-name": "value" 或 'key-name': "value"
+  // 注意：key 和冒号之间可能有空格
+  const regex = /(?:([a-zA-Z_$][\w$]*)|(["'])([^"']+)\2)\s*:\s*["'`]((?:[^"'`\\]|\\.)*)["\'`]/g;
   let m;
   while ((m = regex.exec(body)) !== null) {
-    const key = m[1];
+    // m[1] 是标识符 key，m[3] 是字符串 key
+    const key = m[1] || m[3];
     // 将转义序列解析为实际字符
-    const value = unescapeString(m[2]);
+    const value = unescapeString(m[4]);
     keys.push(key);
     values[key] = value;
   }
@@ -61,6 +67,7 @@ function parseExport(content) {
 
 /**
  * 生成 TypeScript 导出文件内容
+ * 统一使用字符串格式的 key
  * @param {string[]} keys 按顺序的 key 列表
  * @param {Record<string, string>} values key-value 映射
  * @returns {string}
@@ -71,8 +78,10 @@ function generateExport(keys, values) {
     const value = values[key] || '';
     // 正确转义所有特殊字符
     const escapedValue = escapeString(value);
+    // key 也需要转义（以防 key 中包含特殊字符）
+    const escapedKey = escapeString(key);
     const comma = index < keys.length - 1 ? ',' : '';
-    lines.push(`  ${key}: "${escapedValue}"${comma}`);
+    lines.push(`  "${escapedKey}": "${escapedValue}"${comma}`);
   });
   lines.push('};');
   return lines.join('\n') + '\n';
@@ -102,6 +111,11 @@ function main() {
 
   console.log(`Base keys from en-US.ts: ${baseKeys.length}`);
   console.log('---');
+
+  // 先格式化 en-US.ts
+  const enUSNewContent = generateExport(baseKeys, enUS.values);
+  fs.writeFileSync(enUSPath, enUSNewContent, 'utf-8');
+  console.log('[OK] en-US.ts: Reformatted');
 
   // 获取所有本地化文件（排除 index.ts 和 en-US.ts）
   const files = fs.readdirSync(LOCALISATIONS_DIR)

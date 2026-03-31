@@ -56,7 +56,7 @@ const AddButton = () => {
     type: "button",
     key: "add",
     value: "add",
-    label: "Add",
+    label: "CustomPhaseEditor.Add",
     engineEventName: "C2VM.TLE.CallAddCustomPhase"
   };
   return (
@@ -70,7 +70,7 @@ const BackButton = () => {
     type: "button",
     key: "state",
     value: `${MainPanelState.Main}`,
-    label: "Back",
+    label: "CustomPhaseEditor.Back",
     engineEventName: "C2VM.TLE.CallSetMainPanelState"
   };
   return (
@@ -85,7 +85,7 @@ const ManualControlButton = (props: {currentSignalGroup: number}) => {
   };
   return (
     <Row hoverEffect={true}>
-      <Button label="ManualControl" onClick={clickHandler} />
+      <Button label="CustomPhaseEditor.ManualControl" onClick={clickHandler} />
     </Row>
   );
 };
@@ -135,8 +135,8 @@ export default function MainPanel(props: {items: MainPanelItem[]}) {
             {props.items.map(item => item.itemType == "customPhase" && <Item data={item} />)}
           </Scrollable>
           {length > 0 && <Divider />}
-          {length < 16 && <AddButton />}
           {length > 0 && <ManualControlButton currentSignalGroup={currentSignalGroup} />}
+          {length < 16 && <AddButton />}
           <BackButton />
         </>}
         {manualSignalGroup > 0 && <ManualControlPanel items={props.items} />}

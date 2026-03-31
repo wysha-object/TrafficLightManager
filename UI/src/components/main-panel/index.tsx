@@ -11,10 +11,11 @@ import Content from './content';
 
 import FloatingButton from '@/components/common/floating-button';
 import CustomPhaseMainPanel from '@/components/custom-phase-tool/main-panel';
+import { useTranslate } from '@/localisations';
 
 const defaultPanel = {
-  title: "",
-  image: "",
+  title: "TrafficLightManager",
+  image: "Media/Game/Icons/TrafficLights.svg",
   position: {top: -999999, left: -999999},
   showPanel: false,
   showFloatingButton: false,
@@ -30,8 +31,8 @@ const useMainPanel = () => {
   useEffect(() => {
     const newPanel = JSON.parse(result);
     setPanel({
-      title: newPanel.title ?? defaultPanel.title,
-      image: newPanel.image ?? defaultPanel.image,
+      title: defaultPanel.title,
+      image: defaultPanel.image,
       position: newPanel.position ?? defaultPanel.position,
       showPanel: newPanel.showPanel ?? defaultPanel.showPanel,
       showFloatingButton: newPanel.showFloatingButton ?? defaultPanel.showFloatingButton,
@@ -152,19 +153,20 @@ export default function MainPanel() {
     return result;
   }, [showPanel, top, left, container, toolSideColumn, recalc, panel]); // Recalc values on recalc or panel change
 
+  const { t } = useTranslate();
   return (
     <>
       <FloatingButton
         show={showFloatingButton}
         src="Media/Game/Icons/TrafficLights.svg"
-        tooltip={panel.title}
+        tooltip={t(panel.title)}
         onClick={floatingButtonClickHandler}
       />
       <Container
         ref={containerRef}
         style={style}
       >
-        <Header title={panel.title} image={panel.image} onMouseDown={mouseDownHandler} />
+        <Header title={t(panel.title)} image={panel.image} onMouseDown={mouseDownHandler} />
         {panel.state != MainPanelState.CustomPhase && <Content items={panel.items} />}
         {panel.state == MainPanelState.CustomPhase && <CustomPhaseMainPanel items={panel.items} />}
       </Container>
