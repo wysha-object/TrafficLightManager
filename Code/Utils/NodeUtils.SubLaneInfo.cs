@@ -1,9 +1,9 @@
-using C2VM.TrafficLightsEnhancement.Components;
+using TrafficLightManager.Code.Components;
 using Colossal.UI.Binding;
 using Unity.Entities;
-using static C2VM.TrafficLightsEnhancement.Systems.UI.UITypes;
+using static TrafficLightManager.Code.Systems.UI.UITypes;
 
-namespace C2VM.TrafficLightsEnhancement.Utils;
+namespace TrafficLightManager.Code.Utils;
 
 public partial struct NodeUtils
 {

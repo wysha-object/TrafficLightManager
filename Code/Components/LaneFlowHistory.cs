@@ -2,7 +2,7 @@ using Colossal.Serialization.Entities;
 using Unity.Entities;
 using Unity.Mathematics;
 
-namespace C2VM.TrafficLightsEnhancement.Components
+namespace TrafficLightManager.Code.Components
 {
     public struct LaneFlowHistory : IComponentData, IQueryTypeParameter, ISerializable
     {

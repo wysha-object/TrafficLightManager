@@ -1,7 +1,7 @@
 import { useContext, useEffect, useState } from "react";
 import styled from "styled-components";
 
-import { call } from "cs2/api";
+import { bindValue, call, useValue } from "cs2/api";
 
 import { LocaleContext } from "@/context";
 import { getString } from "@/localisations";
@@ -17,7 +17,7 @@ import Row from "@/components/main-panel/items/row";
 
 import ItemDivider from "./item-divider";
 
-const Label = styled.div<{dim?: boolean}>`
+const Label = styled.div<{ dim?: boolean }>`
   color: ${props => props.dim ? "var(--textColorDim)" : "var(--textColor)"};
   flex-grow: 1;
   flex-shrink: 1;
@@ -35,7 +35,7 @@ const IconBarContainer = styled.div`
   justify-content: flex-end;
 `;
 
-const IconContainer = styled.div<{disabled?: boolean}>`
+const IconContainer = styled.div<{ disabled?: boolean }>`
   display: flex;
   margin-left: 0.35em;
   border-radius: 0.2em;
@@ -56,63 +56,85 @@ const IconStyleDisabled = {
   opacity: 0.3
 };
 
-const ActiveDot = () => <div style={{color: "#34bf42", marginLeft: "6rem"}}>•</div>;
+const ActiveDot = () => <div style={{ color: "#34bf42", marginLeft: "6rem" }}>•</div>;
 
-export default function Item(props: {data: MainPanelItemCustomPhase}) {
+export enum ItemState {
+  None,
+  Viewing,
+  Editing,
+}
+
+export default function Item(
+  props: {
+    data: CustomPhaseItem,
+    itemIndex: number,
+    itemState: ItemState,
+    currentIndex: number,
+    updateItemState: (state: ItemState) => void,
+    updateCurrentIndex: (index: number) => void,
+  }
+) {
   const locale = useContext(LocaleContext);
   const [isActiveLabel, setIsActiveLabel] = useState(false);
-  const [showEditor, setShowEditor] = useState(false);
-  const swap = (index1: number, index2: number) => {
-    if (index1 < 0 || index2 < 0 || index1 >= props.data.length || index2 >= props.data.length) {
-      return;
+  const swapItem = (index1: number, index2: number) => {
+    call("C2VM.TLE", "CallSwapCustomPhase", JSON.stringify({ index1, index2 }))
+
+    if (index1 === props.currentIndex) {
+      props.updateCurrentIndex(index2);
+    } else if (index2 === props.currentIndex) {
+      props.updateCurrentIndex(index1);
     }
-    call("C2VM.TLE", "CallSwapCustomPhase", JSON.stringify({index1, index2}));
   };
+  const currentIndex = useValue(bindValue("TrafficLightManager", "GetCurrentPhaseIndex"));
   useEffect(() => {
-    if (props.data.activeViewingIndex >= 0) {
-      setIsActiveLabel(props.data.activeViewingIndex == props.data.index);
-    } else if (props.data.activeIndex >= 0) {
-      setIsActiveLabel(props.data.activeIndex == props.data.index);
+    if (props.itemState == ItemState.Viewing) {
+      setIsActiveLabel(true);
+    } else if (props.itemState == ItemState.Editing) {
+      setIsActiveLabel(true);
     } else {
-      setIsActiveLabel(props.data.index + 1 == props.data.currentSignalGroup);
+      setIsActiveLabel(false);
     }
-    setShowEditor(props.data.activeIndex == props.data.index);
-  }, [props.data.activeViewingIndex, props.data.activeIndex, props.data.index, props.data.currentSignalGroup]);
+  }, [props.itemState]);
   return (
     <>
-      <Row style={{padding: "0.25em"}}>
+      <Row style={{ padding: "0.25em" }}>
         <Label dim={!isActiveLabel}>
-          {getString(locale, "Phase") + " #" + (props.data.index + 1)}{props.data.activeIndex < 0 && props.data.index + 1 == props.data.currentSignalGroup && <ActiveDot />}
+          {getString(locale, "Phase") + " #" + (props.itemIndex + 1)}{currentIndex === props.itemIndex && <ActiveDot />}
         </Label>
         <IconBarContainer>
-          {!showEditor && <>
-            {props.data.activeViewingIndex == props.data.index && <IconContainer>
-              <VisibilityOff style={IconStyle} onClick={() => call("C2VM.TLE", "CallSetActiveCustomPhaseIndex", JSON.stringify({key: "ActiveViewingCustomPhaseIndex", value: -1}))} />
+          {props.itemState != ItemState.Editing && <>
+            {props.itemState == ItemState.Viewing && <IconContainer>
+              <VisibilityOff style={IconStyle} onClick={() => props.updateItemState(ItemState.None)} />
             </IconContainer>}
-            {props.data.activeViewingIndex != props.data.index && <IconContainer>
-              <Visibility style={IconStyle} onClick={() => call("C2VM.TLE", "CallSetActiveCustomPhaseIndex", JSON.stringify({key: "ActiveViewingCustomPhaseIndex", value: props.data.index}))} />
+            {props.itemState == ItemState.None && <IconContainer>
+              <Visibility style={IconStyle} onClick={() => props.updateItemState(ItemState.Viewing)} />
             </IconContainer>}
             <IconContainer>
-              <Tune style={IconStyle} onClick={() => call("C2VM.TLE", "CallSetActiveCustomPhaseIndex", JSON.stringify({key: "ActiveEditingCustomPhaseIndex", value: props.data.index}))} />
+              <Tune style={IconStyle} onClick={() => props.updateItemState(ItemState.Editing)} />
             </IconContainer>
           </>}
-          {showEditor && <>
+          {props.itemState == ItemState.Editing && <>
             <IconContainer>
-              <Delete style={IconStyle} onClick={() => call("C2VM.TLE", "CallRemoveCustomPhase", JSON.stringify({index: props.data.index}))} />
+              <Delete style={IconStyle} onClick={() => {
+                call("C2VM.TLE", "CallRemoveCustomPhase", JSON.stringify({ index: props.itemIndex }))
+                if (props.currentIndex === props.itemIndex) {
+                  props.updateCurrentIndex(props.currentIndex - 1);
+                }
+              }} />
             </IconContainer>
             <IconContainer>
-              <Check style={IconStyle} onClick={() => call("C2VM.TLE", "CallSetActiveCustomPhaseIndex", JSON.stringify({key: "ActiveEditingCustomPhaseIndex", value: -1}))} />
+              <Check style={IconStyle} onClick={() => props.updateItemState(ItemState.None)} />
             </IconContainer>
-            <IconContainer disabled={props.data.activeIndex <= 0}>
-              <ChevronUp style={{...IconStyle, ...(props.data.activeIndex <= 0 && IconStyleDisabled)}} onClick={() => swap(props.data.activeIndex, props.data.activeIndex - 1)} />
+            <IconContainer>
+              <ChevronUp style={{ ...IconStyle, ...IconStyleDisabled }} onClick={() => swapItem(props.itemIndex, props.itemIndex - 1)} />
             </IconContainer>
-            <IconContainer disabled={props.data.activeIndex >= (props.data.length - 1)}>
-              <ChevronDown style={{...IconStyle, ...(props.data.activeIndex >= (props.data.length - 1) && IconStyleDisabled)}} onClick={() => swap(props.data.activeIndex, props.data.activeIndex + 1)} />
+            <IconContainer>
+              <ChevronDown style={{ ...IconStyle, ...IconStyleDisabled }} onClick={() => swapItem(props.itemIndex, props.itemIndex + 1)} />
             </IconContainer>
           </>}
         </IconBarContainer>
       </Row>
-      {props.data.index + 1 < props.data.length && <ItemDivider index={props.data.index} linked={props.data.linkedWithNextPhase} />}
+      {props.itemIndex + 1 < props.itemIndex && <ItemDivider index={props.itemIndex} linked={props.data.linkedWithNextPhase} />}
     </>
   );
 }

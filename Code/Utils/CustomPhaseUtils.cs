@@ -1,15 +1,23 @@
-using C2VM.TrafficLightsEnhancement.Components;
 using Game.Net;
+using TrafficLightManager.Code.Components;
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
-using static C2VM.TrafficLightsEnhancement.Systems.TrafficLightSystems.Initialisation.PatchedTrafficLightInitializationSystem;
+using static TrafficLightManager.Code.Systems.TrafficLightSystems.Initialisation.PatchedTrafficLightInitializationSystem;
 
-namespace C2VM.TrafficLightsEnhancement.Utils;
+namespace TrafficLightManager.Code.Utils;
 
 public struct CustomPhaseUtils
 {
-    public static void ValidateBuffer(ref InitializeTrafficLightsJob job, Entity nodeEntity, DynamicBuffer<SubLane> nodeSubLaneBuffer, DynamicBuffer<ConnectedEdge> connectedEdgeBuffer, DynamicBuffer<EdgeGroupMask> edgeGroupMaskBuffer, DynamicBuffer<SubLaneGroupMask> subLaneGroupMaskBuffer, BufferLookup<SubLane> subLaneLookup)
+    public static void ValidateBuffer(
+        ref InitializeTrafficLightsJob job,
+        Entity nodeEntity,
+        DynamicBuffer<SubLane> nodeSubLaneBuffer,
+        DynamicBuffer<ConnectedEdge> connectedEdgeBuffer,
+        DynamicBuffer<EdgeGroupMask> edgeGroupMaskBuffer,
+        DynamicBuffer<SubLaneGroupMask> subLaneGroupMaskBuffer,
+        BufferLookup<SubLane> subLaneLookup
+    )
     {
         for (int i = 0; i < edgeGroupMaskBuffer.Length; i++)
         {

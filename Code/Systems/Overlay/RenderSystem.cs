@@ -13,7 +13,7 @@ using Unity.Mathematics;
 using UnityEngine;
 using UnityEngine.Rendering;
 
-namespace C2VM.TrafficLightsEnhancement.Systems.Overlay
+namespace TrafficLightManager.Code.Systems.Overlay
 {
     public partial class RenderSystem : GameSystemBase
     {

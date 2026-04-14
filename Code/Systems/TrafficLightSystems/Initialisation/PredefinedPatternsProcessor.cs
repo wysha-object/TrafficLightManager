@@ -1,12 +1,12 @@
-using C2VM.TrafficLightsEnhancement.Components;
-using C2VM.TrafficLightsEnhancement.Utils;
 using Game.Net;
+using TrafficLightManager.Code.Components;
+using TrafficLightManager.Code.Utils;
 using Unity.Collections;
 using Unity.Entities;
-using static C2VM.TrafficLightsEnhancement.Systems.TrafficLightSystems.Initialisation.PatchedTrafficLightInitializationSystem;
-using static C2VM.TrafficLightsEnhancement.Utils.NodeUtils;
+using static TrafficLightManager.Code.Systems.TrafficLightSystems.Initialisation.PatchedTrafficLightInitializationSystem;
+using static TrafficLightManager.Code.Utils.NodeUtils;
 
-namespace C2VM.TrafficLightsEnhancement.Systems.TrafficLightSystems.Initialisation;
+namespace TrafficLightManager.Code.Systems.TrafficLightSystems.Initialisation;
 
 public class PredefinedPatternsProcessor
 {
@@ -61,9 +61,21 @@ public class PredefinedPatternsProcessor
         }
     }
 
-    public static void SetupSplitPhasing(ref InitializeTrafficLightsJob job, DynamicBuffer<ConnectedEdge> connectedEdges, DynamicBuffer<SubLane> subLanes, out int groupCount, ref TrafficLights trafficLights)
+    public static void SetupSplitPhasing(
+        ref InitializeTrafficLightsJob job,
+        DynamicBuffer<ConnectedEdge> connectedEdges,
+        DynamicBuffer<SubLane> subLanes,
+        out int groupCount,
+        ref TrafficLights trafficLights
+    )
     {
-        NativeHashMap<Entity, NodeUtils.LaneConnection> laneConnectionMap = NodeUtils.GetLaneConnectionMap(Allocator.Temp, subLanes, connectedEdges, job.m_ExtraTypeHandle.m_SubLane, job.m_ExtraTypeHandle.m_Lane);
+        NativeHashMap<Entity, NodeUtils.LaneConnection> laneConnectionMap = NodeUtils.GetLaneConnectionMap(
+            Allocator.Temp,
+            subLanes,
+            connectedEdges,
+            job.m_ExtraTypeHandle.m_SubLane,
+            job.m_ExtraTypeHandle.m_Lane
+        );
         groupCount = 0;
 
         for (int i = 0; i < subLanes.Length; i++)
@@ -145,9 +157,21 @@ public class PredefinedPatternsProcessor
         UpdateLaneSignal(ref job, subLanes, ref trafficLights);
     }
 
-    public static void SetupProtectedCentreTurn(ref InitializeTrafficLightsJob job, DynamicBuffer<ConnectedEdge> connectedEdges, DynamicBuffer<SubLane> subLanes, out int groupCount, ref TrafficLights trafficLights)
+    public static void SetupProtectedCentreTurn(
+        ref InitializeTrafficLightsJob job,
+        DynamicBuffer<ConnectedEdge> connectedEdges,
+        DynamicBuffer<SubLane> subLanes,
+        out int groupCount,
+        ref TrafficLights trafficLights
+    )
     {
-        NativeHashMap<Entity, NodeUtils.LaneConnection> laneConnectionMap = NodeUtils.GetLaneConnectionMap(Allocator.Temp, subLanes, connectedEdges, job.m_ExtraTypeHandle.m_SubLane, job.m_ExtraTypeHandle.m_Lane);
+        NativeHashMap<Entity, NodeUtils.LaneConnection> laneConnectionMap = NodeUtils.GetLaneConnectionMap(
+            Allocator.Temp,
+            subLanes,
+            connectedEdges,
+            job.m_ExtraTypeHandle.m_SubLane,
+            job.m_ExtraTypeHandle.m_Lane
+        );
         groupCount = 0;
 
         NativeHashMap<Entity, Entity> straightEdgeMap = new(connectedEdges.Length, Allocator.Temp);
@@ -170,7 +194,20 @@ public class PredefinedPatternsProcessor
             {
                 continue;
             }
-            if (isCarLane && (carLane.m_Flags & (CarLaneFlags.TurnLeft | CarLaneFlags.TurnRight | CarLaneFlags.GentleTurnLeft | CarLaneFlags.GentleTurnRight | CarLaneFlags.UTurnLeft | CarLaneFlags.UTurnRight)) != 0)
+            if (
+                isCarLane
+                && (
+                    carLane.m_Flags
+                    & (
+                        CarLaneFlags.TurnLeft
+                        | CarLaneFlags.TurnRight
+                        | CarLaneFlags.GentleTurnLeft
+                        | CarLaneFlags.GentleTurnRight
+                        | CarLaneFlags.UTurnLeft
+                        | CarLaneFlags.UTurnRight
+                    )
+                ) != 0
+            )
             {
                 continue;
             }
@@ -313,7 +350,12 @@ public class PredefinedPatternsProcessor
         UpdateLaneSignal(ref job, subLanes, ref trafficLights);
     }
 
-    private static void SetupNonOverlapLanes(ref InitializeTrafficLightsJob job, DynamicBuffer<SubLane> subLanes, int groupCount, NativeHashMap<Entity, NodeUtils.LaneConnection> laneConnectionMap)
+    private static void SetupNonOverlapLanes(
+        ref InitializeTrafficLightsJob job,
+        DynamicBuffer<SubLane> subLanes,
+        int groupCount,
+        NativeHashMap<Entity, NodeUtils.LaneConnection> laneConnectionMap
+    )
     {
         for (int i = 0; i < subLanes.Length; i++)
         {
@@ -457,7 +499,12 @@ public class PredefinedPatternsProcessor
         }
     }
 
-    private static void SetupPedestrianLanes(ref InitializeTrafficLightsJob job, DynamicBuffer<SubLane> subLanes, int groupCount, NativeHashMap<Entity, NodeUtils.LaneConnection> laneConnectionMap)
+    private static void SetupPedestrianLanes(
+        ref InitializeTrafficLightsJob job,
+        DynamicBuffer<SubLane> subLanes,
+        int groupCount,
+        NativeHashMap<Entity, NodeUtils.LaneConnection> laneConnectionMap
+    )
     {
         for (int i = 0; i < subLanes.Length; i++)
         {
@@ -492,7 +539,10 @@ public class PredefinedPatternsProcessor
                     {
                         continue;
                     }
-                    if (subLaneConnection.m_SourceEdge == laneConnectionMap[overlapSubLane].m_DestEdge || subLaneConnection.m_DestEdge == laneConnectionMap[overlapSubLane].m_DestEdge)
+                    if (
+                        subLaneConnection.m_SourceEdge == laneConnectionMap[overlapSubLane].m_DestEdge
+                        || subLaneConnection.m_DestEdge == laneConnectionMap[overlapSubLane].m_DestEdge
+                    )
                     {
                         if (job.m_LeftHandTraffic)
                         {
@@ -503,7 +553,10 @@ public class PredefinedPatternsProcessor
                         }
                         if (!job.m_LeftHandTraffic)
                         {
-                            if ((overlapCarLane.m_Flags & (CarLaneFlags.GentleTurnRight | CarLaneFlags.TurnRight)) != 0 || (overlapTrackLane.m_Flags & TrackLaneFlags.TurnRight) != 0)
+                            if (
+                                (overlapCarLane.m_Flags & (CarLaneFlags.GentleTurnRight | CarLaneFlags.TurnRight)) != 0
+                                || (overlapTrackLane.m_Flags & TrackLaneFlags.TurnRight) != 0
+                            )
                             {
                                 continue;
                             }
@@ -568,7 +621,13 @@ public class PredefinedPatternsProcessor
         }
     }
 
-    public static void AddExclusivePedestrianPhase(ref InitializeTrafficLightsJob job, DynamicBuffer<SubLane> subLanes, ref int groupCount, ref TrafficLights trafficLights, ref CustomTrafficLights customTrafficLights)
+    public static void AddExclusivePedestrianPhase(
+        ref InitializeTrafficLightsJob job,
+        DynamicBuffer<SubLane> subLanes,
+        ref int groupCount,
+        ref TrafficLights trafficLights,
+        ref CustomTrafficLights customTrafficLights
+    )
     {
         ushort pedestrianGroupMask = ushort.MaxValue;
         for (int i = 0; i < subLanes.Length; i++)
@@ -613,7 +672,13 @@ public class PredefinedPatternsProcessor
         }
     }
 
-    public static void AddAlwaysGreenKerbsideTurn(ref InitializeTrafficLightsJob job, int unfilteredChunkIndex, DynamicBuffer<SubLane> subLanes, ref int groupCount, ref TrafficLights trafficLights)
+    public static void AddAlwaysGreenKerbsideTurn(
+        ref InitializeTrafficLightsJob job,
+        int unfilteredChunkIndex,
+        DynamicBuffer<SubLane> subLanes,
+        ref int groupCount,
+        ref TrafficLights trafficLights
+    )
     {
         ushort pedestrianGroupMask = ushort.MaxValue;
         for (int i = 0; i < subLanes.Length; i++)

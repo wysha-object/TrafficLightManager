@@ -1,27 +1,38 @@
-import { CSSProperties } from "react";
+import { CSSProperties, useEffect, useState } from "react";
 import styled from "styled-components";
 
-import { call } from "cs2/api";
-
-import { MainPanelState } from "@/constants";
+import { bindValue, trigger, useValue } from "cs2/api";
 
 import Button from "@/components/common/button";
 import Scrollable from "@/components/common/scrollable";
 import Divider from "@/components/main-panel/items/divider";
 import Row from "@/components/main-panel/items/row";
 
-import Item from "./item";
+import Item, { ItemState } from "./item";
 import ManualControlPanel from "./manual-control-panel";
 import SubPanel from "./sub-panel";
+import { useTranslate } from "@/localisations";
+import { ToolState } from "@/constants";
 
 const Container = styled.div`
-  width: 30em;
+  width: 40em;
   display: flex;
   flex-direction: row;
   flex-grow: 1;
   flex-shrink: 1;
   flex-basis: auto;
 `;
+
+const TrafficLightsMembersContainer = styled.div`
+  width: 10em;
+  background-color: var(--panelColorNormal);
+  backdrop-filter: var(--panelBlur);
+  color: var(--textColor);
+  flex: 1;
+  position: relative;
+  padding: 0.25em;
+`;
+
 
 const LeftPanelContainer = styled.div`
   width: 13.5em;
@@ -64,87 +75,102 @@ const AddButton = () => {
   );
 };
 
-const BackButton = () => {
-  const data: MainPanelItemButton = {
-    itemType: "button",
-    type: "button",
-    key: "state",
-    value: `${MainPanelState.Main}`,
-    label: "CustomPhaseEditor.Back",
-    engineEventName: "C2VM.TLE.CallSetMainPanelState"
-  };
-  return (
-    <Row data={data}><Button {...data} /></Row>
-  );
-};
-
-const ManualControlButton = (props: {currentSignalGroup: number}) => {
-  const clickHandler = () => {
-    const manualSignalGroup = props.currentSignalGroup > 0 ? props.currentSignalGroup : 1;
-    call("C2VM.TLE", "CallSetActiveCustomPhaseIndex", JSON.stringify({key: "ManualSignalGroup", value: manualSignalGroup}));
-  };
+const ManualControlButton = (props: { onClick: () => void }) => {
   return (
     <Row hoverEffect={true}>
-      <Button label="CustomPhaseEditor.ManualControl" onClick={clickHandler} />
+      <Button label="CustomPhaseEditor.ManualControl" onClick={props.onClick} />
     </Row>
   );
 };
 
-export default function MainPanel(props: {items: MainPanelItem[]}) {
-  let activeIndex = -1;
-  let activeViewingIndex = -1;
-  let activeItem: MainPanelItemCustomPhase | null = null;
-  let currentItem: MainPanelItemCustomPhase | null = null;
-  let currentSignalGroup = 0;
-  let manualSignalGroup = 0;
-  let length = 0;
-  if (props.items.length > 0 && props.items[0].itemType == "customPhase") {
-    activeIndex = props.items[0].activeIndex;
-    activeViewingIndex = props.items[0].activeViewingIndex;
-    currentSignalGroup = props.items[0].currentSignalGroup;
-    manualSignalGroup = props.items[0].manualSignalGroup;
-    length = props.items[0].length;
+const AddMemberButton = () => {
+  return (
+    <Row>
+      <Button label="CustomPhaseEditor.AddMember" onClick={() => trigger("TrafficLightManager", "SetToolState", ToolState.AddTrafficLights)} />
+    </Row>
+  )
+}
+
+const RemoveMemberButton = () => {
+  return (
+    <Row>
+      <Button label="CustomPhaseEditor.RemoveMember" onClick={() => trigger("TrafficLightManager", "SetToolState", ToolState.RemoveTrafficLights)} />
+    </Row>
+  )
+}
+
+export default function MainPanel() {
+  let [currentIndex, setCurrentIndex] = useState(0);
+  let [currentItemState, setCurrentItemState] = useState(ItemState.None);
+  let [manualControl, setManualControl] = useState(false);
+
+  const trafficLightsMembers = JSON.parse(useValue(bindValue("TrafficLightManager", "GetTrafficLightsMembers"))) as any[];
+  const customPhaseItems = JSON.parse(useValue(bindValue("TrafficLightManager", "GetCustomPhaseItems"))) as CustomPhaseItem[];
+
+  if (currentIndex >= customPhaseItems.length) {
+    setCurrentIndex(customPhaseItems.length - 1);
   }
-  if (activeIndex >= 0) {
-    const newActiveItem = props.items[activeIndex];
-    if (newActiveItem.itemType == "customPhase") {
-      activeItem = newActiveItem;
+
+  useEffect(() => {
+    trigger("TrafficLightManager", "SetDisplayPhaseIndex", currentIndex);
+    if (currentItemState === ItemState.Editing) {
+      trigger("TrafficLightManager", "SetEditingPhaseIndex", currentIndex);
+    } else {
+      trigger("TrafficLightManager", "SetEditingPhaseIndex", -1);
     }
-  }
-  if (manualSignalGroup > 0) {
-    const newCurrentItem = props.items[manualSignalGroup - 1];
-    if (newCurrentItem.itemType == "customPhase") {
-      currentItem = newCurrentItem;
-    }
-  } else if (activeViewingIndex >= 0) {
-    const newCurrentItem = props.items[activeViewingIndex];
-    if (newCurrentItem.itemType == "customPhase") {
-      currentItem = newCurrentItem;
-    }
-  } else if (currentSignalGroup > 0 && currentSignalGroup - 1 < props.items.length) {
-    const newCurrentItem = props.items[currentSignalGroup - 1];
-    if (newCurrentItem.itemType == "customPhase") {
-      currentItem = newCurrentItem;
-    }
-  }
+  }, [currentIndex, currentItemState]);
+
+  let currentItem: CustomPhaseItem | null = currentIndex >= 0 && currentItemState !== ItemState.None ? customPhaseItems[currentIndex] : null;
+
+  const { t } = useTranslate();
   return (
     <Container>
+      <TrafficLightsMembersContainer>
+        <Row>{t("CustomPhaseEditor.TrafficLightsMembers")}</Row>
+        <Scrollable contentStyle={ItemContainerStyle}>
+          {
+            trafficLightsMembers.map(
+              (item, _) => <Row>#{item.entityIndex}</Row>
+            )
+          }
+        </Scrollable>
+        <Divider />
+        <AddMemberButton />
+        <RemoveMemberButton />
+      </TrafficLightsMembersContainer>
       <LeftPanelContainer>
-        {manualSignalGroup <= 0 && <>
-          <Scrollable style={{flex: 1}} contentStyle={ItemContainerStyle}>
-            {props.items.map(item => item.itemType == "customPhase" && <Item data={item} />)}
+        {!manualControl && <>
+          <Scrollable style={{ flex: 1 }} contentStyle={ItemContainerStyle}>
+            {customPhaseItems.map(
+              (item, index) => <Item
+                data={item}
+                itemIndex={index}
+                itemState={index === currentIndex ? currentItemState : ItemState.None}
+                currentIndex={currentIndex}
+                updateItemState={(state) => {
+                  if (state === ItemState.None) {
+                    setCurrentIndex(-1);
+                  } else {
+                    setCurrentIndex(index);
+                  }
+                  setCurrentItemState(state);
+                }}
+                updateCurrentIndex={setCurrentIndex}
+              />
+            )}
           </Scrollable>
-          {length > 0 && <Divider />}
-          {length > 0 && <ManualControlButton currentSignalGroup={currentSignalGroup} />}
-          {length < 16 && <AddButton />}
-          <BackButton />
+          {customPhaseItems.length > 0 && <Divider />}
+          {customPhaseItems.length > 0 && <ManualControlButton onClick={() => setManualControl(true)} />}
+          {customPhaseItems.length < 16 && <AddButton />}
         </>}
-        {manualSignalGroup > 0 && <ManualControlPanel items={props.items} />}
+        {manualControl && <ManualControlPanel items={customPhaseItems} onBack={() => {
+          trigger("TrafficLightManager", "SetManualPhaseIndex", -1);
+          setManualControl(false);
+        }} />}
       </LeftPanelContainer>
       <RightPanelContainer>
-        <Scrollable style={{flex: 1}} contentStyle={{flex: 1}} trackStyle={{marginLeft: "0.25em"}}>
-          {activeItem && <SubPanel data={activeItem} />}
-          {!activeItem && currentItem && <SubPanel data={currentItem} statisticsOnly={true} />}
+        <Scrollable style={{ flex: 1 }} contentStyle={{ flex: 1 }} trackStyle={{ marginLeft: "0.25em" }}>
+          <SubPanel data={currentItem} itemIndex={currentIndex} statisticsOnly={currentItemState !== ItemState.Editing} />
         </Scrollable>
       </RightPanelContainer>
     </Container>

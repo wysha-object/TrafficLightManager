@@ -1,7 +1,7 @@
 using Colossal.Serialization.Entities;
 using Colossal.UI.Binding;
 
-namespace C2VM.TrafficLightsEnhancement.Components;
+namespace TrafficLightManager.Code.Components;
 
 public struct GroupMask
 {

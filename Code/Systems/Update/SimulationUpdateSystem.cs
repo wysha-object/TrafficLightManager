@@ -3,29 +3,44 @@ using Game;
 using Game.Simulation;
 using Unity.Entities;
 
-namespace C2VM.TrafficLightsEnhancement.Systems.Update;
+namespace TrafficLightManager.Code.Systems.Update;
 
 public partial class SimulationUpdateSystem : GameSystemBase
 {
     private Game.Simulation.SimulationSystem m_SimulationSystem;
 
-    private C2VM.TrafficLightsEnhancement.Systems.UI.UISystem m_UISystem;
+    private TrafficLightManager.Code.Systems.UI.UISystem m_UISystem;
 
     protected override void OnCreate()
     {
         base.OnCreate();
         m_SimulationSystem = World.GetOrCreateSystemManaged<Game.Simulation.SimulationSystem>();
-        m_UISystem = World.GetOrCreateSystemManaged<C2VM.TrafficLightsEnhancement.Systems.UI.UISystem>();
+        m_UISystem = World.GetOrCreateSystemManaged<TrafficLightManager.Code.Systems.UI.UISystem>();
     }
 
     protected override void OnUpdate()
     {
-        if (m_UISystem.m_SelectedEntity != Entity.Null && EntityManager.TryGetSharedComponent<UpdateFrame>(m_UISystem.m_SelectedEntity, out var updateFrame))
-        {
-            if (updateFrame.m_Index == SimulationUtils.GetUpdateFrameWithInterval(m_SimulationSystem.frameIndex, 4, 16))
+        bool hasUpdate = false;
+        m_UISystem.ForEachTrafficLight(
+            (e) =>
             {
-                m_UISystem.SimulationUpdate();
+                if (hasUpdate)
+                {
+                    return;
+                }
+                if (EntityManager.TryGetSharedComponent<UpdateFrame>(e, out var updateFrame))
+                {
+                    if (updateFrame.m_Index == SimulationUtils.GetUpdateFrameWithInterval(m_SimulationSystem.frameIndex, 4, 16))
+                    {
+                        hasUpdate = true;
+                        return;
+                    }
+                }
             }
+        );
+        if (hasUpdate)
+        {
+            m_UISystem.SimulationUpdate();
         }
     }
 }

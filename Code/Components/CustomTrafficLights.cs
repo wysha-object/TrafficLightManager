@@ -1,10 +1,14 @@
+using System.Linq;
 using Colossal.Serialization.Entities;
 using Unity.Entities;
 
-namespace C2VM.TrafficLightsEnhancement.Components;
+namespace TrafficLightManager.Code.Components;
 
 public struct CustomTrafficLights : IComponentData, IQueryTypeParameter, ISerializable
 {
+    /**
+     * 只使用CustomPhase,其他模式不直接使用,仅用于完成默认模式下的更新
+     */
     public enum Patterns : uint
     {
         Vanilla = 0,
@@ -44,22 +48,25 @@ public struct CustomTrafficLights : IComponentData, IQueryTypeParameter, ISerial
 
     public byte m_ManualSignalGroup;
 
-    public void Serialize<TWriter>(TWriter writer) where TWriter : IWriter
+    // Schema 5
+    public Entity m_TrafficLightGroupEntity;
+
+    public void Serialize<TWriter>(TWriter writer)
+        where TWriter : IWriter
     {
-        m_SchemaVersion = 4;
+        m_SchemaVersion = 5;
         writer.Write(uint.MaxValue);
         writer.Write(m_SchemaVersion);
-        writer.Write((uint)m_Pattern);
+        writer.Write(uint.MaxValue);
         writer.Write(m_PedestrianPhaseDurationMultiplier);
         writer.Write(m_PedestrianPhaseGroupMask);
         writer.Write(m_Timer);
-        writer.Write(m_ManualSignalGroup);
+        writer.Write(m_TrafficLightGroupEntity);
     }
 
-    public void Deserialize<TReader>(TReader reader) where TReader : IReader
+    public void Deserialize<TReader>(TReader reader)
+        where TReader : IReader
     {
-        m_PedestrianPhaseDurationMultiplier = 1;
-        m_PedestrianPhaseGroupMask = 0;
         reader.Read(out uint uint1);
         if (uint1 == uint.MaxValue)
         {
@@ -69,19 +76,22 @@ public struct CustomTrafficLights : IComponentData, IQueryTypeParameter, ISerial
         {
             m_SchemaVersion = 1;
         }
+
         if (m_SchemaVersion == 1)
         {
             for (int i = 1; i < DefaultSelectedPatternLength; i++)
             {
-                reader.Read(out uint pattern);
+                reader.Read(out uint _);
             }
-            m_Pattern = Patterns.Vanilla;
         }
+
         if (m_SchemaVersion >= 2)
         {
-            reader.Read(out uint pattern);
-            m_Pattern = (Patterns)pattern;
+            reader.Read(out uint _);
         }
+
+        m_PedestrianPhaseDurationMultiplier = 1;
+        m_PedestrianPhaseGroupMask = 0;
         if (m_SchemaVersion >= 3)
         {
             reader.Read(out float pedestrianPhaseDurationMultiplier);
@@ -89,36 +99,55 @@ public struct CustomTrafficLights : IComponentData, IQueryTypeParameter, ISerial
             m_PedestrianPhaseDurationMultiplier = pedestrianPhaseDurationMultiplier;
             m_PedestrianPhaseGroupMask = pedestrianPhaseGroupMask;
         }
+
         if (m_SchemaVersion >= 4)
         {
             reader.Read(out m_Timer);
-            reader.Read(out m_ManualSignalGroup);
-        }
-        if (GetPatternOnly() == Patterns.SplitPhasingAdvancedObsolete)
-        {
-            SetPatternOnly(Patterns.SplitPhasing);
         }
         m_ManualSignalGroup = 0;
+
+        if (m_SchemaVersion >= 5)
+        {
+            reader.Read(out m_TrafficLightGroupEntity);
+            SetPatternOnly(Patterns.CustomPhase);
+        }
+        else
+        {
+            SetPatternOnly(Patterns.ModDefault);
+        }
     }
 
     public CustomTrafficLights()
     {
-        m_SchemaVersion = 4;
-        m_Pattern = Patterns.Vanilla;
+        m_SchemaVersion = 5;
+        m_Pattern = Patterns.ModDefault;
         m_PedestrianPhaseDurationMultiplier = 1;
         m_PedestrianPhaseGroupMask = 0;
         m_Timer = 0;
         m_ManualSignalGroup = 0;
+        m_TrafficLightGroupEntity = Entity.Null;
     }
 
     public CustomTrafficLights(Patterns pattern)
     {
-        m_SchemaVersion = 4;
+        m_SchemaVersion = 5;
         m_Pattern = pattern;
         m_PedestrianPhaseDurationMultiplier = 1;
         m_PedestrianPhaseGroupMask = 0;
         m_Timer = 0;
         m_ManualSignalGroup = 0;
+        m_TrafficLightGroupEntity = Entity.Null;
+    }
+
+    public CustomTrafficLights(Patterns pattern, Entity trafficLightGroupEntity)
+    {
+        m_SchemaVersion = 5;
+        m_Pattern = pattern;
+        m_PedestrianPhaseDurationMultiplier = 1;
+        m_PedestrianPhaseGroupMask = 0;
+        m_Timer = 0;
+        m_ManualSignalGroup = 0;
+        m_TrafficLightGroupEntity = trafficLightGroupEntity;
     }
 
     public Patterns GetPattern()

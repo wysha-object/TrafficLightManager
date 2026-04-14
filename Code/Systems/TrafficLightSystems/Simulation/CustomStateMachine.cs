@@ -1,13 +1,17 @@
-using C2VM.TrafficLightsEnhancement.Components;
 using Game.Net;
+using TrafficLightManager.Code.Components;
 using Unity.Entities;
 using Unity.Mathematics;
 
-namespace C2VM.TrafficLightsEnhancement.Systems.TrafficLightSystems.Simulation
+namespace TrafficLightManager.Code.Systems.TrafficLightSystems.Simulation
 {
     public struct CustomStateMachine
     {
-        public static bool UpdateTrafficLightState(ref TrafficLights trafficLights, ref CustomTrafficLights customTrafficLights, DynamicBuffer<CustomPhaseData> customPhaseDataBuffer)
+        public static bool UpdateTrafficLightState(
+            ref TrafficLights trafficLights,
+            ref CustomTrafficLights customTrafficLights,
+            DynamicBuffer<CustomPhaseData> customPhaseDataBuffer
+        )
         {
             if (trafficLights.m_State == TrafficLightState.None || trafficLights.m_State == TrafficLightState.Extending || trafficLights.m_State == TrafficLightState.Extended)
             {
@@ -141,7 +145,13 @@ namespace C2VM.TrafficLightsEnhancement.Systems.TrafficLightSystems.Simulation
             return false;
         }
 
-        public static void CalculateFlow(PatchedTrafficLightSystem.UpdateTrafficLightsJob job, int unfilteredChunkIndex, DynamicBuffer<SubLane> subLaneBuffer, TrafficLights trafficLights, DynamicBuffer<CustomPhaseData> customPhaseDataBuffer)
+        public static void CalculateFlow(
+            PatchedTrafficLightSystem.UpdateTrafficLightsJob job,
+            int unfilteredChunkIndex,
+            DynamicBuffer<SubLane> subLaneBuffer,
+            TrafficLights trafficLights,
+            DynamicBuffer<CustomPhaseData> customPhaseDataBuffer
+        )
         {
             float4 timeFactors = job.m_ExtraData.m_TimeFactors * 0.125f;
             for (int i = 0; i < customPhaseDataBuffer.Length; i++)
@@ -214,7 +224,11 @@ namespace C2VM.TrafficLightsEnhancement.Systems.TrafficLightSystems.Simulation
             }
         }
 
-        public static void CalculatePriority(PatchedTrafficLightSystem.UpdateTrafficLightsJob job, DynamicBuffer<SubLane> subLaneBuffer, DynamicBuffer<CustomPhaseData> customPhaseDataBuffer)
+        public static void CalculatePriority(
+            PatchedTrafficLightSystem.UpdateTrafficLightsJob job,
+            DynamicBuffer<SubLane> subLaneBuffer,
+            DynamicBuffer<CustomPhaseData> customPhaseDataBuffer
+        )
         {
             for (int i = 0; i < customPhaseDataBuffer.Length; i++)
             {
@@ -265,7 +279,10 @@ namespace C2VM.TrafficLightsEnhancement.Systems.TrafficLightSystems.Simulation
                         customPhaseData.m_CarLaneOccupied++;
                         if (job.m_ExtraTypeHandle.m_ExtraLaneSignal.TryGetComponent(subLaneEntity, out var extraLaneSignal))
                         {
-                            if (extraLaneSignal.m_SourceSubLane != Entity.Null && job.m_ExtraTypeHandle.m_CarLane.TryGetComponent(extraLaneSignal.m_SourceSubLane, out var sourceCarLane))
+                            if (
+                                extraLaneSignal.m_SourceSubLane != Entity.Null
+                                && job.m_ExtraTypeHandle.m_CarLane.TryGetComponent(extraLaneSignal.m_SourceSubLane, out var sourceCarLane)
+                            )
                             {
                                 if ((sourceCarLane.m_Flags & CarLaneFlags.PublicOnly) != 0)
                                 {
@@ -327,7 +344,10 @@ namespace C2VM.TrafficLightsEnhancement.Systems.TrafficLightSystems.Simulation
             for (int i = 0; i < customPhaseDataBuffer.Length; i++)
             {
                 CustomPhaseData phase = customPhaseDataBuffer[i];
-                float weightedWaiting = ((float)phase.TotalLaneOccupied()) * phase.m_LaneOccupiedMultiplier * math.pow((float)phase.m_TurnsSinceLastRun / (float)customPhaseDataBuffer.Length, phase.m_IntervalExponent);
+                float weightedWaiting =
+                    ((float)phase.TotalLaneOccupied())
+                    * phase.m_LaneOccupiedMultiplier
+                    * math.pow((float)phase.m_TurnsSinceLastRun / (float)customPhaseDataBuffer.Length, phase.m_IntervalExponent);
                 if (phase.m_Priority > maxPriority)
                 {
                     nextGroup = (byte)(i + 1);

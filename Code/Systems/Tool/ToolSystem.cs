@@ -1,21 +1,23 @@
+using System.Linq;
 using System.Reflection;
-using C2VM.TrafficLightsEnhancement.Components;
-using C2VM.TrafficLightsEnhancement.Systems.Overlay;
 using Colossal.Entities;
 using Game.Net;
 using Game.Prefabs;
 using Game.Tools;
 using Game.UI.Localization;
 using Game.UI.Tooltip;
+using TrafficLightManager.Code.Components;
+using TrafficLightManager.Code.Systems.Overlay;
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Jobs;
+using static TrafficLightManager.Code.Systems.UI.UISystem;
 
-namespace C2VM.TrafficLightsEnhancement.Systems.Tool;
+namespace TrafficLightManager.Code.Systems.Tool;
 
 public partial class ToolSystem : NetToolSystem
 {
-    public override string toolID => "C2VMTLE Tool";
+    public override string toolID => "TrafficLightManager Tool";
 
     private RenderSystem m_RenderSystem;
 
@@ -35,11 +37,11 @@ public partial class ToolSystem : NetToolSystem
 
     private PropertyInfo m_DisplayOverridePropertyInfo;
 
-    private StringTooltip m_ConfigureTooltip;
+    private StringTooltip m_ChooseGroupTooltip;
 
-    private StringTooltip m_RemoveConfigurationTooltip;
+    private StringTooltip m_AddMemberTooltip;
 
-    private StringTooltip m_RemoveTrafficLightsTooltip;
+    private StringTooltip m_RemoveMemberTooltip;
 
     protected override void OnCreate()
     {
@@ -52,23 +54,23 @@ public partial class ToolSystem : NetToolSystem
         m_DisplayOverridePropertyInfo = typeof(Game.Input.ProxyAction).GetProperty("displayOverride");
         m_ToolSystem.EventToolChanged += ToolChanged;
 
-        m_ConfigureTooltip = new StringTooltip
+        m_ChooseGroupTooltip = new StringTooltip
         {
-            path = "C2VM.TLE.Tooltips.Configure",
+            path = "TrafficLightManager.Code.Tooltips.Configure",
             icon = "Media/Mouse/LMB.svg",
-            value = LocalizedString.Id("C2VM.TLE.Tooltips.Configure"),
+            value = LocalizedString.Id("TrafficLightManager.Code.Tooltips.Configure"),
         };
-        m_RemoveConfigurationTooltip = new StringTooltip
+        m_AddMemberTooltip = new StringTooltip
         {
-            path = "C2VM.TLE.Tooltips.RemoveTLEConfiguration",
-            icon = "Media/Mouse/RMB.svg",
-            value = LocalizedString.Id("C2VM.TLE.Tooltips.RemoveTLEConfiguration"),
+            path = "TrafficLightManager.Code.Tooltips.AddMember",
+            icon = "Media/Mouse/LMB.svg",
+            value = LocalizedString.Id("TrafficLightManager.Code.Tooltips.AddMember"),
         };
-        m_RemoveTrafficLightsTooltip = new StringTooltip
+        m_RemoveMemberTooltip = new StringTooltip
         {
-            path = "C2VM.TLE.Tooltips.RemoveTrafficLights",
+            path = "TrafficLightManager.Code.Tooltips.RemoveMember",
             icon = "Media/Mouse/RMB.svg",
-            value = LocalizedString.Id("C2VM.TLE.Tooltips.RemoveTrafficLights"),
+            value = LocalizedString.Id("TrafficLightManager.Code.Tooltips.RemoveMember"),
         };
     }
 
@@ -87,11 +89,12 @@ public partial class ToolSystem : NetToolSystem
             {
                 if (m_RaycastResult != Entity.Null)
                 {
-                    if (EntityManager.HasComponent<CustomTrafficLights>(m_RaycastResult))
+                    if (IsValidEntity(m_RaycastResult))
                     {
-                        EntityManager.RemoveComponent<CustomTrafficLights>(m_RaycastResult);
-                        EntityManager.AddComponentData(m_RaycastResult, default(Game.Common.Updated));
-                        m_UISystem.RedrawIcon();
+                        if (m_UISystem.GetToolState() == UI.UISystem.ToolState.RemoveTrafficLights)
+                        {
+                            m_UISystem.RemoveTrafficLights(m_RaycastResult);
+                        }
                         UpdateTooltip(m_RaycastResult);
                     }
                 }
@@ -123,7 +126,15 @@ public partial class ToolSystem : NetToolSystem
                 CompositionFlags flags = m_ParentAppliedUpgrade.Value.m_Flags;
                 if (entity != Entity.Null && (flags.m_General & CompositionFlags.General.TrafficLights) != 0 && IsValidEntity(entity))
                 {
-                    m_UISystem.ChangeSelectedEntity(entity);
+                    switch (m_UISystem.GetToolState())
+                    {
+                        case UI.UISystem.ToolState.AddTrafficLights:
+                            m_UISystem.AddTrafficLights(entity);
+                            break;
+                        case UI.UISystem.ToolState.ChooseGroup:
+                            m_UISystem.ChangeSelectedTrafficLightGroupEntity(entity);
+                            break;
+                    }
                 }
             }
             DisableActionTooltips();
@@ -177,17 +188,17 @@ public partial class ToolSystem : NetToolSystem
         m_TooltipSystem.m_TooltipList.Clear();
         if (IsValidEntity(entity))
         {
-            m_TooltipSystem.m_TooltipList.Add(m_ConfigureTooltip);
-        }
-        if (EntityManager.HasComponent<CustomTrafficLights>(entity))
-        {
-            m_TooltipSystem.m_TooltipList.Add(m_RemoveConfigurationTooltip);
-        }
-        else if (EntityManager.TryGetComponent<TrafficLights>(entity, out var trafficLights))
-        {
-            if ((trafficLights.m_Flags & TrafficLightFlags.MoveableBridge) == 0)
+            switch (m_UISystem.GetToolState())
             {
-                m_TooltipSystem.m_TooltipList.Add(m_RemoveTrafficLightsTooltip);
+                case UI.UISystem.ToolState.ChooseGroup:
+                    m_TooltipSystem.m_TooltipList.Add(m_ChooseGroupTooltip);
+                    break;
+                case UI.UISystem.ToolState.AddTrafficLights:
+                    m_TooltipSystem.m_TooltipList.Add(m_AddMemberTooltip);
+                    break;
+                case UI.UISystem.ToolState.RemoveTrafficLights:
+                    m_TooltipSystem.m_TooltipList.Add(m_RemoveMemberTooltip);
+                    break;
             }
         }
     }
@@ -206,14 +217,16 @@ public partial class ToolSystem : NetToolSystem
 
     public bool IsValidEntity(Entity entity)
     {
+        if (new[] { ToolState.Choosed, ToolState.Disabled }.Contains(m_UISystem.GetToolState()))
+        {
+            return false;
+        }
+
         if (entity == Entity.Null)
         {
             return false;
         }
-        if (EntityManager.HasComponent<Roundabout>(entity))
-        {
-            return false;
-        }
+
         if (EntityManager.TryGetComponent<TrafficLights>(entity, out var trafficLights))
         {
             if ((trafficLights.m_Flags & TrafficLightFlags.MoveableBridge) != 0)
@@ -221,6 +234,34 @@ public partial class ToolSystem : NetToolSystem
                 return false;
             }
         }
+        else
+        {
+            return false;
+        }
+
+        if (new[] { ToolState.AddTrafficLights }.Contains(m_UISystem.GetToolState()))
+        {
+            if (EntityManager.HasComponent<CustomTrafficLights>(entity))
+            {
+                return false;
+            }
+        }
+
+        if (new[] { ToolState.RemoveTrafficLights }.Contains(m_UISystem.GetToolState()))
+        {
+            if (EntityManager.TryGetComponent<CustomTrafficLights>(entity, out var customTrafficLights))
+            {
+                if (customTrafficLights.m_TrafficLightGroupEntity != m_UISystem.m_SelectedTrafficLightGroupEntity)
+                {
+                    return false;
+                }
+            }
+            else
+            {
+                return false;
+            }
+        }
+
         return true;
     }
 
@@ -256,9 +297,9 @@ public partial class ToolSystem : NetToolSystem
 
     private void ToolChanged(ToolBaseSystem system)
     {
-        if (system != this && m_UISystem.m_MainPanelState != UI.UISystem.MainPanelState.Hidden)
+        if (system != this)
         {
-            m_UISystem.SetMainPanelState(UI.UISystem.MainPanelState.Hidden);
+            m_UISystem.SetToolState(UI.UISystem.ToolState.Disabled);
         }
     }
 }

@@ -1,7 +1,7 @@
 import { CSSProperties, useContext } from "react";
 import styled from "styled-components";
 
-import { call } from "cs2/api";
+import { bindValue, trigger, useValue } from "cs2/api";
 
 import { LocaleContext } from "@/context";
 import { getString } from "@/localisations";
@@ -11,7 +11,7 @@ import Radio from "@/components/common/radio";
 import Scrollable from "@/components/common/scrollable";
 import Divider from "@/components/main-panel/items/divider";
 
-const Label = styled.div<{dim?: boolean}>`
+const Label = styled.div<{ dim?: boolean }>`
   color: ${props => props.dim ? "var(--textColorDim)" : "var(--textColor)"};
   flex-grow: 1;
   flex-shrink: 1;
@@ -19,7 +19,7 @@ const Label = styled.div<{dim?: boolean}>`
   display: inline;
 `;
 
-const Row = styled.div<{hoverEffect?: boolean}>`
+const Row = styled.div<{ hoverEffect?: boolean }>`
   padding: 0.25em 0.5em;
   width: 100%;
   display: flex;
@@ -35,44 +35,44 @@ const ItemContainerStyle: CSSProperties = {
   flex: 1,
 };
 
-const BackButton = () => {
-  const clickHandler = () => {
-    call("C2VM.TLE", "CallSetActiveCustomPhaseIndex", JSON.stringify({key: "ManualSignalGroup", value: 0}));
-  };
+const BackButton = (props: { onClick: () => void }) => {
   return (
-    <Row hoverEffect={true} onClick={clickHandler}>
+    <Row hoverEffect={true} onClick={props.onClick}>
       <Button label="CustomPhaseEditor.Back" />
     </Row>
   );
 };
 
-function Item(props: {data: MainPanelItemCustomPhase}) {
+function Item(props: { data: CustomPhaseItem, itemIndex: number, manualPhaseIndex: number }) {
   const locale = useContext(LocaleContext);
   const clickHandler = () => {
-    call("C2VM.TLE", "CallSetActiveCustomPhaseIndex", JSON.stringify({key: "ManualSignalGroup", value: props.data.index + 1}));
+    trigger("TrafficLightManager", "SetManualPhaseIndex", props.itemIndex);
   };
   return (
     <Row onClick={clickHandler}>
-      <Radio isChecked={props.data.manualSignalGroup == props.data.index + 1} />
+      <Radio isChecked={props.manualPhaseIndex == props.itemIndex} />
       <Label dim={true}>
-        {getString(locale, "Phase") + " #" + (props.data.index + 1)}
+        {getString(locale, "Phase") + " #" + (props.itemIndex + 1)}
       </Label>
     </Row>
   );
 }
 
-export default function ManualControlPanel(props: {items: MainPanelItem[]}) {
+export default function ManualControlPanel(props: { items: CustomPhaseItem[], onBack: () => void }) {
+  const manualPhaseIndex: number = useValue(bindValue("TrafficLightManager", "GetManualPhaseIndex"));
+  console.log("ManualControlPanel render", { manualPhaseIndex });
+
   const locale = useContext(LocaleContext);
   return (
     <>
-      <Scrollable style={{flex: 1}} contentStyle={ItemContainerStyle}>
+      <Scrollable style={{ flex: 1 }} contentStyle={ItemContainerStyle}>
         <Row>
           <Label dim={false}>{getString(locale, "CustomPhaseEditor.ManualControl")}</Label>
         </Row>
-        {props.items.map(item => item.itemType == "customPhase" && <Item data={item} />)}
+        {props.items.map((item, index) => <Item data={item} itemIndex={index} manualPhaseIndex={manualPhaseIndex} />)}
       </Scrollable>
       <Divider />
-      <BackButton />
+      <BackButton onClick={props.onBack} />
     </>
   );
 }

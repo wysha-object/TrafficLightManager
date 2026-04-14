@@ -2,9 +2,10 @@ export const enum EdgeGroupMaskOptions {
   PerLaneSignal = 1 << 0,
 }
 
-export const enum MainPanelState {
-  Hidden = 0,
-  Empty = 1,
-  Main = 2,
-  CustomPhase = 3,
+export const enum ToolState {
+  Disabled = 0,
+  ChooseGroup = 1,
+  Choosed = 2,
+  AddTrafficLights = 3,
+  RemoveTrafficLights = 4,
 }

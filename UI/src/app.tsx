@@ -1,6 +1,5 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
-import engine from "cohtml/cohtml";
 import { bindValue, useValue } from "cs2/api";
 
 import { CityConfigurationContext, defaultCityConfiguration, LocaleContext } from "./context";
@@ -20,16 +19,6 @@ export default function App() {
 
   const cityConfigurationJson = useValue(bindValue("C2VM.TLE", "GetCityConfiguration", JSON.stringify(defaultCityConfiguration)));
   const cityConfiguration = JSON.parse(cityConfigurationJson);
-
-  useEffect(() => {
-    const keyDownHandler = (event: KeyboardEvent) => {
-      if (event.ctrlKey && event.key == "S") {
-        engine.call("C2VM.TLE.CallKeyPress", JSON.stringify({ctrlKey: event.ctrlKey, key: event.key}));
-      }
-    };
-    document.addEventListener("keydown", keyDownHandler);
-    return () => document.removeEventListener("keydown", keyDownHandler);
-  }, []);
 
   return (
     <CityConfigurationContext.Provider value={cityConfiguration}>

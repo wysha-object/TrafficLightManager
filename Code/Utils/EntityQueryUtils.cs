@@ -2,7 +2,7 @@ using System.Reflection;
 using Unity.Collections;
 using Unity.Entities;
 
-namespace C2VM.TrafficLightsEnhancement.Utils
+namespace TrafficLightManager.Code.Utils
 {
     public class EntityQueryUtils
     {

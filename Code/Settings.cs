@@ -7,9 +7,9 @@ using Game.Settings;
 using Game.UI.Widgets;
 using Unity.Entities;
 
-namespace C2VM.TrafficLightsEnhancement;
+namespace TrafficLightManager.Code;
 
-[FileLocation("ModsSettings/C2VM.TrafficLightsEnhancement/Settings")]
+[FileLocation("ModsSettings/TrafficLightManager.Code/Settings")]
 [SettingsUITabOrder(kTabGeneral, kTabKeyBindings)]
 [SettingsUIGroupOrder(kGroupGeneral, kGroupDefault, kGroupVersion, kGroupMainPanel, kGroupKeyBindingReset)]
 [SettingsUIShowGroupName]
@@ -53,10 +53,7 @@ public class Settings : ModSetting
     [SettingsUIDropdown(typeof(Settings), "GetLanguageValues")]
     public string m_LocaleOption
     {
-        get
-        {
-            return m_Locale;
-        }
+        get { return m_Locale; }
         set
         {
             m_Locale = value;
@@ -70,10 +67,7 @@ public class Settings : ModSetting
     [SettingsUISection(kTabGeneral, kGroupGeneral)]
     public bool m_CompatibilityModeOption
     {
-        get
-        {
-            return m_CompatibilityMode;
-        }
+        get { return m_CompatibilityMode; }
         set
         {
             m_CompatibilityMode = value;
@@ -116,10 +110,7 @@ public class Settings : ModSetting
     [SettingsUIHideByCondition(typeof(Settings), "IsCompatibilityMode")]
     public bool m_ForceNodeUpdate
     {
-        get
-        {
-            return false;
-        }
+        get { return false; }
         set
         {
             EntityQuery entityQuery = Mod.m_World.EntityManager.CreateEntityQuery(ComponentType.ReadOnly<Game.Net.TrafficLights>());
@@ -133,16 +124,13 @@ public class Settings : ModSetting
     [SettingsUIHideByCondition(typeof(Settings), "IsNotCanary")]
     public bool m_SuppressCanaryWarning
     {
-        get
-        {
-            return false;
-        }
+        get { return false; }
         set
         {
             if (value == true)
             {
                 m_SuppressCanaryWarningVersion = Mod.m_InformationalVersion;
-                Systems.UI.UISystem.m_MainPanelBinding?.Update();
+                //Systems.UI.UISystem.m_MainPanelBinding?.Update();
             }
         }
     }
@@ -158,13 +146,11 @@ public class Settings : ModSetting
     [SettingsUIConfirmation(null, null)]
     public bool m_ResetBindings
     {
-        set
-        {
-            ResetKeyBindings();
-        }
+        set { ResetKeyBindings(); }
     }
 
-    public Settings(IMod mod) : base(mod)
+    public Settings(IMod mod)
+        : base(mod)
     {
         SetDefaults();
         RegisterInOptionsUI();
@@ -188,87 +174,24 @@ public class Settings : ModSetting
 
     public static DropdownItem<string>[] GetLanguageValues()
     {
-        DropdownItem<string>[] list = [
-            new DropdownItem<string>
-            {
-                value = "auto",
-                displayName = "Auto"
-            },
-            new DropdownItem<string>
-            {
-                value = "de-DE",
-                displayName = "German"
-            },
-            new DropdownItem<string>
-            {
-                value = "en-US",
-                displayName = "English"
-            },
-            new DropdownItem<string>
-            {
-                value = "es-ES",
-                displayName = "Spanish"
-            },
-            new DropdownItem<string>
-            {
-                value = "fr-FR",
-                displayName = "French"
-            },
-            new DropdownItem<string>
-            {
-                value = "it-IT",
-                displayName = "Italian"
-            },
-            new DropdownItem<string>
-            {
-                value = "ja-JP",
-                displayName = "Japanese"
-            },
-            new DropdownItem<string>
-            {
-                value = "ko-KR",
-                displayName = "Korean"
-            },
-            new DropdownItem<string>
-            {
-                value = "nl-NL",
-                displayName = "Dutch"
-            },
-            new DropdownItem<string>
-            {
-                value = "pl-PL",
-                displayName = "Polish"
-            },
-            new DropdownItem<string>
-            {
-                value = "pt-BR",
-                displayName = "Portuguese (Brazil)"
-            },
-            new DropdownItem<string>
-            {
-                value = "ru-RU",
-                displayName = "Russian"
-            },
-            new DropdownItem<string>
-            {
-                value = "zh-HANS",
-                displayName = "Chinese (Simplified)"
-            },
-            new DropdownItem<string>
-            {
-                value = "zh-HANT",
-                displayName = "Chinese (Traditional)"
-            },
-            new DropdownItem<string>
-            {
-                value = "zh-HK",
-                displayName = "Chinese (Hong Kong)"
-            },
-            new DropdownItem<string>
-            {
-                value = "zh-TW",
-                displayName = "Chinese (Taiwan)"
-            }
+        DropdownItem<string>[] list =
+        [
+            new DropdownItem<string> { value = "auto", displayName = "Auto" },
+            new DropdownItem<string> { value = "de-DE", displayName = "German" },
+            new DropdownItem<string> { value = "en-US", displayName = "English" },
+            new DropdownItem<string> { value = "es-ES", displayName = "Spanish" },
+            new DropdownItem<string> { value = "fr-FR", displayName = "French" },
+            new DropdownItem<string> { value = "it-IT", displayName = "Italian" },
+            new DropdownItem<string> { value = "ja-JP", displayName = "Japanese" },
+            new DropdownItem<string> { value = "ko-KR", displayName = "Korean" },
+            new DropdownItem<string> { value = "nl-NL", displayName = "Dutch" },
+            new DropdownItem<string> { value = "pl-PL", displayName = "Polish" },
+            new DropdownItem<string> { value = "pt-BR", displayName = "Portuguese (Brazil)" },
+            new DropdownItem<string> { value = "ru-RU", displayName = "Russian" },
+            new DropdownItem<string> { value = "zh-HANS", displayName = "Chinese (Simplified)" },
+            new DropdownItem<string> { value = "zh-HANT", displayName = "Chinese (Traditional)" },
+            new DropdownItem<string> { value = "zh-HK", displayName = "Chinese (Hong Kong)" },
+            new DropdownItem<string> { value = "zh-TW", displayName = "Chinese (Taiwan)" },
         ];
         return list;
     }

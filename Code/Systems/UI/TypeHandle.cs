@@ -1,10 +1,10 @@
 using System.Runtime.CompilerServices;
-using C2VM.TrafficLightsEnhancement.Components;
+using TrafficLightManager.Code.Components;
 using Game.Net;
 using Unity.Collections;
 using Unity.Entities;
 
-namespace C2VM.TrafficLightsEnhancement.Systems.UI;
+namespace TrafficLightManager.Code.Systems.UI;
 
 public struct TypeHandle
 {

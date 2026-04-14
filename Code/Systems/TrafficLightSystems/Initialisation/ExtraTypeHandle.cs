@@ -1,10 +1,10 @@
 using System.Runtime.CompilerServices;
-using C2VM.TrafficLightsEnhancement.Components;
 using Game.Net;
+using TrafficLightManager.Code.Components;
 using Unity.Collections;
 using Unity.Entities;
 
-namespace C2VM.TrafficLightsEnhancement.Systems.TrafficLightSystems.Initialisation;
+namespace TrafficLightManager.Code.Systems.TrafficLightSystems.Initialisation;
 
 public struct ExtraTypeHandle
 {

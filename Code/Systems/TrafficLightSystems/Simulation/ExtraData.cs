@@ -1,6 +1,6 @@
 using Unity.Mathematics;
 
-namespace C2VM.TrafficLightsEnhancement.Systems.TrafficLightSystems.Simulation
+namespace TrafficLightManager.Code.Systems.TrafficLightSystems.Simulation
 {
     public struct ExtraData
     {

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Reflection;
 using Newtonsoft.Json;
 
-namespace C2VM.TrafficLightsEnhancement.Utils;
+namespace TrafficLightManager.Code.Utils;
 
 public class LocalisationUtils
 {
@@ -26,15 +26,11 @@ public class LocalisationUtils
         "zh-HANS",
         "zh-HANT",
         "zh-HK",
-        "zh-TW"
+        "zh-TW",
     ];
 
-    public static readonly Dictionary<string, string[]> m_SupportedCultures = new()
-    {
-        { "en-US", ["nl-NL"] },
-        { "zh-HANT", ["zh-HK", "zh-TW"] }
-    };
-    
+    public static readonly Dictionary<string, string[]> m_SupportedCultures = new() { { "en-US", ["nl-NL"] }, { "zh-HANT", ["zh-HK", "zh-TW"] } };
+
     public string m_Locale { get; private set; }
 
     private Dictionary<string, string> m_Dictionary = new Dictionary<string, string>();
@@ -67,7 +63,8 @@ public class LocalisationUtils
 
     public static string GetAutoLocale(string locale, string culture)
     {
-        if (m_SupportedCultures.ContainsKey(locale) && m_SupportedCultures[locale].Contains(culture)) {
+        if (m_SupportedCultures.ContainsKey(locale) && m_SupportedCultures[locale].Contains(culture))
+        {
             return culture;
         }
         if (m_SupportedLocales.Contains(locale))
@@ -142,8 +139,8 @@ public class LocalisationUtils
         dictionary.Add(Mod.m_Settings.GetOptionWarningLocaleID("m_ForceNodeUpdate"), this.GetString("ForceAllNodesUpdateWarning"));
         dictionary.Add(Mod.m_Settings.GetOptionWarningLocaleID("m_SuppressCanaryWarning"), this.GetString("SuppressCanaryWarningDesc"));
         dictionary.Add(Mod.m_Settings.GetOptionWarningLocaleID("m_ResetBindings"), this.GetString("ResetBindingsDesc"));
-        dictionary.Add("C2VM.TLE.Tooltips.Configure", this.GetString("TooltipConfigure"));
-        dictionary.Add("C2VM.TLE.Tooltips.RemoveTLEConfiguration", this.GetString("TooltipRemoveTLEConfiguration"));
-        dictionary.Add("C2VM.TLE.Tooltips.RemoveTrafficLights", this.GetString("TooltipRemoveTrafficLights"));
+        dictionary.Add("TrafficLightManager.Code.Tooltips.Configure", this.GetString("TooltipConfigure"));
+        dictionary.Add("TrafficLightManager.Code.Tooltips.AddMember", this.GetString("AddMember"));
+        dictionary.Add("TrafficLightManager.Code.Tooltips.RemoveMember", this.GetString("RemoveMember"));
     }
 }

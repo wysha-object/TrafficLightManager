@@ -2,7 +2,7 @@ using Colossal.Serialization.Entities;
 using Unity.Entities;
 using Unity.Mathematics;
 
-namespace C2VM.TrafficLightsEnhancement.Components;
+namespace TrafficLightManager.Code.Components;
 
 public struct CustomPhaseData : IBufferElementData, ISerializable
 {
@@ -57,7 +57,8 @@ public struct CustomPhaseData : IBufferElementData, ISerializable
 
     public float m_IntervalExponent;
 
-    public void Serialize<TWriter>(TWriter writer) where TWriter : IWriter
+    public void Serialize<TWriter>(TWriter writer)
+        where TWriter : IWriter
     {
         writer.Write(m_SchemaVersion);
         writer.Write(m_TurnsSinceLastRun);
@@ -79,7 +80,8 @@ public struct CustomPhaseData : IBufferElementData, ISerializable
         writer.Write(m_IntervalExponent);
     }
 
-    public void Deserialize<TReader>(TReader reader) where TReader : IReader
+    public void Deserialize<TReader>(TReader reader)
+        where TReader : IReader
     {
         Initialisation();
         reader.Read(out m_SchemaVersion);

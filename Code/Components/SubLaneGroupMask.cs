@@ -2,9 +2,9 @@ using Colossal.Serialization.Entities;
 using Colossal.UI.Binding;
 using Unity.Entities;
 using Unity.Mathematics;
-using static C2VM.TrafficLightsEnhancement.Systems.UI.UITypes;
+using static TrafficLightManager.Code.Systems.UI.UITypes;
 
-namespace C2VM.TrafficLightsEnhancement.Components;
+namespace TrafficLightManager.Code.Components;
 
 public struct SubLaneGroupMask : IBufferElementData, ISerializable, IJsonWritable
 {

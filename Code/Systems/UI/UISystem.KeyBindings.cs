@@ -2,7 +2,7 @@ using Game.Input;
 using Game.UI;
 using UnityEngine.InputSystem;
 
-namespace C2VM.TrafficLightsEnhancement.Systems.UI;
+namespace TrafficLightManager.Code.Systems.UI;
 
 public partial class UISystem : UISystemBase
 {
@@ -17,20 +17,20 @@ public partial class UISystem : UISystemBase
         }
         m_MainPanelToggleKeyboardBinding = Mod.m_Settings.GetAction(Settings.kKeyboardBindingMainPanelToggle);
         m_MainPanelToggleKeyboardBinding.shouldBeEnabled = true;
-        m_MainPanelToggleKeyboardBinding.onInteraction += MainPanelToggle;
+        m_MainPanelToggleKeyboardBinding.onInteraction += ToggleToolState;
     }
 
-    private void MainPanelToggle(ProxyAction action, InputActionPhase phase)
+    private void ToggleToolState(ProxyAction action, InputActionPhase phase)
     {
         if (Enabled && phase == InputActionPhase.Performed)
         {
-            if (m_MainPanelState == MainPanelState.Hidden)
+            if ((ToolState)m_ToolStateBinding.value != ToolState.Disabled)
             {
-                SetMainPanelState(MainPanelState.Empty);
+                SetToolState(ToolState.Disabled);
             }
             else
             {
-                SetMainPanelState(MainPanelState.Hidden);
+                SetToolState(ToolState.ChooseGroup);
             }
         }
     }

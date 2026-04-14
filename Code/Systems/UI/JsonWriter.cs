@@ -1,10 +1,10 @@
 using System.Collections.Generic;
-using C2VM.TrafficLightsEnhancement.Utils;
+using TrafficLightManager.Code.Utils;
 using Colossal.UI.Binding;
 using Unity.Collections;
 using Unity.Entities;
 
-namespace C2VM.TrafficLightsEnhancement.Systems.UI.JsonWriter
+namespace TrafficLightManager.Code.Systems.UI.JsonWriter
 {
     public class EdgeInfoWriter : IWriter<Dictionary<Entity, NativeArray<NodeUtils.EdgeInfo>>>
     {

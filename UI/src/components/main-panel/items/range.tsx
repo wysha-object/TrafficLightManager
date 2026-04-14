@@ -22,7 +22,7 @@ const Gap = styled.div`
   height: 6rem;
 `;
 
-const IconContainer = styled.div<{disabled?: boolean}>`
+const IconContainer = styled.div<{ disabled?: boolean }>`
   margin-left: 0.25em;
   border-radius: 0.2em;
   &:hover {
@@ -44,7 +44,7 @@ const IconStyle = {
   fontSize: "1em"
 };
 
-export default function MainPanelRange(props: {data: MainPanelItemRange}) {
+export default function MainPanelRange(props: { data: MainPanelItemRange, index: number }) {
   const locale = useContext(LocaleContext);
   const [value, setValue] = useState(0);
   const [textFieldActive, setTextFieldActive] = useState(false);
@@ -54,7 +54,7 @@ export default function MainPanelRange(props: {data: MainPanelItemRange}) {
   }, [props.data.textFieldRegExp]);
   const changeHandler = (value: number) => {
     if ("engineEventName" in props.data) {
-      engineCall(props.data.engineEventName, JSON.stringify({key: props.data.key, value}));
+      engineCall(props.data.engineEventName, JSON.stringify({ key: props.data.key, value, index: props.index }));
     }
   };
   const updateHandler = (value: number) => {
@@ -98,7 +98,7 @@ export default function MainPanelRange(props: {data: MainPanelItemRange}) {
     <Container>
       <TitleContainer>
         <TitleDim itemType="title" title={props.data.label} secondaryText={!textFieldActive ? getString(locale, props.data.valuePrefix) + `${Math.round(value * 100) / 100}` + getString(locale, props.data.valueSuffix) : ""} />
-        {textFieldActive && <Input type="number" style={{minWidth: "3em", width: "3em"}} onChange={textFieldChangeHandler} onKeyDown={textFieldKeyDownHandler} value={textFieldValue} autoFocus />}
+        {textFieldActive && <Input type="number" style={{ minWidth: "3em", width: "3em" }} onChange={textFieldChangeHandler} onKeyDown={textFieldKeyDownHandler} value={textFieldValue} autoFocus />}
         {props.data.enableTextField && <>
           {textFieldActive && <IconContainer><Check style={IconStyle} onClick={submitTextField} /></IconContainer>}
           {!textFieldActive && <IconContainer><Edit style={IconStyle} onClick={enableTextField} /></IconContainer>}

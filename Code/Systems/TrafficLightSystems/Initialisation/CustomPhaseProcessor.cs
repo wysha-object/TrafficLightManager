@@ -1,18 +1,36 @@
-using C2VM.TrafficLightsEnhancement.Components;
-using C2VM.TrafficLightsEnhancement.Utils;
 using Game.Net;
+using TrafficLightManager.Code.Components;
+using TrafficLightManager.Code.Utils;
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
-using static C2VM.TrafficLightsEnhancement.Systems.TrafficLightSystems.Initialisation.PatchedTrafficLightInitializationSystem;
+using static TrafficLightManager.Code.Systems.TrafficLightSystems.Initialisation.PatchedTrafficLightInitializationSystem;
 
-namespace C2VM.TrafficLightsEnhancement.Systems.TrafficLightSystems.Initialisation;
+namespace TrafficLightManager.Code.Systems.TrafficLightSystems.Initialisation;
 
 public struct CustomPhaseProcessor
 {
-    public static void ProcessLanes(ref InitializeTrafficLightsJob job, int unfilteredChunkIndex, Entity nodeEntity, DynamicBuffer<ConnectedEdge> connectedEdges, DynamicBuffer<SubLane> subLanes, out int groupCount, ref TrafficLights trafficLights, ref CustomTrafficLights customTrafficLights, DynamicBuffer<EdgeGroupMask> edgeGroupMasks, DynamicBuffer<SubLaneGroupMask> subLaneGroupMasks, DynamicBuffer<CustomPhaseData> customPhaseDatas)
+    public static void ProcessLanes(
+        ref InitializeTrafficLightsJob job,
+        int unfilteredChunkIndex,
+        Entity nodeEntity,
+        DynamicBuffer<ConnectedEdge> connectedEdges,
+        DynamicBuffer<SubLane> subLanes,
+        out int groupCount,
+        ref TrafficLights trafficLights,
+        ref CustomTrafficLights customTrafficLights,
+        DynamicBuffer<EdgeGroupMask> edgeGroupMasks,
+        DynamicBuffer<SubLaneGroupMask> subLaneGroupMasks,
+        DynamicBuffer<CustomPhaseData> customPhaseDatas
+    )
     {
-        NativeHashMap<Entity, NodeUtils.LaneConnection> laneConnectionMap = NodeUtils.GetLaneConnectionMap(Allocator.Temp, subLanes, connectedEdges, job.m_ExtraTypeHandle.m_SubLane, job.m_ExtraTypeHandle.m_Lane);
+        NativeHashMap<Entity, NodeUtils.LaneConnection> laneConnectionMap = NodeUtils.GetLaneConnectionMap(
+            Allocator.Temp,
+            subLanes,
+            connectedEdges,
+            job.m_ExtraTypeHandle.m_SubLane,
+            job.m_ExtraTypeHandle.m_Lane
+        );
         groupCount = customPhaseDatas.Length;
 
         for (int i = 0; i < subLanes.Length; i++)

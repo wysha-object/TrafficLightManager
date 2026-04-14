@@ -6,17 +6,19 @@ using Game.SceneFlow;
 using Unity.Collections;
 using Unity.Entities;
 
-namespace C2VM.TrafficLightsEnhancement;
+namespace TrafficLightManager.Code;
 
 public class Mod : IMod
 {
     public static readonly string m_Id = typeof(Mod).Assembly.GetName().Name;
 
-    public static readonly string m_InformationalVersion = ((AssemblyInformationalVersionAttribute)System.Attribute.GetCustomAttribute(Assembly.GetAssembly(typeof(Mod)), typeof(AssemblyInformationalVersionAttribute))).InformationalVersion;
+    public static readonly string m_InformationalVersion = (
+        (AssemblyInformationalVersionAttribute)System.Attribute.GetCustomAttribute(Assembly.GetAssembly(typeof(Mod)), typeof(AssemblyInformationalVersionAttribute))
+    ).InformationalVersion;
 
     public static readonly ILog m_Log = LogManager.GetLogger($"{m_Id}.{nameof(Mod)}").SetShowsErrorsInUI(false);
 
-    public static C2VM.TrafficLightsEnhancement.Settings m_Settings;
+    public static TrafficLightManager.Code.Settings m_Settings;
 
     public static World m_World;
 
@@ -24,15 +26,19 @@ public class Mod : IMod
 
     private static Game.Simulation.TrafficLightSystem m_TrafficLightSystem;
 
-    private static C2VM.TrafficLightsEnhancement.Systems.TrafficLightSystems.Initialisation.PatchedTrafficLightInitializationSystem m_PatchedTrafficLightInitializationSystem;
+    private static TrafficLightManager.Code.Systems.TrafficLightSystems.Initialisation.PatchedTrafficLightInitializationSystem m_PatchedTrafficLightInitializationSystem;
 
-    private static C2VM.TrafficLightsEnhancement.Systems.TrafficLightSystems.Simulation.PatchedTrafficLightSystem m_PatchedTrafficLightSystem;
+    private static TrafficLightManager.Code.Systems.TrafficLightSystems.Simulation.PatchedTrafficLightSystem m_PatchedTrafficLightSystem;
+
+    private static Systems.TrafficLightSystems.Simulation.TrafficLightGroupSystem m_TrafficLightGroupSystem;
 
     public void OnLoad(UpdateSystem updateSystem)
     {
         m_Log.Info($"Loading {m_Id} v{m_InformationalVersion}");
 
-        var outdatedType = System.Type.GetType("C2VM.TrafficLightsEnhancement.Plugin, C2VM.TrafficLightsEnhancement") ?? System.Type.GetType("C2VM.CommonLibraries.LaneSystem.Plugin, C2VM.CommonLibraries.LaneSystem");
+        var outdatedType =
+            System.Type.GetType("TrafficLightManager.Code.Plugin, TrafficLightManager.Code")
+            ?? System.Type.GetType("C2VM.CommonLibraries.LaneSystem.Plugin, C2VM.CommonLibraries.LaneSystem");
         if (outdatedType != null)
         {
             throw new System.Exception($"An outdated version of Traffic Lights Enhancement has been detected at {outdatedType.Assembly.Location}");
@@ -47,9 +53,10 @@ public class Mod : IMod
 
         m_TrafficLightInitializationSystem = m_World.GetOrCreateSystemManaged<Game.Net.TrafficLightInitializationSystem>();
         m_TrafficLightSystem = m_World.GetOrCreateSystemManaged<Game.Simulation.TrafficLightSystem>();
-        m_PatchedTrafficLightInitializationSystem = m_World.GetOrCreateSystemManaged<C2VM.TrafficLightsEnhancement.Systems.TrafficLightSystems.Initialisation.PatchedTrafficLightInitializationSystem>();
-        m_PatchedTrafficLightSystem = m_World.GetOrCreateSystemManaged<C2VM.TrafficLightsEnhancement.Systems.TrafficLightSystems.Simulation.PatchedTrafficLightSystem>();
-
+        m_PatchedTrafficLightInitializationSystem =
+            m_World.GetOrCreateSystemManaged<TrafficLightManager.Code.Systems.TrafficLightSystems.Initialisation.PatchedTrafficLightInitializationSystem>();
+        m_PatchedTrafficLightSystem = m_World.GetOrCreateSystemManaged<TrafficLightManager.Code.Systems.TrafficLightSystems.Simulation.PatchedTrafficLightSystem>();
+        m_TrafficLightGroupSystem = m_World.GetOrCreateSystemManaged<TrafficLightManager.Code.Systems.TrafficLightSystems.Simulation.TrafficLightGroupSystem>();
         m_Settings = new Settings(this);
 
         SystemSetup(updateSystem);
@@ -73,13 +80,22 @@ public class Mod : IMod
         Utils.EntityQueryUtils.UpdateEntityQuery(m_TrafficLightInitializationSystem, "m_TrafficLightsQuery", noneList);
         Utils.EntityQueryUtils.UpdateEntityQuery(m_TrafficLightSystem, "m_TrafficLightQuery", noneList);
 
-        updateSystem.UpdateBefore<C2VM.TrafficLightsEnhancement.Systems.TrafficLightSystems.Initialisation.PatchedTrafficLightInitializationSystem, Game.Net.TrafficLightInitializationSystem>(SystemUpdatePhase.Modification4B);
-        updateSystem.UpdateBefore<C2VM.TrafficLightsEnhancement.Systems.TrafficLightSystems.Simulation.PatchedTrafficLightSystem, Game.Simulation.TrafficLightSystem>(SystemUpdatePhase.GameSimulation);
-        updateSystem.UpdateAt<C2VM.TrafficLightsEnhancement.Systems.UI.TooltipSystem>(SystemUpdatePhase.UITooltip);
-        updateSystem.UpdateAt<C2VM.TrafficLightsEnhancement.Systems.UI.UISystem>(SystemUpdatePhase.UIUpdate);
-        updateSystem.UpdateAt<C2VM.TrafficLightsEnhancement.Systems.Tool.ToolSystem>(SystemUpdatePhase.ToolUpdate);
-        updateSystem.UpdateAt<C2VM.TrafficLightsEnhancement.Systems.Update.ModificationUpdateSystem>(SystemUpdatePhase.ModificationEnd);
-        updateSystem.UpdateAfter<C2VM.TrafficLightsEnhancement.Systems.Update.SimulationUpdateSystem>(SystemUpdatePhase.GameSimulation);
+        updateSystem.UpdateBefore<
+            TrafficLightManager.Code.Systems.TrafficLightSystems.Initialisation.PatchedTrafficLightInitializationSystem,
+            Game.Net.TrafficLightInitializationSystem
+        >(SystemUpdatePhase.Modification4B);
+        updateSystem.UpdateBefore<TrafficLightManager.Code.Systems.TrafficLightSystems.Simulation.PatchedTrafficLightSystem, Game.Simulation.TrafficLightSystem>(
+            SystemUpdatePhase.GameSimulation
+        );
+        updateSystem.UpdateAfter<
+            TrafficLightManager.Code.Systems.TrafficLightSystems.Simulation.TrafficLightGroupSystem,
+            TrafficLightManager.Code.Systems.TrafficLightSystems.Simulation.PatchedTrafficLightSystem
+        >(SystemUpdatePhase.GameSimulation);
+        updateSystem.UpdateAt<TrafficLightManager.Code.Systems.UI.TooltipSystem>(SystemUpdatePhase.UITooltip);
+        updateSystem.UpdateAt<TrafficLightManager.Code.Systems.UI.UISystem>(SystemUpdatePhase.UIUpdate);
+        updateSystem.UpdateAt<TrafficLightManager.Code.Systems.Tool.ToolSystem>(SystemUpdatePhase.ToolUpdate);
+        updateSystem.UpdateAt<TrafficLightManager.Code.Systems.Update.ModificationUpdateSystem>(SystemUpdatePhase.ModificationEnd);
+        updateSystem.UpdateAfter<TrafficLightManager.Code.Systems.Update.SimulationUpdateSystem>(SystemUpdatePhase.GameSimulation);
 
         SetCompatibilityMode(m_Settings != null && m_Settings.m_CompatibilityMode);
     }
@@ -97,14 +113,19 @@ public class Mod : IMod
 
     public static bool IsCanary()
     {
-        #if SHOW_CANARY_BUILD_WARNING
+#if SHOW_CANARY_BUILD_WARNING
         return true;
-        #else
+#else
         return false;
-        #endif
+#endif
     }
 
-    public static void Assert(bool condition, string message = "", bool showInUI = false, [System.Runtime.CompilerServices.CallerArgumentExpression(nameof(condition))] string expression = "")
+    public static void Assert(
+        bool condition,
+        string message = "",
+        bool showInUI = false,
+        [System.Runtime.CompilerServices.CallerArgumentExpression(nameof(condition))] string expression = ""
+    )
     {
         if (condition == true)
         {

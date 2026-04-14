@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using Game.UI.Tooltip;
 
-namespace C2VM.TrafficLightsEnhancement.Systems.UI
+namespace TrafficLightManager.Code.Systems.UI
 {
     public partial class TooltipSystem : TooltipSystemBase
     {

@@ -1,14 +1,4 @@
-interface MainPanel {
-  title: string,
-  image: string,
-  position: ScreenPoint,
-  showPanel: boolean,
-  showFloatingButton: boolean,
-  state: number,
-  items: MainPanelItem[]
-}
-
-type MainPanelItem = MainPanelItemTitle | MainPanelItemMessage | MainPanelItemDivider | MainPanelItemRadio | MainPanelItemCheckbox | MainPanelItemButton | MainPanelItemNotification | MainPanelItemRange | MainPanelItemCustomPhase;
+type MainPanelItem = MainPanelItemTitle | MainPanelItemMessage | MainPanelItemDivider | MainPanelItemRadio | MainPanelItemCheckbox | MainPanelItemButton | MainPanelItemNotification | MainPanelItemRange | CustomPhaseItem;
 
 interface MainPanelItemTitle {
   itemType: "title",
@@ -17,7 +7,6 @@ interface MainPanelItemTitle {
 }
 
 interface MainPanelItemMessage {
-  itemType: "message",
   message: string
 }
 
@@ -80,15 +69,7 @@ interface MainPanelItemRange {
   engineEventName: string
 }
 
-interface MainPanelItemCustomPhase {
-  itemType: "customPhase",
-  activeIndex: number,
-  activeViewingIndex: number,
-  currentSignalGroup: number,
-  manualSignalGroup: number,
-  index: number,
-  length: number,
-  timer: number,
+interface CustomPhaseItem {
   turnsSinceLastRun: number,
   lowFlowTimer: number,
   carFlow: number,

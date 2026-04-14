@@ -8,8 +8,8 @@ import EdgePanel from "./edge-panel";
 import SubLanePanel from "./sublane-panel";
 
 export default function CustomPhaseTool() {
-  const activeEditingCustomPhaseIndex = useValue(bindValue("C2VM.TLE", "GetActiveEditingCustomPhaseIndex", -1));
-  const edgeInfoList = useValue(bindValue<EdgeInfo[]>("C2VM.TLE", "GetEdgeInfo", []));
+  const editingPhaseIndex: number = useValue(bindValue("TrafficLightManager", "GetEditingPhaseIndex"));
+  const edgeInfoList: EdgeInfo[] = useValue(bindValue("C2VM.TLE", "GetEdgeInfo"));
 
   useEffect(() => {
     const edgePositionArray = JSON.stringify(edgeInfoList.filter(edge => (edge.m_EdgeGroupMask.m_Options & EdgeGroupMaskOptions.PerLaneSignal) == 0).map(item => item.m_Position));
@@ -26,8 +26,38 @@ export default function CustomPhaseTool() {
 
   return (
     <>
-      {activeEditingCustomPhaseIndex >= 0 && edgeInfoList.filter(edge => (edge.m_EdgeGroupMask.m_Options & EdgeGroupMaskOptions.PerLaneSignal) == 0).map(edge => <EdgePanel data={edge} index={activeEditingCustomPhaseIndex} position={screenPointMap[edge.m_Position.key]} />)}
-      {activeEditingCustomPhaseIndex >= 0 && edgeInfoList.filter(edge => (edge.m_EdgeGroupMask.m_Options & EdgeGroupMaskOptions.PerLaneSignal) != 0).map(edge => edge.m_SubLaneInfoList.map(subLane => <SubLanePanel edge={edge} subLane={subLane} index={activeEditingCustomPhaseIndex} position={screenPointMap[subLane.m_Position.key]} />).flat())}
+      {
+        editingPhaseIndex >= 0 &&
+        edgeInfoList.filter(
+          edge => (
+            edge.m_EdgeGroupMask.m_Options &
+            EdgeGroupMaskOptions.PerLaneSignal
+          ) == 0
+        ).map(
+          edge => <EdgePanel
+            data={edge}
+            index={editingPhaseIndex}
+            position={screenPointMap[edge.m_Position.key]}
+          />
+        )
+      }
+      {
+        editingPhaseIndex >= 0 &&
+        edgeInfoList.filter(
+          edge => (
+            edge.m_EdgeGroupMask.m_Options &
+            EdgeGroupMaskOptions.PerLaneSignal) != 0
+        ).map(
+          edge => edge.m_SubLaneInfoList.map(
+            subLane => <SubLanePanel
+              edge={edge}
+              subLane={subLane}
+              index={editingPhaseIndex}
+              position={screenPointMap[subLane.m_Position.key]}
+            />
+          ).flat()
+        )
+      }
     </>
   );
 }

@@ -2,49 +2,18 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import styled from 'styled-components';
 
 import engine from 'cohtml/cohtml';
-import { bindValue, useValue } from 'cs2/api';
-
-import { MainPanelState } from '@/constants';
+import { bindValue, trigger, useValue } from 'cs2/api';
 
 import Header from './header';
-import Content from './content';
 
 import FloatingButton from '@/components/common/floating-button';
 import CustomPhaseMainPanel from '@/components/custom-phase-tool/main-panel';
 import { useTranslate } from '@/localisations';
+import { ToolState } from '@/constants';
+import Row from './items/row';
+import Message from './items/message';
 
-const defaultPanel = {
-  title: "TrafficLightManager",
-  image: "Media/Game/Icons/TrafficLights.svg",
-  position: {top: -999999, left: -999999},
-  showPanel: false,
-  showFloatingButton: false,
-  state: 0,
-  items: []
-};
-
-const useMainPanel = () => {
-  const [panel, setPanel] = useState<MainPanel>(defaultPanel);
-
-  const result = useValue(bindValue("C2VM.TLE", "GetMainPanel", "{}"));
-
-  useEffect(() => {
-    const newPanel = JSON.parse(result);
-    setPanel({
-      title: defaultPanel.title,
-      image: defaultPanel.image,
-      position: newPanel.position ?? defaultPanel.position,
-      showPanel: newPanel.showPanel ?? defaultPanel.showPanel,
-      showFloatingButton: newPanel.showFloatingButton ?? defaultPanel.showFloatingButton,
-      state: newPanel.state ?? defaultPanel.state,
-      items: newPanel.items ?? defaultPanel.items
-    });
-  }, [result]);
-
-  return panel;
-};
-
-const Container = styled.div`
+const HeaderContainer = styled.div`
   position: absolute;
   top: calc(10rem + var(--floatingToggleSize));
   left: 0rem;
@@ -54,8 +23,19 @@ const Container = styled.div`
   padding: 10rem 10rem 6rem 10rem;
 `;
 
+const Container = styled.div`
+  width: 20em;
+  background-color: var(--panelColorNormal);
+  backdrop-filter: var(--panelBlur);
+  color: var(--textColor);
+  flex: 1;
+  position: relative;
+  padding: 0.25em;
+  overflow-y: scroll;
+`;
+
 export default function MainPanel() {
-  const [showFloatingButton, setShowFloatingButton] = useState(false);
+  const [showFloatingButton, _] = useState(true);
   const [showPanel, setShowPanel] = useState(false);
 
   const [top, setTop] = useState(-999999);
@@ -66,25 +46,13 @@ export default function MainPanel() {
   const [container, setContainer] = useState<Element | null>(null);
   const [toolSideColumn, setToolSideColumn] = useState<Element | null>(null);
 
-  const panel = useMainPanel();
+  const toolState = JSON.parse(useValue(bindValue("TrafficLightManager", "GetToolState"))) as ToolState;
 
   const containerRef = useCallback((el: Element | null) => setContainer(el), []);
 
   useEffect(() => {
-    setShowPanel(panel.showPanel);
-    setShowFloatingButton(panel.showFloatingButton);
-    if (!dragging) {
-      setTop(panel.position.top);
-      setLeft(panel.position.left);
-    }
-  }, [panel.showPanel, panel.showFloatingButton, panel.position.top, panel.position.left, dragging]);
-
-  // Save everything when the panel is closed
-  useEffect(() => {
-    return () => {
-      engine.call("C2VM.TLE.CallMainPanelSave", "{}");
-    };
-  }, []);
+    setShowPanel([ToolState.ChooseGroup, ToolState.Choosed].includes(toolState));
+  }, [toolState]);
 
   useEffect(() => {
     setToolSideColumn(document.querySelector(".tool-side-column_l9i"));
@@ -97,12 +65,12 @@ export default function MainPanel() {
   }, [container, showPanel]);
 
   const floatingButtonClickHandler = useCallback(() => {
-    if (panel.showPanel) {
-      engine.call("C2VM.TLE.CallSetMainPanelState", JSON.stringify({value: `${MainPanelState.Hidden}`}));
+    if (toolState !== ToolState.Disabled) {
+      trigger("TrafficLightManager", "SetToolState", ToolState.Disabled);
     } else {
-      engine.call("C2VM.TLE.CallSetMainPanelState", JSON.stringify({value: `${MainPanelState.Empty}`}));
+      trigger("TrafficLightManager", "SetToolState", ToolState.ChooseGroup);
     }
-  }, [panel.showPanel]);
+  }, [toolState]);
 
   const mouseDownHandler = useCallback((_event: React.MouseEvent<HTMLElement>) => {
     if (container) {
@@ -115,7 +83,7 @@ export default function MainPanel() {
   const mouseUpHandler = useCallback((_event: MouseEvent) => {
     if (container) {
       const rect = container.getBoundingClientRect();
-      engine.call("C2VM.TLE.CallMainPanelUpdatePosition", JSON.stringify({top: Math.floor(rect.top), left: Math.floor(rect.left)}));
+      engine.call("C2VM.TLE.CallMainPanelUpdatePosition", JSON.stringify({ top: Math.floor(rect.top), left: Math.floor(rect.left) }));
     }
     setDragging(false);
   }, [container]);
@@ -142,7 +110,6 @@ export default function MainPanel() {
     if (container && toolSideColumn) {
       const containerRect = container.getBoundingClientRect();
       const toolSideColumnRect = toolSideColumn.getBoundingClientRect();
-      result.maxHeight = Math.max(200, toolSideColumnRect.top - containerRect.top);
       if (top > -999999 && left > -999999) {
         result.top = Math.min(top, toolSideColumnRect.top - 200);
         result.left = Math.min(left, document.body.clientWidth - containerRect.width);
@@ -151,7 +118,7 @@ export default function MainPanel() {
       }
     }
     return result;
-  }, [showPanel, top, left, container, toolSideColumn, recalc, panel]); // Recalc values on recalc or panel change
+  }, [showPanel, top, left, container, toolSideColumn, recalc]); // Recalc values on recalc or panel change
 
   const { t } = useTranslate();
   return (
@@ -159,17 +126,29 @@ export default function MainPanel() {
       <FloatingButton
         show={showFloatingButton}
         src="Media/Game/Icons/TrafficLights.svg"
-        tooltip={t(panel.title)}
+        tooltip={t("TrafficLightManager")}
         onClick={floatingButtonClickHandler}
       />
-      <Container
+      <HeaderContainer
         ref={containerRef}
         style={style}
       >
-        <Header title={t(panel.title)} image={panel.image} onMouseDown={mouseDownHandler} />
-        {panel.state != MainPanelState.CustomPhase && <Content items={panel.items} />}
-        {panel.state == MainPanelState.CustomPhase && <CustomPhaseMainPanel items={panel.items} />}
-      </Container>
+        <Header title={t("TrafficLightManager")} image={"Media/Game/Icons/TrafficLights.svg"} onMouseDown={mouseDownHandler} />
+        {toolState !== ToolState.Choosed &&
+          <Container>
+            <Row>
+              <Message message={
+                new Map(
+                  [
+                    [ToolState.ChooseGroup, t("CustomPhaseEditor.ChooseGroup")],
+                    [ToolState.AddTrafficLights, t("CustomPhaseEditor.AddTrafficLights")],
+                    [ToolState.RemoveTrafficLights, t("CustomPhaseEditor.RemoveTrafficLights")]
+                  ]).get(toolState) ?? ""} />
+            </Row>
+          </Container>
+        }
+        {toolState === ToolState.Choosed && <CustomPhaseMainPanel />}
+      </HeaderContainer>
     </>
   );
 }

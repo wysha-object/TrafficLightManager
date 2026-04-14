@@ -1,7 +1,7 @@
 using Colossal.Serialization.Entities;
 using Unity.Entities;
 
-namespace C2VM.TrafficLightsEnhancement.Components;
+namespace TrafficLightManager.Code.Components;
 
 public struct ExtraLaneSignal : IComponentData, IQueryTypeParameter, ISerializable
 {

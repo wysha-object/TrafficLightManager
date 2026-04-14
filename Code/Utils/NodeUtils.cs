@@ -1,11 +1,11 @@
-using C2VM.TrafficLightsEnhancement.Components;
 using Game.Net;
+using TrafficLightManager.Code.Components;
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
-using static C2VM.TrafficLightsEnhancement.Systems.TrafficLightSystems.Initialisation.PatchedTrafficLightInitializationSystem;
+using static TrafficLightManager.Code.Systems.TrafficLightSystems.Initialisation.PatchedTrafficLightInitializationSystem;
 
-namespace C2VM.TrafficLightsEnhancement.Utils;
+namespace TrafficLightManager.Code.Utils;
 
 public partial struct NodeUtils
 {
@@ -28,8 +28,7 @@ public partial struct NodeUtils
         }
     }
 
-    public static NativeList<EdgeInfo> GetEdgeInfoList
-    (
+    public static NativeList<EdgeInfo> GetEdgeInfoList(
         Allocator allocator,
         Entity nodeEntity,
         DynamicBuffer<SubLane> nodeSubLaneBuffer,
@@ -67,7 +66,11 @@ public partial struct NodeUtils
             foreach (SubLane nodeSubLane in nodeSubLaneBuffer)
             {
                 pedestrianLaneLookup.TryGetComponent(nodeSubLane.m_SubLane, out var nodePedestrianLane);
-                LaneConnection laneConnection = GetLaneConnectionFromNodeSubLane(nodeSubLane.m_SubLane, laneConnectionMap, (nodePedestrianLane.m_Flags & PedestrianLaneFlags.Crosswalk) != 0);
+                LaneConnection laneConnection = GetLaneConnectionFromNodeSubLane(
+                    nodeSubLane.m_SubLane,
+                    laneConnectionMap,
+                    (nodePedestrianLane.m_Flags & PedestrianLaneFlags.Crosswalk) != 0
+                );
                 if (laneConnection.m_SourceEdge == edgeEntity)
                 {
                     if (!masterLaneLookup.HasComponent(nodeSubLane.m_SubLane))
@@ -173,8 +176,7 @@ public partial struct NodeUtils
         uISystem.m_TypeHandle.m_ConnectedEdge.TryGetBuffer(nodeEntity, out var connectedEdgeBuffer);
         uISystem.m_TypeHandle.m_EdgeGroupMask.TryGetBuffer(nodeEntity, out var edgeGroupMaskBuffer);
         uISystem.m_TypeHandle.m_SubLaneGroupMask.TryGetBuffer(nodeEntity, out var subLaneGroupMaskBuffer);
-        return GetEdgeInfoList
-        (
+        return GetEdgeInfoList(
             allocator,
             nodeEntity,
             nodeSubLaneBuffer,
@@ -195,10 +197,17 @@ public partial struct NodeUtils
         );
     }
 
-    public static NativeList<EdgeInfo> GetEdgeInfoList(Allocator allocator, Entity nodeEntity, ref InitializeTrafficLightsJob job, DynamicBuffer<SubLane> nodeSubLaneBuffer, DynamicBuffer<ConnectedEdge> connectedEdgeBuffer, DynamicBuffer<EdgeGroupMask> edgeGroupMaskBuffer, DynamicBuffer<SubLaneGroupMask> subLaneGroupMaskBuffer)
+    public static NativeList<EdgeInfo> GetEdgeInfoList(
+        Allocator allocator,
+        Entity nodeEntity,
+        ref InitializeTrafficLightsJob job,
+        DynamicBuffer<SubLane> nodeSubLaneBuffer,
+        DynamicBuffer<ConnectedEdge> connectedEdgeBuffer,
+        DynamicBuffer<EdgeGroupMask> edgeGroupMaskBuffer,
+        DynamicBuffer<SubLaneGroupMask> subLaneGroupMaskBuffer
+    )
     {
-        return GetEdgeInfoList
-        (
+        return GetEdgeInfoList(
             allocator,
             nodeEntity,
             nodeSubLaneBuffer,
@@ -228,7 +237,13 @@ public partial struct NodeUtils
         edgeInfoList.Dispose();
     }
 
-    public static NativeHashMap<Entity, LaneConnection> GetLaneConnectionMap(Allocator allocator, DynamicBuffer<SubLane> nodeSubLaneBuffer, DynamicBuffer<ConnectedEdge> connectedEdgeBuffer, BufferLookup<SubLane> subLaneLookup, ComponentLookup<Lane> laneLookup)
+    public static NativeHashMap<Entity, LaneConnection> GetLaneConnectionMap(
+        Allocator allocator,
+        DynamicBuffer<SubLane> nodeSubLaneBuffer,
+        DynamicBuffer<ConnectedEdge> connectedEdgeBuffer,
+        BufferLookup<SubLane> subLaneLookup,
+        ComponentLookup<Lane> laneLookup
+    )
     {
         NativeHashMap<Entity, LaneConnection> laneConnectionMap = new NativeHashMap<Entity, LaneConnection>(16, allocator);
         foreach (SubLane nodeSubLane in nodeSubLaneBuffer)
@@ -376,7 +391,13 @@ public partial struct NodeUtils
         return laneConnection;
     }
 
-    public static bool IsCrossingStopLine(Entity nodeSubLaneEntity, Entity edgeEntity, ComponentLookup<Lane> laneLookup, BufferLookup<LaneOverlap> laneOverlapLookup, BufferLookup<SubLane> subLaneLookup)
+    public static bool IsCrossingStopLine(
+        Entity nodeSubLaneEntity,
+        Entity edgeEntity,
+        ComponentLookup<Lane> laneLookup,
+        BufferLookup<LaneOverlap> laneOverlapLookup,
+        BufferLookup<SubLane> subLaneLookup
+    )
     {
         if (laneOverlapLookup.TryGetBuffer(nodeSubLaneEntity, out DynamicBuffer<LaneOverlap> laneOverlapBuffer))
         {
