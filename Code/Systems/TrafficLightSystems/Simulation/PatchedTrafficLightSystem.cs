@@ -13,6 +13,7 @@ using Game.Prefabs;
 using Game.Simulation;
 using Game.Tools;
 using TrafficLightManager.Code.Components;
+using Unity.Burst;
 using Unity.Burst.Intrinsics;
 using Unity.Collections;
 using Unity.Entities;
@@ -26,7 +27,7 @@ namespace TrafficLightManager.Code.Systems.TrafficLightSystems.Simulation;
 [CompilerGenerated]
 public partial class PatchedTrafficLightSystem : GameSystemBase
 {
-    //[BurstCompile]
+    [BurstCompile]
     public struct UpdateTrafficLightsJob : IJobChunk
     {
         public EntityStorageInfoLookup m_EntityStorageInfoLookup;
@@ -167,11 +168,9 @@ public partial class PatchedTrafficLightSystem : GameSystemBase
                     DynamicBuffer<CustomPhaseData> customPhaseDataBufferValue = customPhaseDataBuffer.Value;
                     CustomStateMachine.CalculatePriority(this, subLanes, customPhaseDataBufferValue);
                     CustomStateMachine.CalculateFlow(this, unfilteredChunkIndex, subLanes, trafficLights, customPhaseDataBufferValue);
-                    if (CustomStateMachine.UpdateTrafficLightState(ref trafficLights, ref customTrafficLights, customPhaseDataBufferValue))
-                    {
-                        UpdateLaneSignals(laneSignals, trafficLights);
-                        UpdateTrafficLightObjects(subObjects, trafficLights);
-                    }
+                    CustomStateMachine.UpdateTrafficLightState(ref trafficLights, ref customTrafficLights, customPhaseDataBufferValue);
+                    UpdateLaneSignals(laneSignals, trafficLights);
+                    UpdateTrafficLightObjects(subObjects, trafficLights);
                 }
                 else if (UpdateTrafficLightState(laneSignals, moveableBridgeData, ref trafficLights, ref customTrafficLights))
                 {
@@ -941,8 +940,8 @@ public partial class PatchedTrafficLightSystem : GameSystemBase
         m_TrafficLightsQuery.SetSharedComponentFilter(
             new UpdateFrame(SimulationUtils.GetUpdateFrameWithInterval(m_SimulationSystem.frameIndex, (uint)GetUpdateInterval(SystemUpdatePhase.GameSimulation), 16))
         );
-        JobHandle dependency = JobChunkExtensions.Schedule(
-            //JobChunkExtensions.ScheduleParallel(
+        JobHandle dependency = //JobChunkExtensions.Schedule(
+        JobChunkExtensions.ScheduleParallel(
             new UpdateTrafficLightsJob
             {
                 m_EntityStorageInfoLookup = GetEntityStorageInfoLookup(),

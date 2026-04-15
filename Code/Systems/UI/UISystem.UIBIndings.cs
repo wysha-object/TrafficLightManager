@@ -597,22 +597,18 @@ public partial class UISystem : UISystemBase
             )
         );
         AddBinding(new TriggerBinding<int>("TrafficLightManager", "SetEditingPhaseIndex", (index) => m_EditingPhaseIndexBinding.Update(index)));
-        AddBinding(
-            new TriggerBinding<int>(
-                "TrafficLightManager",
-                "SetManualPhaseIndex",
-                (index) =>
-                {
-                    if (m_SelectedTrafficLightGroupEntity != Entity.Null)
-                    {
-                        EntityManager.TryGetComponent(m_SelectedTrafficLightGroupEntity, out TrafficLightGroup trafficLightGroup);
-                        trafficLightGroup.m_ManualSignalGroup = (byte)(index + 1);
-                        EntityManager.SetComponentData(m_SelectedTrafficLightGroupEntity, trafficLightGroup);
-                        m_ManualSignalGroupBinding.Update();
-                        RedrawGizmo();
-                    }
-                }
-            )
-        );
+        AddBinding(new TriggerBinding<int>("TrafficLightManager", "SetManualPhaseIndex", UpdateManualPhaseIndex));
+    }
+
+    public void UpdateManualPhaseIndex(int index)
+    {
+        if (m_SelectedTrafficLightGroupEntity != Entity.Null)
+        {
+            EntityManager.TryGetComponent(m_SelectedTrafficLightGroupEntity, out TrafficLightGroup trafficLightGroup);
+            trafficLightGroup.m_ManualSignalGroup = (byte)(index + 1);
+            EntityManager.SetComponentData(m_SelectedTrafficLightGroupEntity, trafficLightGroup);
+            m_ManualSignalGroupBinding.Update();
+            RedrawGizmo();
+        }
     }
 }

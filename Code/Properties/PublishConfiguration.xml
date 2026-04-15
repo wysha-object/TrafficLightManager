@@ -27,14 +27,16 @@ If you find this mod helpful, please consider giving it a star !
     <!--Tag, can be set multiple times-->
     <Tag Value="" />
     <!--Version of the mod-->
-    <ModVersion Value="1.2.2" />
+    <ModVersion Value="1.2.3" />
     <!--Recommended version of the base game to use the mod-->
     <GameVersion Value="1.5.*" />
     <!--Dependency for the mod, can be set multiple times-->
     <Dependency Id="" />
     <!--Change log for new version. Single line or multi line. Supports minimal markdown subset-->
     <ChangeLog>
-- Fix traffic light doesn't work
+- Improve performance
+- Fix sync logic
+- Fix ManualPhaseIndex miss change when manually switch visible
     </ChangeLog>
     <!--External link. supported types are discord, github, youtube, twitch, x, paypal, patreon-->
     <ExternalLink Type="github" Url="https://github.com/wysha-object/TrafficLightManager" />

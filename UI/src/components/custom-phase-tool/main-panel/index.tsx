@@ -100,7 +100,7 @@ const RemoveMemberButton = () => {
 }
 
 export default function MainPanel() {
-  let [currentIndex, setCurrentIndex] = useState(0);
+  let [currentIndex, setCurrentIndex] = useState(-1);
   let [currentItemState, setCurrentItemState] = useState(ItemState.None);
   let [manualControl, setManualControl] = useState(false);
 

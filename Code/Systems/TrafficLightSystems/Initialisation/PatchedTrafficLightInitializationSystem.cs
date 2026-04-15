@@ -12,6 +12,7 @@ using Game.Prefabs;
 using Game.Tools;
 using TrafficLightManager.Code.Components;
 using TrafficLightManager.Code.Utils;
+using Unity.Burst;
 using Unity.Burst.Intrinsics;
 using Unity.Collections;
 using Unity.Entities;
@@ -72,7 +73,7 @@ public partial class PatchedTrafficLightInitializationSystem : Game.GameSystemBa
         public bool m_IsPedestrian;
     }
 
-    //[BurstCompile]
+    [BurstCompile]
     public struct InitializeTrafficLightsJob : IJobChunk
     {
         [ReadOnly]
@@ -976,8 +977,8 @@ public partial class PatchedTrafficLightInitializationSystem : Game.GameSystemBa
     protected override void OnUpdate()
     {
         m_ExtraTypeHandle.Update(ref base.CheckedStateRef);
-        JobHandle dependency = JobChunkExtensions.Schedule(
-            //JobChunkExtensions.ScheduleParallel(
+        JobHandle dependency = //JobChunkExtensions.Schedule(
+        JobChunkExtensions.ScheduleParallel(
             new InitializeTrafficLightsJob
             {
                 m_EntityType = InternalCompilerInterface.GetEntityTypeHandle(ref __TypeHandle.__Unity_Entities_Entity_TypeHandle, ref base.CheckedStateRef),

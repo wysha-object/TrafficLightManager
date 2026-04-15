@@ -299,6 +299,7 @@ public partial class UISystem : UISystemBase
 
     public void SetToolState(ToolState toolState)
     {
+        UpdateManualPhaseIndex(-1);
         if (!new[] { ToolState.Disabled, ToolState.ChooseGroup }.Contains(toolState) && m_SelectedTrafficLightGroupEntity == Entity.Null)
         {
             toolState = ToolState.Disabled;
@@ -323,8 +324,8 @@ public partial class UISystem : UISystemBase
         ClearEdgeInfo();
         ForEachTrafficLight(UpdateEdgeInfo);
 
-        RedrawIcon();
         m_DisplayPhaseIndexBinding.Update(-1);
+        RedrawIcon();
     }
 
     public void AddUpdate()

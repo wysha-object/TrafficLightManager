@@ -5,6 +5,7 @@ using Game.Common;
 using Game.Net;
 using Game.Tools;
 using TrafficLightManager.Code.Components;
+using Unity.Burst;
 using Unity.Burst.Intrinsics;
 using Unity.Collections;
 using Unity.Entities;
@@ -20,7 +21,7 @@ namespace TrafficLightManager.Code.Systems.TrafficLightSystems.Simulation;
  */
 public partial class TrafficLightGroupSystem : GameSystemBase
 {
-    //[BurstCompile]
+    [BurstCompile]
     public partial struct UpdateTrafficLightGroupJob : IJobChunk
     {
         public EntityStorageInfoLookup m_EntityStorageInfoLookup;
@@ -108,10 +109,27 @@ public partial class TrafficLightGroupSystem : GameSystemBase
                         {
                             TrafficLights targetTrafficLights = m_TrafficLightsLookup[target];
                             CustomTrafficLights targetCustomTrafficLights = m_CustomTrafficLightsLookup[target];
-                            if (
-                                isAheadSignalGroup(trafficLights.m_CurrentSignalGroup, targetTrafficLights.m_CurrentSignalGroup, customPhaseDataBuffer.Length)
-                                || customTrafficLights.m_Timer > targetCustomTrafficLights.m_Timer
-                            )
+
+                            bool ahead = IsAheadSignalGroup(trafficLights.m_NextSignalGroup, targetTrafficLights.m_NextSignalGroup, customPhaseDataBuffer.Length);
+
+                            if (!ahead && trafficLights.m_NextSignalGroup == targetTrafficLights.m_NextSignalGroup)
+                            {
+                                ahead = IsAheadState(trafficLights.m_State, targetTrafficLights.m_State);
+
+                                if (!ahead && trafficLights.m_State == targetTrafficLights.m_State)
+                                {
+                                    if (customTrafficLights.m_Timer > targetCustomTrafficLights.m_Timer)
+                                    {
+                                        ahead = true;
+                                    }
+                                    else if (customTrafficLights.m_Timer == targetCustomTrafficLights.m_Timer)
+                                    {
+                                        ahead = IsAheadEntity(item, target);
+                                    }
+                                }
+                            }
+
+                            if (ahead)
                             {
                                 target = item;
                             }
@@ -148,18 +166,65 @@ public partial class TrafficLightGroupSystem : GameSystemBase
             }
         }
 
-        public bool isAheadSignalGroup(int signalGroup1, int signalGroup2, int signalGroupCount)
+        private static bool IsAheadSignalGroup(int index1, int index2, int signalGroupCount)
         {
-            int linearDiff = signalGroup1 - signalGroup2;
-            int circularDiff = signalGroup1 + signalGroupCount - signalGroup2;
-            if (Math.Abs(linearDiff) < Math.Abs(circularDiff))
+            if (signalGroupCount <= 0 || index1 == index2)
             {
-                return linearDiff > 0;
+                return false;
             }
-            else
+
+            if (index1 <= 0)
             {
-                return circularDiff > 0;
+                return false;
             }
+
+            if (index2 <= 0)
+            {
+                return true;
+            }
+
+            int a = (index1 - 1) % signalGroupCount;
+            int b = (index2 - 1) % signalGroupCount;
+
+            int forward = (a - b + signalGroupCount) % signalGroupCount;
+            int backward = (b - a + signalGroupCount) % signalGroupCount;
+
+            if (forward == backward)
+            {
+                return a > b;
+            }
+
+            return forward < backward;
+        }
+
+        private static bool IsAheadState(TrafficLightState state1, TrafficLightState state2)
+        {
+            return GetStateOrder(state1) > GetStateOrder(state2);
+        }
+
+        private static int GetStateOrder(TrafficLightState state)
+        {
+            return state switch
+            {
+                TrafficLightState.None => 0,
+                TrafficLightState.Beginning => 1,
+                TrafficLightState.Ongoing => 2,
+                TrafficLightState.Ending => 3,
+                TrafficLightState.Changing => 4,
+                TrafficLightState.Extending => 5,
+                TrafficLightState.Extended => 6,
+                _ => -1,
+            };
+        }
+
+        private static bool IsAheadEntity(Entity entity1, Entity entity2)
+        {
+            if (entity1.Index != entity2.Index)
+            {
+                return entity1.Index > entity2.Index;
+            }
+
+            return entity1.Version > entity2.Version;
         }
 
         void IJobChunk.Execute(in ArchetypeChunk chunk, int unfilteredChunkIndex, bool useEnabledMask, in v128 chunkEnabledMask)
@@ -224,8 +289,8 @@ public partial class TrafficLightGroupSystem : GameSystemBase
     [Preserve]
     protected override void OnUpdate()
     {
-        JobHandle dependency = JobChunkExtensions.Schedule(
-            //JobChunkExtensions.ScheduleParallel(
+        JobHandle dependency = //JobChunkExtensions.Schedule(
+        JobChunkExtensions.ScheduleParallel(
             new UpdateTrafficLightGroupJob
             {
                 m_EntityStorageInfoLookup = GetEntityStorageInfoLookup(),
