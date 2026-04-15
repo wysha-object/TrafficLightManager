@@ -34,7 +34,8 @@ If you find this mod helpful, please consider giving it a star !
     <Dependency Id="" />
     <!--Change log for new version. Single line or multi line. Supports minimal markdown subset-->
     <ChangeLog>
-- Fix traffic light doesn't work
+- Added coordinated traffic light control across multiple intersections
+- Simplified the UI
     </ChangeLog>
     <!--External link. supported types are discord, github, youtube, twitch, x, paypal, patreon-->
     <ExternalLink Type="github" Url="https://github.com/wysha-object/TrafficLightManager" />
