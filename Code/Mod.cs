@@ -96,6 +96,9 @@ public class Mod : IMod
         updateSystem.UpdateAt<TrafficLightManager.Code.Systems.Tool.ToolSystem>(SystemUpdatePhase.ToolUpdate);
         updateSystem.UpdateAt<TrafficLightManager.Code.Systems.Update.ModificationUpdateSystem>(SystemUpdatePhase.ModificationEnd);
         updateSystem.UpdateAfter<TrafficLightManager.Code.Systems.Update.SimulationUpdateSystem>(SystemUpdatePhase.GameSimulation);
+
+        m_TrafficLightInitializationSystem.Enabled = false;
+        m_TrafficLightSystem.Enabled = false;
     }
 
     public static bool IsCanary()

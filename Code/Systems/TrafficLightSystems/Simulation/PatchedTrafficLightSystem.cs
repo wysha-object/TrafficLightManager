@@ -29,6 +29,8 @@ public partial class PatchedTrafficLightSystem : GameSystemBase
     //[BurstCompile]
     public struct UpdateTrafficLightsJob : IJobChunk
     {
+        public EntityStorageInfoLookup m_EntityStorageInfoLookup;
+
         [ReadOnly]
         public EntityTypeHandle m_EntityType;
 
@@ -122,6 +124,7 @@ public partial class PatchedTrafficLightSystem : GameSystemBase
 
             for (int i = 0; i < nativeArray2.Length; i++)
             {
+                Entity e = nativeArray[i];
                 TrafficLights trafficLights = nativeArray2[i];
                 DynamicBuffer<Game.Net.SubLane> subLanes = bufferAccessor[i];
                 DynamicBuffer<Game.Objects.SubObject> subObjects = bufferAccessor3[i];
@@ -131,6 +134,11 @@ public partial class PatchedTrafficLightSystem : GameSystemBase
                 }
 
                 CustomTrafficLights customTrafficLights = i < customTrafficLightsArray.Length ? customTrafficLightsArray[i] : new CustomTrafficLights();
+                if (customTrafficLightsArray.Length > 0 && !m_EntityStorageInfoLookup.Exists(customTrafficLights.m_TrafficLightGroupEntity))
+                {
+                    m_CommandBuffer.RemoveComponent<CustomTrafficLights>(unfilteredChunkIndex, e);
+                    continue;
+                }
 
                 Entity trafficLightGroupEntity = customTrafficLights.m_TrafficLightGroupEntity;
                 TrafficLightGroup? trafficLightGroup = null;
@@ -937,6 +945,7 @@ public partial class PatchedTrafficLightSystem : GameSystemBase
             //JobChunkExtensions.ScheduleParallel(
             new UpdateTrafficLightsJob
             {
+                m_EntityStorageInfoLookup = GetEntityStorageInfoLookup(),
                 m_EntityType = InternalCompilerInterface.GetEntityTypeHandle(ref __TypeHandle.__Unity_Entities_Entity_TypeHandle, ref base.CheckedStateRef),
                 m_SubLaneType = InternalCompilerInterface.GetBufferTypeHandle(ref __TypeHandle.__Game_Net_SubLane_RO_BufferTypeHandle, ref base.CheckedStateRef),
                 m_ConnectedEdgeType = InternalCompilerInterface.GetBufferTypeHandle(ref __TypeHandle.__Game_Net_ConnectedEdge_RO_BufferTypeHandle, ref base.CheckedStateRef),
