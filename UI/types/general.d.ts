@@ -169,6 +169,8 @@ interface EdgeInfo {
   m_PedestrianLaneNonStopLineCount: number,
   m_SubLaneInfoList: SubLaneInfo[],
   m_EdgeGroupMask: EdgeGroupMask
+  // 所属路口实体
+  m_TrafficLightsEntity: Entity,
 }
 
 interface SubLaneGroupMask {

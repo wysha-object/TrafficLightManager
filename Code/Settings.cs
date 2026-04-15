@@ -64,33 +64,6 @@ public class Settings : ModSetting
 
     public string m_Locale { get; private set; }
 
-    [SettingsUISection(kTabGeneral, kGroupGeneral)]
-    public bool m_CompatibilityModeOption
-    {
-        get { return m_CompatibilityMode; }
-        set
-        {
-            m_CompatibilityMode = value;
-            Mod.SetCompatibilityMode(value);
-            if (!IsNotInGame())
-            {
-                m_ForceNodeUpdate = true;
-            }
-        }
-    }
-
-    [SettingsUIHideByCondition(typeof(Settings), "IsTrue")]
-    public bool m_CompatibilityMode { get; private set; }
-
-    [SettingsUISection(kTabGeneral, kGroupVersion)]
-    public string m_ReleaseChannel => IsNotCanary() ? "Alpha" : "Canary";
-
-    [SettingsUISection(kTabGeneral, kGroupVersion)]
-    public string m_TleVersion => Mod.m_InformationalVersion.Substring(0, 20);
-
-    [SettingsUISection(kTabGeneral, kGroupVersion)]
-    public string m_LaneSystemVersion => C2VM.CommonLibraries.LaneSystem.Mod.m_InformationalVersion.Substring(0, 20);
-
     [SettingsUISection(kTabGeneral, kGroupDefault)]
     [SettingsUIHideByCondition(typeof(Settings), "IsCompatibilityMode")]
     public bool m_DefaultSplitPhasing { get; set; }
@@ -204,15 +177,5 @@ public class Settings : ModSetting
     public bool IsNotCanary()
     {
         return !Mod.IsCanary();
-    }
-
-    public bool IsCompatibilityMode()
-    {
-        return m_CompatibilityMode;
-    }
-
-    public bool IsTrue()
-    {
-        return true;
     }
 }

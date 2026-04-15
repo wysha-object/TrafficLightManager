@@ -967,7 +967,7 @@ public partial class PatchedTrafficLightInitializationSystem : Game.GameSystemBa
         m_CityConfigurationSystem = World.GetOrCreateSystemManaged<Game.City.CityConfigurationSystem>();
         m_ModificationBarrier = World.GetOrCreateSystemManaged<ModificationBarrier4B>();
         m_TrafficLightsQuery = GetEntityQuery(
-            new EntityQueryDesc { All = new ComponentType[1] { ComponentType.ReadWrite<CustomTrafficLights>() }, Any = new ComponentType[1] { ComponentType.ReadOnly<Updated>() } }
+            new EntityQueryDesc { All = new ComponentType[1] { ComponentType.ReadWrite<TrafficLights>() }, Any = new ComponentType[1] { ComponentType.ReadOnly<Updated>() } }
         );
         RequireForUpdate(m_TrafficLightsQuery);
     }
@@ -1019,26 +1019,6 @@ public partial class PatchedTrafficLightInitializationSystem : Game.GameSystemBa
         );
         m_ModificationBarrier.AddJobHandleForProducer(dependency);
         base.Dependency = dependency;
-    }
-
-    public void SetCompatibilityMode(bool enable)
-    {
-        if (enable)
-        {
-            m_TrafficLightsQuery = GetEntityQuery(
-                new EntityQueryDesc
-                {
-                    All = new ComponentType[2] { ComponentType.ReadOnly<TrafficLights>(), ComponentType.ReadWrite<CustomTrafficLights>() },
-                    Any = new ComponentType[1] { ComponentType.ReadOnly<Updated>() },
-                }
-            );
-        }
-        else
-        {
-            m_TrafficLightsQuery = GetEntityQuery(
-                new EntityQueryDesc { All = new ComponentType[1] { ComponentType.ReadOnly<TrafficLights>() }, Any = new ComponentType[1] { ComponentType.ReadOnly<Updated>() } }
-            );
-        }
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]

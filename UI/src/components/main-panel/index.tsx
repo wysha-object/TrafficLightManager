@@ -12,6 +12,7 @@ import { useTranslate } from '@/localisations';
 import { ToolState } from '@/constants';
 import Row from './items/row';
 import Message from './items/message';
+import Button from '../common/button';
 
 const HeaderContainer = styled.div`
   position: absolute;
@@ -34,6 +35,14 @@ const Container = styled.div`
   overflow-y: scroll;
 `;
 
+const BackButton = () => {
+  return (
+    <Row>
+      <Button label="CustomPhaseEditor.Back" onClick={() => trigger("TrafficLightManager", "SetToolState", ToolState.Choosed)} />
+    </Row>
+  )
+}
+
 export default function MainPanel() {
   const [showFloatingButton, _] = useState(true);
   const [showPanel, setShowPanel] = useState(false);
@@ -51,7 +60,7 @@ export default function MainPanel() {
   const containerRef = useCallback((el: Element | null) => setContainer(el), []);
 
   useEffect(() => {
-    setShowPanel([ToolState.ChooseGroup, ToolState.Choosed].includes(toolState));
+    setShowPanel(toolState !== ToolState.Disabled);
   }, [toolState]);
 
   useEffect(() => {
@@ -134,7 +143,9 @@ export default function MainPanel() {
         style={style}
       >
         <Header title={t("TrafficLightManager")} image={"Media/Game/Icons/TrafficLights.svg"} onMouseDown={mouseDownHandler} />
-        {toolState !== ToolState.Choosed &&
+        {[ToolState.Choosed, ToolState.Editing].includes(toolState) &&
+          <CustomPhaseMainPanel />
+          ||
           <Container>
             <Row>
               <Message message={
@@ -145,9 +156,14 @@ export default function MainPanel() {
                     [ToolState.RemoveTrafficLights, t("CustomPhaseEditor.RemoveTrafficLights")]
                   ]).get(toolState) ?? ""} />
             </Row>
+            {
+              [ToolState.AddTrafficLights, ToolState.RemoveTrafficLights].includes(toolState) &&
+              <Row>
+                <BackButton />
+              </Row>
+            }
           </Container>
         }
-        {toolState === ToolState.Choosed && <CustomPhaseMainPanel />}
       </HeaderContainer>
     </>
   );

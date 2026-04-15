@@ -1,6 +1,6 @@
 using System.Linq;
-using System.Reflection;
 using Colossal.Entities;
+using Game.Common;
 using Game.Net;
 using Game.Prefabs;
 using Game.Tools;
@@ -15,7 +15,7 @@ using static TrafficLightManager.Code.Systems.UI.UISystem;
 
 namespace TrafficLightManager.Code.Systems.Tool;
 
-public partial class ToolSystem : NetToolSystem
+public partial class ToolSystem : ToolBaseSystem
 {
     public override string toolID => "TrafficLightManager Tool";
 
@@ -25,19 +25,9 @@ public partial class ToolSystem : NetToolSystem
 
     private UI.UISystem m_UISystem;
 
-    private NativeList<ControlPoint> m_ParentControlPoints;
+    private StringTooltip m_ConfigureTooltip;
 
-    private NativeReference<AppliedUpgrade> m_ParentAppliedUpgrade;
-
-    private Entity m_PrefabEntity = Entity.Null;
-
-    private Entity m_RaycastResult = Entity.Null;
-
-    public bool m_Suspended { get; private set; }
-
-    private PropertyInfo m_DisplayOverridePropertyInfo;
-
-    private StringTooltip m_ChooseGroupTooltip;
+    private StringTooltip m_CreateGroupTooltip;
 
     private StringTooltip m_AddMemberTooltip;
 
@@ -49,82 +39,87 @@ public partial class ToolSystem : NetToolSystem
         m_RenderSystem = World.GetOrCreateSystemManaged<RenderSystem>();
         m_TooltipSystem = World.GetOrCreateSystemManaged<UI.TooltipSystem>();
         m_UISystem = World.GetOrCreateSystemManaged<UI.UISystem>();
-        m_ParentControlPoints = GetControlPoints(out JobHandle _);
-        m_ParentAppliedUpgrade = (NativeReference<AppliedUpgrade>)typeof(NetToolSystem).GetField("m_AppliedUpgrade", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(this);
-        m_DisplayOverridePropertyInfo = typeof(Game.Input.ProxyAction).GetProperty("displayOverride");
         m_ToolSystem.EventToolChanged += ToolChanged;
 
-        m_ChooseGroupTooltip = new StringTooltip
+        m_ConfigureTooltip = new StringTooltip
         {
             path = "TrafficLightManager.Code.Tooltips.Configure",
             icon = "Media/Mouse/LMB.svg",
-            value = LocalizedString.Id("TrafficLightManager.Code.Tooltips.Configure"),
+            value = LocalizedString.Id("Configure"),
+        };
+        m_CreateGroupTooltip = new StringTooltip
+        {
+            path = "CreateGroup",
+            icon = "Media/Mouse/LMB.svg",
+            value = LocalizedString.Id("CreateGroup"),
         };
         m_AddMemberTooltip = new StringTooltip
         {
             path = "TrafficLightManager.Code.Tooltips.AddMember",
             icon = "Media/Mouse/LMB.svg",
-            value = LocalizedString.Id("TrafficLightManager.Code.Tooltips.AddMember"),
+            value = LocalizedString.Id("AddMember"),
         };
         m_RemoveMemberTooltip = new StringTooltip
         {
             path = "TrafficLightManager.Code.Tooltips.RemoveMember",
             icon = "Media/Mouse/RMB.svg",
-            value = LocalizedString.Id("TrafficLightManager.Code.Tooltips.RemoveMember"),
+            value = LocalizedString.Id("RemoveMember"),
         };
+    }
+
+    protected override void OnStartRunning()
+    {
+        applyAction.shouldBeEnabled = true;
+        secondaryApplyAction.shouldBeEnabled = true;
+    }
+
+    protected override void OnStopRunning()
+    {
+        applyAction.shouldBeEnabled = false;
+        secondaryApplyAction.shouldBeEnabled = false;
+    }
+
+    protected override bool GetAllowApply()
+    {
+        return true;
+    }
+
+    public override PrefabBase GetPrefab()
+    {
+        return null;
+    }
+
+    public override bool TrySetPrefab(PrefabBase prefab)
+    {
+        return false;
+    }
+
+    public override void InitializeRaycast()
+    {
+        m_ToolRaycastSystem.typeMask |= TypeMask.Net;
+        m_ToolRaycastSystem.netLayerMask = Layer.All;
     }
 
     protected override JobHandle OnUpdate(JobHandle inputDeps)
     {
-        if (m_Suspended)
-        {
-            m_ToolRaycastSystem.raycastFlags |= Game.Common.RaycastFlags.UIDisable;
-        }
-        var result = base.OnUpdate(inputDeps);
-        base.applyAction.shouldBeEnabled = !m_Suspended;
-        base.secondaryApplyAction.shouldBeEnabled = !m_Suspended;
-        if ((m_ToolRaycastSystem.raycastFlags & Game.Common.RaycastFlags.UIDisable) == 0)
+        base.applyAction.shouldBeEnabled = m_UISystem.GetToolState() != ToolState.Editing;
+        base.secondaryApplyAction.shouldBeEnabled = m_UISystem.GetToolState() != ToolState.Editing;
+        bool raycastFlag = GetRaycastResult(out Entity entity, out RaycastHit hit);
+        if (m_UISystem.GetToolState() != ToolState.Editing)
         {
             if (secondaryApplyAction.WasReleasedThisFrame())
             {
-                if (m_RaycastResult != Entity.Null)
+                if (IsValidEntity(entity))
                 {
-                    if (IsValidEntity(m_RaycastResult))
+                    if (m_UISystem.GetToolState() == UI.UISystem.ToolState.RemoveTrafficLights)
                     {
-                        if (m_UISystem.GetToolState() == UI.UISystem.ToolState.RemoveTrafficLights)
-                        {
-                            m_UISystem.RemoveTrafficLights(m_RaycastResult);
-                        }
-                        UpdateTooltip(m_RaycastResult);
+                        m_UISystem.RemoveTrafficLights(entity);
                     }
                 }
-            }
-            if (m_ParentControlPoints.Length >= 4)
-            {
-                Entity originalEntity = m_ParentControlPoints[m_ParentControlPoints.Length - 3].m_OriginalEntity;
-                if (originalEntity != m_RaycastResult)
-                {
-                    m_RaycastResult = originalEntity;
-                    m_RenderSystem.ClearLineMesh();
-                    if (IsValidEntity(m_RaycastResult) && EntityManager.TryGetComponent<NodeGeometry>(m_RaycastResult, out var nodeGeometry))
-                    {
-                        m_RenderSystem.AddBounds(nodeGeometry.m_Bounds, new UnityEngine.Color(0.5f, 1.0f, 2.0f, 1.0f), 0.5f);
-                        m_RenderSystem.BuildLineMesh();
-                    }
-                    UpdateTooltip(m_RaycastResult);
-                }
-            }
-            else if (m_RaycastResult != Entity.Null)
-            {
-                m_RaycastResult = Entity.Null;
-                m_RenderSystem.ClearLineMesh();
-                UpdateTooltip(m_RaycastResult);
             }
             if (applyAction.WasReleasedThisFrame())
             {
-                Entity entity = m_ParentAppliedUpgrade.Value.m_Entity;
-                CompositionFlags flags = m_ParentAppliedUpgrade.Value.m_Flags;
-                if (entity != Entity.Null && (flags.m_General & CompositionFlags.General.TrafficLights) != 0 && IsValidEntity(entity))
+                if (IsValidEntity(entity))
                 {
                     switch (m_UISystem.GetToolState())
                     {
@@ -132,20 +127,45 @@ public partial class ToolSystem : NetToolSystem
                             m_UISystem.AddTrafficLights(entity);
                             break;
                         case UI.UISystem.ToolState.ChooseGroup:
+                        case UI.UISystem.ToolState.Choosed:
                             m_UISystem.ChangeSelectedTrafficLightGroupEntity(entity);
                             break;
                     }
                 }
             }
-            DisableActionTooltips();
+
+            m_RenderSystem.ClearLineMesh("node_bound");
+            if (IsValidEntity(entity) && EntityManager.TryGetComponent<NodeGeometry>(entity, out var nodeGeometry))
+            {
+                if (
+                    new[] { ToolState.ChooseGroup, ToolState.Choosed }.Contains(m_UISystem.GetToolState())
+                    && EntityManager.TryGetComponent<CustomTrafficLights>(entity, out var customTrafficLights)
+                    && EntityManager.TryGetBuffer<TrafficLightsMemberRef>(customTrafficLights.m_TrafficLightGroupEntity, true, out var trafficLightsMemberRefs)
+                )
+                {
+                    foreach (var item in trafficLightsMemberRefs)
+                    {
+                        if (EntityManager.TryGetComponent<NodeGeometry>(item.m_Entity, out var itemNodeGeometry))
+                        {
+                            m_RenderSystem.AddBounds("node_bound", itemNodeGeometry.m_Bounds, new UnityEngine.Color(0.5f, 1.0f, 2.0f, 1.0f), 0.5f);
+                            m_RenderSystem.BuildLineMesh();
+                        }
+                    }
+                }
+                else
+                {
+                    m_RenderSystem.AddBounds("node_bound", nodeGeometry.m_Bounds, new UnityEngine.Color(0.5f, 1.0f, 2.0f, 1.0f), 0.5f);
+                    m_RenderSystem.BuildLineMesh();
+                }
+            }
         }
-        return result;
+        UpdateTooltip(entity);
+        return inputDeps;
     }
 
     protected override void OnGameLoadingComplete(Colossal.Serialization.Entities.Purpose purpose, Game.GameMode mode)
     {
         Mod.m_Log.Info($"Searching for traffic light prefab asset entities");
-        m_PrefabEntity = Entity.Null;
         EntityQuery query = GetEntityQuery(ComponentType.ReadOnly<PlaceableNetData>());
         NativeArray<Entity> entityArray = query.ToEntityArray(Allocator.Temp);
         NativeArray<PlaceableNetData> placeableNetDataArray = query.ToComponentDataArray<PlaceableNetData>(Allocator.Temp);
@@ -155,32 +175,7 @@ public partial class ToolSystem : NetToolSystem
             {
                 continue;
             }
-            if (m_PrefabSystem.TryGetPrefab(entityArray[i], out PrefabBase prefabBase) && prefabBase is NetPrefab)
-            {
-                m_PrefabEntity = entityArray[i];
-                Mod.m_Log.Info($"{m_PrefabEntity} prefabBase.uiTag: {prefabBase.uiTag}");
-            }
         }
-        Mod.Assert(m_PrefabEntity != Entity.Null, "Traffic lights prefab asset entity not found. The tool system will not work.");
-    }
-
-    protected override bool GetAllowApply()
-    {
-        if (m_RaycastResult != Entity.Null && !EntityManager.HasComponent<CustomTrafficLights>(m_RaycastResult))
-        {
-            return true;
-        }
-        return !(secondaryApplyAction.WasReleasedThisFrame() || secondaryApplyAction.IsPressed());
-    }
-
-    public override bool TrySetPrefab(PrefabBase prefab)
-    {
-        return false;
-    }
-
-    public override PrefabBase GetPrefab()
-    {
-        return null;
     }
 
     private void UpdateTooltip(Entity entity)
@@ -191,7 +186,15 @@ public partial class ToolSystem : NetToolSystem
             switch (m_UISystem.GetToolState())
             {
                 case UI.UISystem.ToolState.ChooseGroup:
-                    m_TooltipSystem.m_TooltipList.Add(m_ChooseGroupTooltip);
+                case UI.UISystem.ToolState.Choosed:
+                    if (EntityManager.HasComponent<CustomTrafficLights>(entity))
+                    {
+                        m_TooltipSystem.m_TooltipList.Add(m_ConfigureTooltip);
+                    }
+                    else
+                    {
+                        m_TooltipSystem.m_TooltipList.Add(m_CreateGroupTooltip);
+                    }
                     break;
                 case UI.UISystem.ToolState.AddTrafficLights:
                     m_TooltipSystem.m_TooltipList.Add(m_AddMemberTooltip);
@@ -203,21 +206,9 @@ public partial class ToolSystem : NetToolSystem
         }
     }
 
-    private void DisableActionTooltips()
-    {
-        if (applyAction is Game.Input.UIInputAction.State applyActionState)
-        {
-            m_DisplayOverridePropertyInfo.SetValue(applyActionState.action, null);
-        }
-        if (secondaryApplyAction is Game.Input.UIInputAction.State secondaryApplyActionState)
-        {
-            m_DisplayOverridePropertyInfo.SetValue(secondaryApplyActionState.action, null);
-        }
-    }
-
     public bool IsValidEntity(Entity entity)
     {
-        if (new[] { ToolState.Choosed, ToolState.Disabled }.Contains(m_UISystem.GetToolState()))
+        if (new[] { ToolState.Editing, ToolState.Disabled }.Contains(m_UISystem.GetToolState()))
         {
             return false;
         }
@@ -267,22 +258,9 @@ public partial class ToolSystem : NetToolSystem
 
     public void Enable()
     {
-        if (m_PrefabSystem.TryGetPrefab(m_PrefabEntity, out NetPrefab netPrefab))
-        {
-            this.prefab = netPrefab;
-            this.underground = m_ToolSystem.activeTool.requireUnderground;
-            m_Suspended = false;
-            m_ToolSystem.activeTool = this;
-            m_TooltipSystem.m_TooltipList.Clear();
-            m_TooltipSystem.Enabled = true;
-        }
-    }
-
-    public void Suspend()
-    {
-        m_Suspended = true;
+        m_ToolSystem.activeTool = this;
         m_TooltipSystem.m_TooltipList.Clear();
-        m_TooltipSystem.Enabled = false;
+        m_TooltipSystem.Enabled = true;
     }
 
     public void Disable()
@@ -290,9 +268,9 @@ public partial class ToolSystem : NetToolSystem
         if (m_ToolSystem.activeTool == this)
         {
             m_ToolSystem.activeTool = m_DefaultToolSystem;
-            m_TooltipSystem.m_TooltipList.Clear();
-            m_TooltipSystem.Enabled = false;
         }
+        m_TooltipSystem.m_TooltipList.Clear();
+        m_TooltipSystem.Enabled = false;
     }
 
     private void ToolChanged(ToolBaseSystem system)

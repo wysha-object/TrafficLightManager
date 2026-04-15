@@ -128,10 +128,10 @@ function GetCustomPhaseLane(edge: EdgeInfo, index: number, type: CustomPhaseLane
 }
 
 function SetBit(input: number, index: number, value: number) {
-    return ((input & (~(1 << index))) | (value << index));
+  return ((input & (~(1 << index))) | (value << index));
 }
 
-export default function EdgePanel(props: {data: EdgeInfo, index: number, position: ScreenPoint}) {
+export default function EdgePanel(props: { data: EdgeInfo, index: number, position: ScreenPoint }) {
   const clickHandler = useCallback((index: number, type: CustomPhaseLaneType, direction: CustomPhaseLaneDirection, currentSignal: CustomPhaseSignalState) => {
     let newSignal = currentSignal == "stop" ? "go" : (currentSignal == "go" ? "yield" : "stop");
     const newGroupMask: EdgeGroupMask = JSON.parse(JSON.stringify(props.data.m_EdgeGroupMask));
@@ -194,13 +194,13 @@ export default function EdgePanel(props: {data: EdgeInfo, index: number, positio
       newSignal = currentSignal == "stop" ? "go" : "stop";
       newGroupMask.m_PedestrianNonStopLine.m_GoGroupMask = SetBit(newGroupMask.m_PedestrianNonStopLine.m_GoGroupMask, index, newSignal != "stop" ? 1 : 0);
     }
-    call("C2VM.TLE", "CallUpdateEdgeGroupMask", JSON.stringify([newGroupMask]));
+    call("C2VM.TLE", "CallUpdateEdgeGroupMask", JSON.stringify({ groupMaskArray: [newGroupMask], entity: props.data.m_TrafficLightsEntity }));
   }, [props.data.m_EdgeGroupMask]);
 
   const unlinkHandler = useCallback(() => {
     const newGroupMask: EdgeGroupMask = JSON.parse(JSON.stringify(props.data.m_EdgeGroupMask));
     newGroupMask.m_Options |= EdgeGroupMaskOptions.PerLaneSignal;
-    call("C2VM.TLE", "CallUpdateEdgeGroupMask", JSON.stringify([newGroupMask]));
+    call("C2VM.TLE", "CallUpdateEdgeGroupMask", JSON.stringify({ groupMaskArray: [newGroupMask], entity: props.data.m_TrafficLightsEntity }));
   }, [props.data.m_EdgeGroupMask]);
 
   const cityConfiguration = useContext(CityConfigurationContext);

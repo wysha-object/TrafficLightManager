@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 using Colossal.Entities;
 using Game;
 using Game.Net;
@@ -28,6 +29,7 @@ public partial class UISystem : UISystemBase
         Choosed = 2,
         AddTrafficLights = 3,
         RemoveTrafficLights = 4,
+        Editing = 5,
     }
 
     public Entity m_SelectedTrafficLightGroupEntity { get; private set; }
@@ -109,6 +111,7 @@ public partial class UISystem : UISystemBase
 
     public void SimulationUpdate()
     {
+        m_CustomPhaseItemsBinding.Update();
         m_CurrentSignalGroupBinding.Update();
         m_TimerBinding.Update();
         RedrawGizmo();
@@ -280,6 +283,7 @@ public partial class UISystem : UISystemBase
 
     public void SetSelectedTrafficLightGroupEntity(Entity entity)
     {
+        RedrawIcon();
         m_SelectedTrafficLightGroupEntity = entity;
         m_CustomPhaseItemsBinding.Update();
         m_TimerBinding.Update();
@@ -295,12 +299,7 @@ public partial class UISystem : UISystemBase
 
     public void SetToolState(ToolState toolState)
     {
-        if (toolState == (ToolState)m_ToolStateBinding.value)
-        {
-            return;
-        }
-
-        if (toolState == ToolState.Choosed && m_SelectedTrafficLightGroupEntity == Entity.Null)
+        if (!new[] { ToolState.Disabled, ToolState.ChooseGroup }.Contains(toolState) && m_SelectedTrafficLightGroupEntity == Entity.Null)
         {
             toolState = ToolState.Disabled;
         }
@@ -308,22 +307,23 @@ public partial class UISystem : UISystemBase
         {
             case ToolState.Disabled:
                 m_ToolSystem.Disable();
+                m_SelectedTrafficLightGroupEntity = Entity.Null;
                 break;
             case ToolState.ChooseGroup:
             case ToolState.AddTrafficLights:
             case ToolState.RemoveTrafficLights:
+            case ToolState.Choosed:
+            case ToolState.Editing:
                 m_ToolSystem.Enable();
                 break;
-            case ToolState.Choosed:
-                m_ToolSystem.Suspend();
-                break;
         }
+        m_ToolStateBinding.Update((int)toolState);
 
-        m_RenderSystem.ClearLineMesh();
+        m_RenderSystem.ClearAllLineMesh();
         ClearEdgeInfo();
         ForEachTrafficLight(UpdateEdgeInfo);
 
-        m_ToolStateBinding.Update((int)toolState);
+        RedrawIcon();
         m_DisplayPhaseIndexBinding.Update(-1);
     }
 

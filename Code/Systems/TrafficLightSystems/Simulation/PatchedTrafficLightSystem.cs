@@ -979,31 +979,6 @@ public partial class PatchedTrafficLightSystem : GameSystemBase
         m_EndFrameBarrier.AddJobHandleForProducer(base.Dependency);
     }
 
-    public void SetCompatibilityMode(bool enable)
-    {
-        if (enable)
-        {
-            m_TrafficLightsQuery = GetEntityQuery(
-                ComponentType.ReadWrite<TrafficLights>(),
-                ComponentType.ReadWrite<CustomTrafficLights>(),
-                ComponentType.ReadOnly<UpdateFrame>(),
-                ComponentType.Exclude<Deleted>(),
-                ComponentType.Exclude<Destroyed>(),
-                ComponentType.Exclude<Temp>()
-            );
-        }
-        else
-        {
-            m_TrafficLightsQuery = GetEntityQuery(
-                ComponentType.ReadWrite<TrafficLights>(),
-                ComponentType.ReadOnly<UpdateFrame>(),
-                ComponentType.Exclude<Deleted>(),
-                ComponentType.Exclude<Destroyed>(),
-                ComponentType.Exclude<Temp>()
-            );
-        }
-    }
-
     public static void UpdateLaneSignal(TrafficLights trafficLights, ref LaneSignal laneSignal)
     {
         ExtraLaneSignal extraLaneSignal = new();

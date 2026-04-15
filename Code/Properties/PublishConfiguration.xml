@@ -4,7 +4,7 @@
     <!--Name of the mod to display to players-->
     <DisplayName Value="Traffic Light Manager" />
     <!--Short description of the mod-->
-    <ShortDescription Value="A traffic light management mod based on Cities2-TrafficLightsEnhancement (Traffic Lights Enhancement Alpha)" />
+    <ShortDescription Value="A traffic light management mod based on TLE" />
     <!--Long description of the mod. Single line or multi line. Supports minimal markdown subset-->
     <!--LongDescription Value="This is a long description" /-->
     <LongDescription>
@@ -27,16 +27,15 @@ If you find this mod helpful, please consider giving it a star !
     <!--Tag, can be set multiple times-->
     <Tag Value="" />
     <!--Version of the mod-->
-    <ModVersion Value="1.1.0" />
+    <ModVersion Value="1.2.0" />
     <!--Recommended version of the base game to use the mod-->
     <GameVersion Value="1.5.*" />
     <!--Dependency for the mod, can be set multiple times-->
     <Dependency Id="" />
     <!--Change log for new version. Single line or multi line. Supports minimal markdown subset-->
     <ChangeLog>
-
-- add multi-language localization support
-
+- Added coordinated traffic light control across multiple intersections
+- Simplified the UI
     </ChangeLog>
     <!--External link. supported types are discord, github, youtube, twitch, x, paypal, patreon-->
     <ExternalLink Type="github" Url="https://github.com/wysha-object/TrafficLightManager" />

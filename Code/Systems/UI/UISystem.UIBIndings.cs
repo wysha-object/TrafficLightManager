@@ -345,33 +345,39 @@ public partial class UISystem : UISystemBase
                         return "";
                     }
 
-                    EdgeGroupMask[] groupMaskArray = JsonConvert.DeserializeObject<EdgeGroupMask[]>(input);
+                    var definition = new { groupMaskArray = new EdgeGroupMask[0], entity = Entity.Null };
+                    var value = JsonConvert.DeserializeAnonymousType(input, definition);
+                    EdgeGroupMask[] groupMaskArray = value.groupMaskArray;
+                    Entity entity = value.entity;
 
                     ForEachTrafficLight(
                         (e) =>
                         {
-                            DynamicBuffer<EdgeGroupMask> groupMaskBuffer;
-                            if (EntityManager.HasBuffer<EdgeGroupMask>(e))
+                            if (e == entity)
                             {
-                                groupMaskBuffer = EntityManager.GetBuffer<EdgeGroupMask>(e, false);
-                            }
-                            else
-                            {
-                                groupMaskBuffer = EntityManager.AddBuffer<EdgeGroupMask>(e);
-                            }
-                            foreach (var newValue in groupMaskArray)
-                            {
-                                int index = CustomPhaseUtils.TryGet(groupMaskBuffer, newValue, out EdgeGroupMask oldValue);
-                                if (index >= 0)
+                                DynamicBuffer<EdgeGroupMask> groupMaskBuffer;
+                                if (EntityManager.HasBuffer<EdgeGroupMask>(e))
                                 {
-                                    groupMaskBuffer[index] = new EdgeGroupMask(oldValue, newValue);
+                                    groupMaskBuffer = EntityManager.GetBuffer<EdgeGroupMask>(e, false);
                                 }
                                 else
                                 {
-                                    groupMaskBuffer.Add(new EdgeGroupMask(oldValue, newValue));
+                                    groupMaskBuffer = EntityManager.AddBuffer<EdgeGroupMask>(e);
                                 }
+                                foreach (var newValue in groupMaskArray)
+                                {
+                                    int index = CustomPhaseUtils.TryGet(groupMaskBuffer, newValue, out EdgeGroupMask oldValue);
+                                    if (index >= 0)
+                                    {
+                                        groupMaskBuffer[index] = new EdgeGroupMask(oldValue, newValue);
+                                    }
+                                    else
+                                    {
+                                        groupMaskBuffer.Add(new EdgeGroupMask(oldValue, newValue));
+                                    }
+                                }
+                                UpdateEdgeInfo(e);
                             }
-                            UpdateEdgeInfo(e);
                         }
                     );
                     AddUpdate();
@@ -391,33 +397,39 @@ public partial class UISystem : UISystemBase
                         return "";
                     }
 
-                    SubLaneGroupMask[] groupMaskArray = JsonConvert.DeserializeObject<SubLaneGroupMask[]>(input);
+                    var definition = new { groupMaskArray = new SubLaneGroupMask[0], entity = Entity.Null };
+                    var value = JsonConvert.DeserializeAnonymousType(input, definition);
+                    SubLaneGroupMask[] groupMaskArray = value.groupMaskArray;
+                    Entity entity = value.entity;
 
                     ForEachTrafficLight(
                         (e) =>
                         {
-                            DynamicBuffer<SubLaneGroupMask> groupMaskBuffer;
-                            if (EntityManager.HasBuffer<SubLaneGroupMask>(e))
+                            if (e == entity)
                             {
-                                groupMaskBuffer = EntityManager.GetBuffer<SubLaneGroupMask>(e, false);
-                            }
-                            else
-                            {
-                                groupMaskBuffer = EntityManager.AddBuffer<SubLaneGroupMask>(e);
-                            }
-                            foreach (var newValue in groupMaskArray)
-                            {
-                                int index = CustomPhaseUtils.TryGet(groupMaskBuffer, newValue, out SubLaneGroupMask oldValue);
-                                if (index >= 0)
+                                DynamicBuffer<SubLaneGroupMask> groupMaskBuffer;
+                                if (EntityManager.HasBuffer<SubLaneGroupMask>(e))
                                 {
-                                    groupMaskBuffer[index] = new SubLaneGroupMask(oldValue, newValue);
+                                    groupMaskBuffer = EntityManager.GetBuffer<SubLaneGroupMask>(e, false);
                                 }
                                 else
                                 {
-                                    groupMaskBuffer.Add(new SubLaneGroupMask(oldValue, newValue));
+                                    groupMaskBuffer = EntityManager.AddBuffer<SubLaneGroupMask>(e);
                                 }
+                                foreach (var newValue in groupMaskArray)
+                                {
+                                    int index = CustomPhaseUtils.TryGet(groupMaskBuffer, newValue, out SubLaneGroupMask oldValue);
+                                    if (index >= 0)
+                                    {
+                                        groupMaskBuffer[index] = new SubLaneGroupMask(oldValue, newValue);
+                                    }
+                                    else
+                                    {
+                                        groupMaskBuffer.Add(new SubLaneGroupMask(oldValue, newValue));
+                                    }
+                                }
+                                UpdateEdgeInfo(e);
                             }
-                            UpdateEdgeInfo(e);
                         }
                     );
                     AddUpdate();

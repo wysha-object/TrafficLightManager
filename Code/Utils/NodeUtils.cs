@@ -163,6 +163,7 @@ public partial struct NodeUtils
                 subLaneInfoList.Add(subLaneInfo);
             }
             edgeInfo.m_SubLaneInfoList = subLaneInfoList.AsArray();
+            edgeInfo.m_TrafficLightsEntity = nodeEntity;
             edgeInfoList.Add(edgeInfo);
         }
 

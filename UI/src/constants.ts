@@ -8,4 +8,5 @@ export const enum ToolState {
   Choosed = 2,
   AddTrafficLights = 3,
   RemoveTrafficLights = 4,
+  Editing = 5,
 }

@@ -25,5 +25,4 @@
   "ResetBindingsDesc": "Reset all key bindings.",
   "CompatibilityModeLabel": "Compatibility Mode",
   "CompatibilityModeDesc": "Allows this mod to coexist with other mods that control traffic lights.\nNote: TLE cannot apply city-wide default traffic light settings when compatibility mode is on.",
-  "TooltipConfigure": "Configure"
 }

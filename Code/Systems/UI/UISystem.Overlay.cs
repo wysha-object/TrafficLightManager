@@ -1,3 +1,4 @@
+using System.Linq;
 using Colossal.Entities;
 using Game.Net;
 using Game.UI;
@@ -15,7 +16,7 @@ public partial class UISystem : UISystemBase
     {
         if (m_SelectedTrafficLightGroupEntity != Entity.Null)
         {
-            m_RenderSystem.ClearLineMesh();
+            m_RenderSystem.ClearLineMesh("gizmo");
             ForEachTrafficLight(
                 (e) =>
                 {
@@ -69,7 +70,7 @@ public partial class UISystem : UISystemBase
                                 }
                                 if ((laneSignal.m_GroupMask & 1 << displayIndex) != 0)
                                 {
-                                    m_RenderSystem.AddBezier(curve.m_Bezier, color, curve.m_Length, 0.25f);
+                                    m_RenderSystem.AddBezier("gizmo", curve.m_Bezier, color, curve.m_Length, 0.25f);
                                 }
                             }
                         }
@@ -85,19 +86,84 @@ public partial class UISystem : UISystemBase
         m_RenderSystem.ClearIconList();
         if (GetToolState() == ToolState.ChooseGroup)
         {
-            var entityQuery = EntityManager.CreateEntityQuery(ComponentType.ReadOnly<Node>(), ComponentType.ReadOnly<CustomTrafficLights>());
-            var nodeArray = entityQuery.ToComponentDataArray<Node>(Allocator.Temp);
-            var customTrafficLightsArray = entityQuery.ToComponentDataArray<CustomTrafficLights>(Allocator.Temp);
-            for (int i = 0; i < nodeArray.Length; i++)
+            var trafficLightsNodeArray = EntityManager
+                .CreateEntityQuery(new EntityQueryDesc { All = [ComponentType.ReadOnly<TrafficLights>()], None = [ComponentType.ReadOnly<CustomTrafficLights>()] })
+                .ToComponentDataArray<Node>(Allocator.Temp);
+            var customTrafficLightsNodeArray = EntityManager.CreateEntityQuery(ComponentType.ReadOnly<CustomTrafficLights>()).ToComponentDataArray<Node>(Allocator.Temp);
+
+            foreach (var item in trafficLightsNodeArray)
             {
-                var node = nodeArray[i];
-                var customTrafficLights = customTrafficLightsArray[i];
-                RenderSystem.Icon icon = RenderSystem.Icon.TrafficLight;
-                if (customTrafficLights.GetPatternOnly() == CustomTrafficLights.Patterns.CustomPhase)
+                m_RenderSystem.AddIcon(item.m_Position, RenderSystem.Icon.TrafficLight);
+            }
+            foreach (var item in customTrafficLightsNodeArray)
+            {
+                m_RenderSystem.AddIcon(item.m_Position, RenderSystem.Icon.TrafficLightWrench);
+            }
+        }
+        else if (GetToolState() == ToolState.AddTrafficLights)
+        {
+            var entityQuery = EntityManager.CreateEntityQuery(ComponentType.ReadOnly<CustomTrafficLights>());
+            var customTrafficLightsNodeArray = entityQuery.ToComponentDataArray<Node>(Allocator.Temp);
+            var customTrafficLightsArray = entityQuery.ToComponentDataArray<CustomTrafficLights>(Allocator.Temp);
+            for (int i = 0; i < customTrafficLightsNodeArray.Length; i++)
+            {
+                Node node = customTrafficLightsNodeArray[i];
+                CustomTrafficLights customTrafficLights = customTrafficLightsArray[i];
+                if (customTrafficLights.m_TrafficLightGroupEntity == m_SelectedTrafficLightGroupEntity)
                 {
-                    icon = RenderSystem.Icon.TrafficLightWrench;
+                    m_RenderSystem.AddIcon(node.m_Position, RenderSystem.Icon.TrafficLightLink);
                 }
-                m_RenderSystem.AddIcon(node.m_Position, icon);
+            }
+
+            var trafficLightsNodeArray = EntityManager
+                .CreateEntityQuery(new EntityQueryDesc { All = [ComponentType.ReadOnly<TrafficLights>()], None = [ComponentType.ReadOnly<CustomTrafficLights>()] })
+                .ToComponentDataArray<Node>(Allocator.Temp);
+
+            foreach (var item in trafficLightsNodeArray)
+            {
+                m_RenderSystem.AddIcon(item.m_Position, RenderSystem.Icon.TrafficLight);
+            }
+        }
+        else if (GetToolState() == ToolState.RemoveTrafficLights)
+        {
+            var entityQuery = EntityManager.CreateEntityQuery(ComponentType.ReadOnly<CustomTrafficLights>());
+            var customTrafficLightsNodeArray = entityQuery.ToComponentDataArray<Node>(Allocator.Temp);
+            var customTrafficLightsArray = entityQuery.ToComponentDataArray<CustomTrafficLights>(Allocator.Temp);
+            for (int i = 0; i < customTrafficLightsNodeArray.Length; i++)
+            {
+                Node node = customTrafficLightsNodeArray[i];
+                CustomTrafficLights customTrafficLights = customTrafficLightsArray[i];
+                if (customTrafficLights.m_TrafficLightGroupEntity == m_SelectedTrafficLightGroupEntity)
+                {
+                    m_RenderSystem.AddIcon(node.m_Position, RenderSystem.Icon.TrafficLightLink);
+                }
+            }
+        }
+        else if (GetToolState() == ToolState.Choosed)
+        {
+            var entityQuery = EntityManager.CreateEntityQuery(ComponentType.ReadOnly<CustomTrafficLights>());
+            var customTrafficLightsNodeArray = entityQuery.ToComponentDataArray<Node>(Allocator.Temp);
+            var customTrafficLightsArray = entityQuery.ToComponentDataArray<CustomTrafficLights>(Allocator.Temp);
+            for (int i = 0; i < customTrafficLightsNodeArray.Length; i++)
+            {
+                Node node = customTrafficLightsNodeArray[i];
+                CustomTrafficLights customTrafficLights = customTrafficLightsArray[i];
+                if (customTrafficLights.m_TrafficLightGroupEntity == m_SelectedTrafficLightGroupEntity)
+                {
+                    m_RenderSystem.AddIcon(node.m_Position, RenderSystem.Icon.TrafficLightLink);
+                }
+                else
+                {
+                    m_RenderSystem.AddIcon(node.m_Position, RenderSystem.Icon.TrafficLightWrench);
+                }
+            }
+
+            var trafficLightsNodeArray = EntityManager
+                .CreateEntityQuery(new EntityQueryDesc { All = [ComponentType.ReadOnly<TrafficLights>()], None = [ComponentType.ReadOnly<CustomTrafficLights>()] })
+                .ToComponentDataArray<Node>(Allocator.Temp);
+            foreach (var item in trafficLightsNodeArray)
+            {
+                m_RenderSystem.AddIcon(item.m_Position, RenderSystem.Icon.TrafficLight);
             }
         }
     }

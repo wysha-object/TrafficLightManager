@@ -96,19 +96,6 @@ public class Mod : IMod
         updateSystem.UpdateAt<TrafficLightManager.Code.Systems.Tool.ToolSystem>(SystemUpdatePhase.ToolUpdate);
         updateSystem.UpdateAt<TrafficLightManager.Code.Systems.Update.ModificationUpdateSystem>(SystemUpdatePhase.ModificationEnd);
         updateSystem.UpdateAfter<TrafficLightManager.Code.Systems.Update.SimulationUpdateSystem>(SystemUpdatePhase.GameSimulation);
-
-        SetCompatibilityMode(m_Settings != null && m_Settings.m_CompatibilityMode);
-    }
-
-    public static void SetCompatibilityMode(bool enable)
-    {
-        m_TrafficLightInitializationSystem.Enabled = enable;
-        m_TrafficLightSystem.Enabled = enable;
-
-        m_PatchedTrafficLightInitializationSystem.SetCompatibilityMode(enable);
-        m_PatchedTrafficLightSystem.SetCompatibilityMode(enable);
-
-        m_Log.Info($"Compatibility mode is set to {enable}.");
     }
 
     public static bool IsCanary()

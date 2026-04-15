@@ -8,7 +8,7 @@ import { EdgeGroupMaskOptions } from "@/constants";
 import Lane from './lane';
 import LinkVariant from '@/components/common/icons/link-variant';
 
-const Container = styled.div<{translateY: string}>`
+const Container = styled.div<{ translateY: string }>`
   position: fixed;
   transform: translate(-50%, ${props => props.translateY});
   margin: -10rem 0 0 -10rem;
@@ -109,10 +109,10 @@ function GetCustomPhaseLane(subLane: SubLaneInfo, index: number, type: CustomPha
 }
 
 function SetBit(input: number, index: number, value: number) {
-    return ((input & (~(1 << index))) | (value << index));
+  return ((input & (~(1 << index))) | (value << index));
 }
 
-export default function SubLanePanel(props: {edge: EdgeInfo, subLane: SubLaneInfo, index: number, position: ScreenPoint}) {
+export default function SubLanePanel(props: { edge: EdgeInfo, subLane: SubLaneInfo, index: number, position: ScreenPoint }) {
   const clickHandler = useCallback((index: number, type: CustomPhaseLaneType, direction: CustomPhaseLaneDirection, currentSignal: CustomPhaseSignalState) => {
     let newSignal = currentSignal == "stop" ? "go" : (currentSignal == "go" ? "yield" : "stop");
     const newGroupMask: SubLaneGroupMask = JSON.parse(JSON.stringify(props.subLane.m_SubLaneGroupMask));
@@ -162,13 +162,13 @@ export default function SubLanePanel(props: {edge: EdgeInfo, subLane: SubLaneInf
       newSignal = currentSignal == "stop" ? "go" : "stop";
       newGroupMask.m_Pedestrian.m_GoGroupMask = SetBit(newGroupMask.m_Pedestrian.m_GoGroupMask, index, newSignal != "stop" ? 1 : 0);
     }
-    call("C2VM.TLE", "CallUpdateSubLaneGroupMask", JSON.stringify([newGroupMask]));
+    call("C2VM.TLE", "CallUpdateSubLaneGroupMask", JSON.stringify({ groupMaskArray: [newGroupMask], entity: props.edge.m_TrafficLightsEntity }));
   }, [props.subLane]);
 
   const linkHandler = useCallback(() => {
     const newGroupMask: EdgeGroupMask = JSON.parse(JSON.stringify(props.edge.m_EdgeGroupMask));
     newGroupMask.m_Options &= ~EdgeGroupMaskOptions.PerLaneSignal;
-    call("C2VM.TLE", "CallUpdateEdgeGroupMask", JSON.stringify([newGroupMask]));
+    call("C2VM.TLE", "CallUpdateEdgeGroupMask", JSON.stringify({ groupMaskArray: [newGroupMask], entity: props.edge.m_TrafficLightsEntity }));
   }, [props.edge.m_EdgeGroupMask]);
 
   const carLaneCount = props.subLane.m_CarLaneLeftCount + props.subLane.m_CarLaneStraightCount + props.subLane.m_CarLaneRightCount + props.subLane.m_CarLaneUTurnCount;

@@ -112,6 +112,14 @@ export default function MainPanel() {
   }
 
   useEffect(() => {
+    if (currentItemState === ItemState.Editing) {
+      trigger("TrafficLightManager", "SetToolState", ToolState.Editing);
+    } else {
+      trigger("TrafficLightManager", "SetToolState", ToolState.Choosed);
+    }
+  }, [currentItemState]);
+
+  useEffect(() => {
     trigger("TrafficLightManager", "SetDisplayPhaseIndex", currentIndex);
     if (currentItemState === ItemState.Editing) {
       trigger("TrafficLightManager", "SetEditingPhaseIndex", currentIndex);
@@ -138,6 +146,7 @@ export default function MainPanel() {
         <AddMemberButton />
         <RemoveMemberButton />
       </TrafficLightsMembersContainer>
+      <div style={{ width: "0.3em", backgroundColor: "var(--panelColorDark)" }}></div>
       <LeftPanelContainer>
         {!manualControl && <>
           <Scrollable style={{ flex: 1 }} contentStyle={ItemContainerStyle}>

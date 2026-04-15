@@ -1,5 +1,5 @@
-using TrafficLightManager.Code.Components;
 using Colossal.UI.Binding;
+using TrafficLightManager.Code.Components;
 using Unity.Collections;
 using Unity.Entities;
 using static TrafficLightManager.Code.Systems.UI.UITypes;
@@ -46,6 +46,8 @@ public partial struct NodeUtils
 
         public EdgeGroupMask m_EdgeGroupMask;
 
+        public Entity m_TrafficLightsEntity;
+
         public void Write(IJsonWriter writer)
         {
             writer.TypeBegin(typeof(EdgeInfo).FullName);
@@ -88,6 +90,8 @@ public partial struct NodeUtils
             writer.ArrayEnd();
             writer.PropertyName("m_EdgeGroupMask");
             writer.Write(m_EdgeGroupMask);
+            writer.PropertyName("m_TrafficLightsEntity");
+            writer.Write(m_TrafficLightsEntity);
             writer.TypeEnd();
         }
     }

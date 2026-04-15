@@ -58,8 +58,20 @@ public partial class TrafficLightGroupSystem : GameSystemBase
                 NativeList<Entity> memberEntities = new NativeList<Entity>(trafficLightsMemberRefBuffer.Length, Allocator.Temp);
                 for (int j = trafficLightsMemberRefBuffer.Length - 1; j >= 0; j--)
                 {
-                    if (!m_EntityStorageInfoLookup.Exists(trafficLightsMemberRefBuffer[j].m_Entity))
+                    if (
+                        !m_EntityStorageInfoLookup.Exists(trafficLightsMemberRefBuffer[j].m_Entity)
+                        // 路口可能被其它方式删除
+                        || !m_TrafficLightsLookup.HasComponent(trafficLightsMemberRefBuffer[j].m_Entity)
+                        || !m_CustomTrafficLightsLookup.HasComponent(trafficLightsMemberRefBuffer[j].m_Entity)
+                    )
                     {
+                        if (
+                            !m_TrafficLightsLookup.HasComponent(trafficLightsMemberRefBuffer[j].m_Entity)
+                            && m_CustomTrafficLightsLookup.HasComponent(trafficLightsMemberRefBuffer[j].m_Entity)
+                        )
+                        {
+                            m_EntityCommandBuffer.RemoveComponent<CustomTrafficLights>(unfilteredChunkIndex, trafficLightsMemberRefBuffer[j].m_Entity);
+                        }
                         trafficLightsMemberRefBuffer.RemoveAtSwapBack(j);
                         continue;
                     }
