@@ -15,7 +15,7 @@
   <img src="https://img.shields.io/badge/TypeScript-3178C6"/>
 </p>
 
-## Feature
+## Features
  
 * Set traffic lights to various predefined signal modes
 
@@ -23,4 +23,16 @@
 
 ## Support
 
-If you find this mod helpful, please consider giving it a star !
+If you find this mod helpful, please consider giving it a star!
+
+## Contribution
+
+### i18n
+
+Use `node i18n-format` in the project root to quickly format localization files.
+
+Other localization files use `en-US` as the baseline.
+
+Extra fields will be removed.
+
+Missing fields are filled from the same/similar language by prefix first, then from `en-US`.

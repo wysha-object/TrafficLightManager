@@ -10,7 +10,6 @@
     "update": "npx create-csii-ui-mod update",
     "clean": "npx create-csii-ui-mod clean",
     "lint": "eslint ./src/ --report-unused-disable-directives",
-    "i18n:format": "node tools/i18n-format.js"
   },
   "exclude": [
     "node_modules",
