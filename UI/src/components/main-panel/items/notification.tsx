@@ -1,9 +1,7 @@
-import { useContext } from 'react';
 import styled from 'styled-components';
 
-import { LocaleContext } from '@/context';
-import { getString } from '@/localisations';
 import { engineCall } from '@/engine';
+import { useTranslate } from '@/localisations';
 
 const Notice = styled.div`
   border-radius: 3rem;
@@ -33,7 +31,7 @@ const Label = styled.div`
 `;
 
 export default function Notification(props: { data: MainPanelItemNotification }) {
-  const locale = useContext(LocaleContext);
+  const { t } = useTranslate();
   const clickHandler = () => {
     if (props.data.engineEventName && props.data.engineEventName.length > 0) {
       engineCall(props.data.engineEventName, JSON.stringify(props.data));
@@ -42,15 +40,15 @@ export default function Notification(props: { data: MainPanelItemNotification })
   return (
     <>
       {props.data.notificationType == "warning" &&
-      <Warning onClick={clickHandler}>
-        <Image src="Media/Game/Icons/AdvisorNotifications.svg" />
-        <Label>{getString(locale, props.data.label)}</Label>
-      </Warning>}
+        <Warning onClick={clickHandler}>
+          <Image src="Media/Game/Icons/AdvisorNotifications.svg" />
+          <Label>{t(props.data.label)}</Label>
+        </Warning>}
       {props.data.notificationType == "notice" &&
-      <Notice onClick={clickHandler}>
-        <Image src="Media/Game/Icons/AdvisorNotifications.svg" />
-        <Label>{getString(locale, props.data.label)}</Label>
-      </Notice>}
+        <Notice onClick={clickHandler}>
+          <Image src="Media/Game/Icons/AdvisorNotifications.svg" />
+          <Label>{t(props.data.label)}</Label>
+        </Notice>}
     </>
   );
 }

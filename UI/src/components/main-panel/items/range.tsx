@@ -1,9 +1,7 @@
-import { ChangeEvent, KeyboardEvent, useContext, useEffect, useMemo, useState } from 'react';
+import { ChangeEvent, KeyboardEvent, useEffect, useMemo, useState } from 'react';
 import styled from 'styled-components';
 
-import { LocaleContext } from '@/context';
 import { engineCall } from '@/engine';
-import { getString } from '@/localisations';
 
 import Input from '@/components/common/input';
 import Range from '@/components/common/range';
@@ -13,6 +11,7 @@ import Edit from '@/components/common/icons/edit';
 import ResetSettings from '@/components/common/icons/reset-settings';
 
 import TitleDim from './title-dim';
+import { useTranslate } from '@/localisations';
 
 const Container = styled.div`
   padding: 4rem 8rem;
@@ -45,7 +44,7 @@ const IconStyle = {
 };
 
 export default function MainPanelRange(props: { data: MainPanelItemRange, index: number }) {
-  const locale = useContext(LocaleContext);
+  const { t } = useTranslate();
   const [value, setValue] = useState(0);
   const [textFieldActive, setTextFieldActive] = useState(false);
   const [textFieldValue, setTextFieldValue] = useState("");
@@ -97,7 +96,7 @@ export default function MainPanelRange(props: { data: MainPanelItemRange, index:
   return (
     <Container>
       <TitleContainer>
-        <TitleDim itemType="title" title={props.data.label} secondaryText={!textFieldActive ? getString(locale, props.data.valuePrefix) + `${Math.round(value * 100) / 100}` + getString(locale, props.data.valueSuffix) : ""} />
+        <TitleDim itemType="title" title={props.data.label} secondaryText={!textFieldActive ? t(props.data.valuePrefix) + `${Math.round(value * 100) / 100}` + t(props.data.valueSuffix) : ""} />
         {textFieldActive && <Input type="number" style={{ minWidth: "3em", width: "3em" }} onChange={textFieldChangeHandler} onKeyDown={textFieldKeyDownHandler} value={textFieldValue} autoFocus />}
         {props.data.enableTextField && <>
           {textFieldActive && <IconContainer><Check style={IconStyle} onClick={submitTextField} /></IconContainer>}

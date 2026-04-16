@@ -1,16 +1,14 @@
 import { createContext } from "react";
 
-import { defaultLocale } from "./localisations";
-
 const defaultCityConfiguration = {
   leftHandTraffic: false
 };
 
 const CityConfigurationContext = createContext<CityConfiguration>(defaultCityConfiguration);
-const LocaleContext = createContext(defaultLocale);
+const LocalisationContext = createContext({});
 
 export {
   CityConfigurationContext,
   defaultCityConfiguration,
-  LocaleContext
+  LocalisationContext
 };

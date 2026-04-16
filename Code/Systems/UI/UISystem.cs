@@ -133,9 +133,9 @@ public partial class UISystem : UISystemBase
         localisationsHelper.AddToDictionary(GameManager.instance.localizationManager.activeDictionary);
         localisationsHelper.UpdateActiveDictionary();
 
-        if (m_LocaleBinding != null)
+        if (m_LocalisationBinding != null)
         {
-            m_LocaleBinding.Update();
+            m_LocalisationBinding.Update();
         }
     }
 

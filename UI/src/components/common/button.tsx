@@ -1,10 +1,8 @@
-import { MouseEventHandler, useContext } from 'react';
+import { useTranslate } from '@/localisations';
+import { MouseEventHandler } from 'react';
 import styled from 'styled-components';
 
-import { LocaleContext } from '@/context';
-import { getString } from '@/localisations';
-
-const ButtonComponent = styled.div<{disabled?: boolean}>`
+const ButtonComponent = styled.div<{ disabled?: boolean }>`
   padding: 3rem;
   border-radius: 3rem;
   color: var(--accentColorLighter);
@@ -17,9 +15,9 @@ const ButtonComponent = styled.div<{disabled?: boolean}>`
   }
 `;
 
-export default function Button(props: {label: string, disabled?: boolean, onClick?: MouseEventHandler<HTMLDivElement>}) {
-  const locale = useContext(LocaleContext);
+export default function Button(props: { label: string, disabled?: boolean, onClick?: MouseEventHandler<HTMLDivElement> }) {
+  const { t } = useTranslate();
   return (
-    <ButtonComponent {...props}>{getString(locale, props.label)}</ButtonComponent>
+    <ButtonComponent {...props}>{t(props.label)}</ButtonComponent>
   );
 }

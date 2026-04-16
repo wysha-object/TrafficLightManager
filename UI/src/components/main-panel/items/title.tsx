@@ -1,8 +1,6 @@
-import { useContext } from 'react';
+import { useTranslate } from '@/localisations';
 import styled from 'styled-components';
 
-import { LocaleContext } from '@/context';
-import { getString } from '@/localisations';
 
 const Container = styled.div`
   display: flex;
@@ -26,11 +24,11 @@ const SecondaryText = styled.div`
 `;
 
 export default function Title(props: MainPanelItemTitle) {
-  const locale = useContext(LocaleContext);
+  const { t } = useTranslate();
   return (
     <Container>
-      <TitleText>{getString(locale, props.title)}</TitleText>
-      {props.secondaryText && <SecondaryText>{getString(locale, props.secondaryText)}</SecondaryText>}
+      <TitleText>{t(props.title)}</TitleText>
+      {props.secondaryText && <SecondaryText>{t(props.secondaryText)}</SecondaryText>}
     </Container>
   );
 }

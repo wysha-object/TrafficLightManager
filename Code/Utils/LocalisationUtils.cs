@@ -79,13 +79,9 @@ public class LocalisationUtils
         m_ActiveDictionary = m_Dictionary;
     }
 
-    public static string GetActiveString(string key)
+    public static Dictionary<string, string> GetActiveDictionary()
     {
-        if (m_ActiveDictionary != null && m_ActiveDictionary.ContainsKey(key))
-        {
-            return m_ActiveDictionary[key];
-        }
-        return key;
+        return m_ActiveDictionary;
     }
 
     public string GetString(string key)

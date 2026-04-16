@@ -1,15 +1,13 @@
-import { CSSProperties, useContext } from "react";
+import { CSSProperties } from "react";
 import styled from "styled-components";
 
 import { bindValue, trigger, useValue } from "cs2/api";
-
-import { LocaleContext } from "@/context";
-import { getString } from "@/localisations";
 
 import Button from "@/components/common/button";
 import Radio from "@/components/common/radio";
 import Scrollable from "@/components/common/scrollable";
 import Divider from "@/components/main-panel/items/divider";
+import { useTranslate } from "@/localisations";
 
 const Label = styled.div<{ dim?: boolean }>`
   color: ${props => props.dim ? "var(--textColorDim)" : "var(--textColor)"};
@@ -44,7 +42,7 @@ const BackButton = (props: { onClick: () => void }) => {
 };
 
 function Item(props: { data: CustomPhaseItem, itemIndex: number, manualPhaseIndex: number }) {
-  const locale = useContext(LocaleContext);
+  const { t } = useTranslate();
   const clickHandler = () => {
     trigger("TrafficLightManager", "SetManualPhaseIndex", props.itemIndex);
   };
@@ -52,7 +50,7 @@ function Item(props: { data: CustomPhaseItem, itemIndex: number, manualPhaseInde
     <Row onClick={clickHandler}>
       <Radio isChecked={props.manualPhaseIndex == props.itemIndex} />
       <Label dim={true}>
-        {getString(locale, "Phase") + " #" + (props.itemIndex + 1)}
+        {t("Phase") + " #" + (props.itemIndex + 1)}
       </Label>
     </Row>
   );
@@ -62,12 +60,12 @@ export default function ManualControlPanel(props: { items: CustomPhaseItem[], on
   const manualPhaseIndex: number = useValue(bindValue("TrafficLightManager", "GetManualPhaseIndex"));
   console.log("ManualControlPanel render", { manualPhaseIndex });
 
-  const locale = useContext(LocaleContext);
+  const { t } = useTranslate();
   return (
     <>
       <Scrollable style={{ flex: 1 }} contentStyle={ItemContainerStyle}>
         <Row>
-          <Label dim={false}>{getString(locale, "CustomPhaseEditor.ManualControl")}</Label>
+          <Label dim={false}>{t("CustomPhaseEditor.ManualControl")}</Label>
         </Row>
         {props.items.map((item, index) => <Item data={item} itemIndex={index} manualPhaseIndex={manualPhaseIndex} />)}
       </Scrollable>

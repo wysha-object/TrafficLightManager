@@ -1,19 +1,15 @@
-import { useContext } from "react";
-
-import { LocaleContext } from "@/context";
-import { getString } from "@/localisations";
-
 import TooltipContainer from "@/components/common/tooltip-container";
+import { useTranslate } from "@/localisations";
 
-export default function TrafficSign(props: {state: CustomPhaseSignalState}) {
-  const locale = useContext(LocaleContext);
+export default function TrafficSign(props: { state: CustomPhaseSignalState }) {
+  const { t } = useTranslate();
   let text = "";
   if (props.state == "go") {
-    text = getString(locale, "TrafficSignGo");
+    text = t("TrafficSignGo");
   } else if (props.state == "yield") {
-    text = getString(locale, "TrafficSignYield");
+    text = t("TrafficSignYield");
   } else if (props.state == "stop") {
-    text = getString(locale, "TrafficSignStop");
+    text = t("TrafficSignStop");
   }
   return (
     <TooltipContainer>

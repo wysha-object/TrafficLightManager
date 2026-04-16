@@ -1,10 +1,7 @@
-import { useContext, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import styled from "styled-components";
 
 import { bindValue, call, useValue } from "cs2/api";
-
-import { LocaleContext } from "@/context";
-import { getString } from "@/localisations";
 
 import Check from "@/components/common/icons/check";
 import ChevronDown from "@/components/common/icons/chevron-down";
@@ -16,6 +13,7 @@ import VisibilityOff from "@/components/common/icons/visibility-off";
 import Row from "@/components/main-panel/items/row";
 
 import ItemDivider from "./item-divider";
+import { useTranslate } from "@/localisations";
 
 const Label = styled.div<{ dim?: boolean }>`
   color: ${props => props.dim ? "var(--textColorDim)" : "var(--textColor)"};
@@ -74,7 +72,7 @@ export default function Item(
     updateCurrentIndex: (index: number) => void,
   }
 ) {
-  const locale = useContext(LocaleContext);
+  const { t } = useTranslate();
   const [isActiveLabel, setIsActiveLabel] = useState(false);
   const swapItem = (index1: number, index2: number) => {
     call("C2VM.TLE", "CallSwapCustomPhase", JSON.stringify({ index1, index2 }))
@@ -99,7 +97,7 @@ export default function Item(
     <>
       <Row style={{ padding: "0.25em" }}>
         <Label dim={!isActiveLabel}>
-          {getString(locale, "Phase") + " #" + (props.itemIndex + 1)}{currentIndex === props.itemIndex && <ActiveDot />}
+          {t("Phase") + " #" + (props.itemIndex + 1)}{currentIndex === props.itemIndex && <ActiveDot />}
         </Label>
         <IconBarContainer>
           {props.itemState != ItemState.Editing && <>

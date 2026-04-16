@@ -8,13 +8,12 @@ using TrafficLightManager.Code.Utils;
 using Unity.Collections;
 using Unity.Entities;
 using UnityEngine;
-using UnityEngine.Windows;
 
 namespace TrafficLightManager.Code.Systems.UI;
 
 public partial class UISystem : UISystemBase
 {
-    private static GetterValueBinding<string> m_LocaleBinding;
+    private static GetterValueBinding<string> m_LocalisationBinding;
 
     private GetterValueBinding<string> m_CityConfigurationBinding;
 
@@ -43,12 +42,12 @@ public partial class UISystem : UISystemBase
     private void AddUIBindings()
     {
         AddBinding(
-            m_LocaleBinding = new GetterValueBinding<string>(
-                "C2VM.TLE",
-                "GetLocale",
+            m_LocalisationBinding = new GetterValueBinding<string>(
+                "TrafficLightManager",
+                "GetLocalisation",
                 () =>
                 {
-                    var result = new { locale = GetLocaleCode() };
+                    var result = LocalisationUtils.GetActiveDictionary();
 
                     return JsonConvert.SerializeObject(result);
                 }

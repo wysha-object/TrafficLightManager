@@ -1,16 +1,12 @@
-import { useContext } from "react";
-
-import { LocaleContext } from "@/context";
-import { getString } from "@/localisations";
-
 import TooltipContainer from "@/components/common/tooltip-container";
+import { useTranslate } from "@/localisations";
 
-export default function LinkPhase(props: {link: boolean}) {
-  const locale = useContext(LocaleContext);
+export default function LinkPhase(props: { link: boolean }) {
+  const { t } = useTranslate();
   return (
     <TooltipContainer>
-      {props.link && getString(locale, "LinkPhase")}
-      {!props.link && getString(locale, "UnlinkPhase")}
+      {props.link && t("LinkPhase")}
+      {!props.link && t("UnlinkPhase")}
     </TooltipContainer>
   );
 }
