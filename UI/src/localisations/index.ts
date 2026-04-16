@@ -1,7 +1,8 @@
-import { bindValue, useValue } from "cs2/api";
+import { LocalisationContext } from "@/context";
+import { useContext } from "react";
 
 const useTranslate = () => {
-  let locale = JSON.parse(useValue(bindValue("TrafficLightManager", "GetLocalisation")));
+  let locale: any = useContext(LocalisationContext);
   let t = (key: string) => locale[key] || key;
   return {
     t
