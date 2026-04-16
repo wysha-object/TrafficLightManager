@@ -49,7 +49,7 @@ public class LocalisationUtils
         {
             m_Locale = m_DefaultLocale;
         }
-        string resourceName = "TrafficLightManager.Code.Resources.Localisations." + m_Locale + ".json";
+        string resourceName = "TrafficLightManager.Code.Resources.Localization." + m_Locale + ".json";
         using Stream stream = Assembly.GetExecutingAssembly().GetManifestResourceStream(resourceName);
         if (stream == null)
         {

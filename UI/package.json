@@ -9,7 +9,7 @@
     "dev": "webpack --watch",
     "update": "npx create-csii-ui-mod update",
     "clean": "npx create-csii-ui-mod clean",
-    "lint": "eslint ./src/ --report-unused-disable-directives",
+    "lint": "eslint ./src/ --report-unused-disable-directives"
   },
   "exclude": [
     "node_modules",
