@@ -4,9 +4,9 @@
 
 <p align="center">
   语言:
-  <a href="../README.md">English</a>
+  <a href="/README.md">English</a>
   |
-  <a href="./README_zh_HANS.md">简体中文</a>
+  <a href="/docs/README_zh_HANS.md">简体中文</a>
 </p>
 
 <p align="center">
@@ -29,7 +29,7 @@
 
 ### i18n
 
-所有本地化文件在[Code/Resources/Localization](./Code/Resources/Localization)目录.
+所有本地化文件在[Code/Resources/Localization](/Code/Resources/Localization)目录.
 
 在项目根目录下使用`node i18n-format`可以快速格式化本地化文件
 
