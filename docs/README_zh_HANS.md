@@ -29,6 +29,8 @@
 
 ### i18n
 
+所有本地化文件在[Code/Resources/Localization](./Code/Resources/Localization)目录.
+
 在项目根目录下使用`node i18n-format`可以快速格式化本地化文件
 
 其它本地化文件以en-US作为标准
