@@ -4,9 +4,9 @@
 
 <p align="center">
   Languages:
-  <a href="./README.md">English</a>
+  <a href="/README.md">English</a>
   |
-  <a href="./docs/README_zh_HANS.md">简体中文</a>
+  <a href="/docs/README_zh_HANS.md">简体中文</a>
 </p>
 
 <p align="center">
@@ -29,7 +29,7 @@ If you find this mod helpful, please consider giving it a star!
 
 ### i18n
 
-All localization files can be found in the [Code/Resources/Localization](./Code/Resources/Localization) directory.
+All localization files can be found in the [Code/Resources/Localization](/Code/Resources/Localization) directory.
 
 Use `node i18n-format` in the project root to quickly format localization files.
 
