@@ -102,10 +102,6 @@
         <EmbeddedResource Include="Resources\**\*" />
     </ItemGroup>
 
-    <ItemGroup>
-        <ProjectReference Include="..\Lib\LaneSystem\LaneSystem.csproj" />
-    </ItemGroup>
-
     <Target Name="CopyLaneSystem" BeforeTargets="CoreCompile">
         <ItemGroup>
             <LaneSystemFiles Include="..\Lib\LaneSystem\bin\$(Configuration)\$(TargetFramework)\*.*" />
