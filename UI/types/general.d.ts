@@ -32,6 +32,7 @@ interface MainPanelItemCheckbox {
   value: string,
   label: string,
   engineEventName: string
+  index: number
 }
 
 interface MainPanelItemButton {

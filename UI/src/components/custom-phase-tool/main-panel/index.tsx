@@ -156,6 +156,7 @@ export default function MainPanel() {
                 itemIndex={index}
                 itemState={index === currentIndex ? currentItemState : ItemState.None}
                 currentIndex={currentIndex}
+                itemCount={customPhaseItems.length}
                 updateItemState={(state) => {
                   if (state === ItemState.None) {
                     setCurrentIndex(-1);

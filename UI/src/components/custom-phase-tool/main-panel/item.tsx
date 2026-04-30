@@ -68,6 +68,7 @@ export default function Item(
     itemIndex: number,
     itemState: ItemState,
     currentIndex: number,
+    itemCount: number,
     updateItemState: (state: ItemState) => void,
     updateCurrentIndex: (index: number) => void,
   }
@@ -124,10 +125,10 @@ export default function Item(
               <Check style={IconStyle} onClick={() => props.updateItemState(ItemState.None)} />
             </IconContainer>
             <IconContainer>
-              <ChevronUp style={{ ...IconStyle, ...IconStyleDisabled }} onClick={() => swapItem(props.itemIndex, props.itemIndex - 1)} />
+              {(props.itemIndex - 1) >= 0 && <ChevronUp style={{ ...IconStyle, ...IconStyleDisabled }} onClick={() => swapItem(props.itemIndex, props.itemIndex - 1)} />}
             </IconContainer>
             <IconContainer>
-              <ChevronDown style={{ ...IconStyle, ...IconStyleDisabled }} onClick={() => swapItem(props.itemIndex, props.itemIndex + 1)} />
+              {(props.itemIndex + 1) < props.itemCount && <ChevronDown style={{ ...IconStyle, ...IconStyleDisabled }} onClick={() => swapItem(props.itemIndex, props.itemIndex + 1)} />}
             </IconContainer>
           </>}
         </IconBarContainer>

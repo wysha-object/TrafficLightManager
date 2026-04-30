@@ -82,7 +82,8 @@ export default function SubPanel(props: { data: CustomPhaseItem | null, itemInde
           key: "PrioritiseTrack",
           value: "0",
           label: "",
-          engineEventName: "C2VM.TLE.CallUpdateCustomPhaseData"
+          engineEventName: "C2VM.TLE.CallUpdateCustomPhaseData",
+          index: props.itemIndex
         }}
         >
           <Checkbox isChecked={data.prioritiseTrack} />
@@ -95,7 +96,8 @@ export default function SubPanel(props: { data: CustomPhaseItem | null, itemInde
           key: "PrioritisePublicCar",
           value: "0",
           label: "",
-          engineEventName: "C2VM.TLE.CallUpdateCustomPhaseData"
+          engineEventName: "C2VM.TLE.CallUpdateCustomPhaseData",
+          index: props.itemIndex
         }}
         >
           <Checkbox isChecked={data.prioritisePublicCar} />
@@ -108,7 +110,8 @@ export default function SubPanel(props: { data: CustomPhaseItem | null, itemInde
           key: "PrioritisePedestrian",
           value: "0",
           label: "",
-          engineEventName: "C2VM.TLE.CallUpdateCustomPhaseData"
+          engineEventName: "C2VM.TLE.CallUpdateCustomPhaseData",
+          index: props.itemIndex
         }}
         >
           <Checkbox isChecked={data.prioritisePedestrian} />
