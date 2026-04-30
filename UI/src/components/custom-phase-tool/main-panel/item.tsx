@@ -132,7 +132,7 @@ export default function Item(
           </>}
         </IconBarContainer>
       </Row>
-      {props.itemIndex + 1 < props.itemIndex && <ItemDivider index={props.itemIndex} linked={props.data.linkedWithNextPhase} />}
+      {<ItemDivider index={props.itemIndex} linked={props.data.linkedWithNextPhase} />}
     </>
   );
 }
