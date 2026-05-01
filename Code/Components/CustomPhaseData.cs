@@ -79,7 +79,8 @@ public struct CustomPhaseData : IBufferElementData, ISerializable
     public void Deserialize<TReader>(TReader reader)
         where TReader : IReader
     {
-        reader.Read(out ushort schemaVersion);
+        ushort schemaVersion;
+        reader.Read(out schemaVersion);
         Initialisation();
         reader.Read(out m_TurnsSinceLastRun);
         reader.Read(out m_LowFlowTimer);
