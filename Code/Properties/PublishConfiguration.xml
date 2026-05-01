@@ -27,7 +27,7 @@ If you find this mod helpful, please consider giving it a star !
     <!--Tag, can be set multiple times-->
     <Tag Value="" />
     <!--Version of the mod-->
-    <ModVersion Value="1.2.5" />
+    <ModVersion Value="1.2.6" />
     <!--Recommended version of the base game to use the mod-->
     <GameVersion Value="1.5.*" />
     <!--Dependency for the mod, can be set multiple times-->
@@ -35,7 +35,7 @@ If you find this mod helpful, please consider giving it a star !
     <!--Change log for new version. Single line or multi line. Supports minimal markdown subset-->
     <ChangeLog>
 - Update translations
-- Fix unexpected crash when adjusting phase order
+- Add tooltip
     </ChangeLog>
     <!--External link. supported types are discord, github, youtube, twitch, x, paypal, patreon-->
     <ExternalLink Type="github" Url="https://github.com/wysha-object/TrafficLightManager" />
