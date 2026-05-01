@@ -193,7 +193,9 @@ export default function SubPanel(props: { data: CustomPhaseItem | null, itemInde
         secondaryText={`
           ${props.trafficLightGroup.currentPhaseIndex == props.itemIndex ? props.trafficLightGroup.timer : 0}
           / 
-          ${props.trafficLightGroup.currentPhaseIndex == props.itemIndex ? Round(Math.min(Math.max(props.trafficLightGroup.targetDuration, data.minimumDuration), data.maximumDuration)) : data.minimumDuration}
+          ${(props.trafficLightGroup.currentPhaseIndex == props.itemIndex ?
+            Math.min(Math.max(props.trafficLightGroup.targetDuration, data.minimumDuration), data.maximumDuration) : data.minimumDuration
+          ).toFixed(2)}s
         `}
         dim={true}
       />
@@ -207,7 +209,7 @@ export default function SubPanel(props: { data: CustomPhaseItem | null, itemInde
         dim={true} />
       <ItemTitle
         title={t("CustomPhaseEditor.Statistics.CarFlow")}
-        secondaryText={`${data.carFlow}`}
+        secondaryText={`${data.carFlow.toFixed(8)}`}
         dim={true} />
       <ItemTitle
         title={t("CustomPhaseEditor.Statistics.CarLaneOccupied")}
@@ -235,14 +237,10 @@ export default function SubPanel(props: { data: CustomPhaseItem | null, itemInde
       />
       <ItemTitle
         title={t("CustomPhaseEditor.Statistics.WeightedWaiting")}
-        secondaryText={`${Round(data.weightedWaiting)}`}
+        secondaryText={`${data.weightedWaiting.toFixed(2)}`}
         dim={true}
       />
       {props.trafficLightGroup.manualPhaseIndex < 0 && props.trafficLightGroup.currentPhaseIndex == props.itemIndex && <EndPhaseButton index={props.itemIndex} disabled={data.endPhasePrematurely} />}
     </>
   );
-}
-
-function Round(num: number): number {
-  return Math.round(num * 100) / 100;
 }

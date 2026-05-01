@@ -30,8 +30,6 @@ public struct CustomTrafficLights : IComponentData, IQueryTypeParameter, ISerial
         CentreTurnGiveWay = 1 << 18,
     }
 
-    private int m_SchemaVersion;
-
     // Schema 1
     private const int DefaultSelectedPatternLength = 16;
 
@@ -51,33 +49,42 @@ public struct CustomTrafficLights : IComponentData, IQueryTypeParameter, ISerial
     // Schema 5
     public Entity m_TrafficLightGroupEntity;
 
+    // Schema 6
+    public float m_TargetDuration;
+
+    public byte m_Status;
+
     public void Serialize<TWriter>(TWriter writer)
         where TWriter : IWriter
     {
-        m_SchemaVersion = 5;
+        int schemaVersion = 6;
         writer.Write(uint.MaxValue);
-        writer.Write(m_SchemaVersion);
+        writer.Write(schemaVersion);
         writer.Write(uint.MaxValue);
         writer.Write(m_PedestrianPhaseDurationMultiplier);
         writer.Write(m_PedestrianPhaseGroupMask);
         writer.Write(m_Timer);
         writer.Write(m_TrafficLightGroupEntity);
+        writer.Write(m_TargetDuration);
     }
 
     public void Deserialize<TReader>(TReader reader)
         where TReader : IReader
     {
+        m_Status = 0;
+        int schemaVersion;
+
         reader.Read(out uint uint1);
         if (uint1 == uint.MaxValue)
         {
-            reader.Read(out m_SchemaVersion);
+            reader.Read(out schemaVersion);
         }
         else
         {
-            m_SchemaVersion = 1;
+            schemaVersion = 1;
         }
 
-        if (m_SchemaVersion == 1)
+        if (schemaVersion == 1)
         {
             for (int i = 1; i < DefaultSelectedPatternLength; i++)
             {
@@ -85,14 +92,14 @@ public struct CustomTrafficLights : IComponentData, IQueryTypeParameter, ISerial
             }
         }
 
-        if (m_SchemaVersion >= 2)
+        if (schemaVersion >= 2)
         {
             reader.Read(out uint _);
         }
 
         m_PedestrianPhaseDurationMultiplier = 1;
         m_PedestrianPhaseGroupMask = 0;
-        if (m_SchemaVersion >= 3)
+        if (schemaVersion >= 3)
         {
             reader.Read(out float pedestrianPhaseDurationMultiplier);
             reader.Read(out int pedestrianPhaseGroupMask);
@@ -100,13 +107,13 @@ public struct CustomTrafficLights : IComponentData, IQueryTypeParameter, ISerial
             m_PedestrianPhaseGroupMask = pedestrianPhaseGroupMask;
         }
 
-        if (m_SchemaVersion >= 4)
+        if (schemaVersion >= 4)
         {
             reader.Read(out m_Timer);
         }
         m_ManualSignalGroup = 0;
 
-        if (m_SchemaVersion >= 5)
+        if (schemaVersion >= 5)
         {
             reader.Read(out m_TrafficLightGroupEntity);
             SetPatternOnly(Patterns.CustomPhase);
@@ -115,11 +122,15 @@ public struct CustomTrafficLights : IComponentData, IQueryTypeParameter, ISerial
         {
             SetPatternOnly(Patterns.ModDefault);
         }
+
+        if (schemaVersion >= 6)
+        {
+            reader.Read(out m_TargetDuration);
+        }
     }
 
     public CustomTrafficLights()
     {
-        m_SchemaVersion = 5;
         m_Pattern = Patterns.ModDefault;
         m_PedestrianPhaseDurationMultiplier = 1;
         m_PedestrianPhaseGroupMask = 0;
@@ -130,7 +141,6 @@ public struct CustomTrafficLights : IComponentData, IQueryTypeParameter, ISerial
 
     public CustomTrafficLights(Patterns pattern)
     {
-        m_SchemaVersion = 5;
         m_Pattern = pattern;
         m_PedestrianPhaseDurationMultiplier = 1;
         m_PedestrianPhaseGroupMask = 0;
@@ -141,7 +151,6 @@ public struct CustomTrafficLights : IComponentData, IQueryTypeParameter, ISerial
 
     public CustomTrafficLights(Patterns pattern, Entity trafficLightGroupEntity)
     {
-        m_SchemaVersion = 5;
         m_Pattern = pattern;
         m_PedestrianPhaseDurationMultiplier = 1;
         m_PedestrianPhaseGroupMask = 0;

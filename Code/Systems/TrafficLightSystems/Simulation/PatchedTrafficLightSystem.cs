@@ -27,6 +27,59 @@ namespace TrafficLightManager.Code.Systems.TrafficLightSystems.Simulation;
 [CompilerGenerated]
 public partial class PatchedTrafficLightSystem : GameSystemBase
 {
+    [Preserve]
+    protected override void OnUpdate()
+    {
+        m_TrafficLightsQuery.ResetFilter();
+        m_TrafficLightsQuery.SetSharedComponentFilter(
+            new UpdateFrame(SimulationUtils.GetUpdateFrameWithInterval(m_SimulationSystem.frameIndex, (uint)GetUpdateInterval(SystemUpdatePhase.GameSimulation), 16))
+        );
+        JobHandle dependency = //JobChunkExtensions.Schedule(
+        JobChunkExtensions.ScheduleParallel(
+            new UpdateTrafficLightsJob
+            {
+                m_EntityStorageInfoLookup = GetEntityStorageInfoLookup(),
+                m_EntityType = InternalCompilerInterface.GetEntityTypeHandle(ref __TypeHandle.__Unity_Entities_Entity_TypeHandle, ref base.CheckedStateRef),
+                m_SubLaneType = InternalCompilerInterface.GetBufferTypeHandle(ref __TypeHandle.__Game_Net_SubLane_RO_BufferTypeHandle, ref base.CheckedStateRef),
+                m_ConnectedEdgeType = InternalCompilerInterface.GetBufferTypeHandle(ref __TypeHandle.__Game_Net_ConnectedEdge_RO_BufferTypeHandle, ref base.CheckedStateRef),
+                m_SubObjectType = InternalCompilerInterface.GetBufferTypeHandle(ref __TypeHandle.__Game_Objects_SubObject_RO_BufferTypeHandle, ref base.CheckedStateRef),
+                m_TrafficLightsType = InternalCompilerInterface.GetComponentTypeHandle(ref __TypeHandle.__Game_Net_TrafficLights_RW_ComponentTypeHandle, ref base.CheckedStateRef),
+                m_OwnerData = InternalCompilerInterface.GetComponentLookup(ref __TypeHandle.__Game_Common_Owner_RO_ComponentLookup, ref base.CheckedStateRef),
+                m_NodeData = InternalCompilerInterface.GetComponentLookup(ref __TypeHandle.__Game_Net_Node_RO_ComponentLookup, ref base.CheckedStateRef),
+                m_EdgeData = InternalCompilerInterface.GetComponentLookup(ref __TypeHandle.__Game_Net_Edge_RO_ComponentLookup, ref base.CheckedStateRef),
+                m_CurveData = InternalCompilerInterface.GetComponentLookup(ref __TypeHandle.__Game_Net_Curve_RO_ComponentLookup, ref base.CheckedStateRef),
+                m_LaneData = InternalCompilerInterface.GetComponentLookup(ref __TypeHandle.__Game_Net_Lane_RO_ComponentLookup, ref base.CheckedStateRef),
+                m_LaneReservationData = InternalCompilerInterface.GetComponentLookup(ref __TypeHandle.__Game_Net_LaneReservation_RO_ComponentLookup, ref base.CheckedStateRef),
+                m_TransformData = InternalCompilerInterface.GetComponentLookup(ref __TypeHandle.__Game_Objects_Transform_RO_ComponentLookup, ref base.CheckedStateRef),
+                m_PrefabRefData = InternalCompilerInterface.GetComponentLookup(ref __TypeHandle.__Game_Prefabs_PrefabRef_RO_ComponentLookup, ref base.CheckedStateRef),
+                m_PrefabCarLaneData = InternalCompilerInterface.GetComponentLookup(ref __TypeHandle.__Game_Prefabs_CarLaneData_RO_ComponentLookup, ref base.CheckedStateRef),
+                m_PrefabMoveableBridgeData = InternalCompilerInterface.GetComponentLookup(
+                    ref __TypeHandle.__Game_Prefabs_MoveableBridgeData_RO_ComponentLookup,
+                    ref base.CheckedStateRef
+                ),
+                m_PrefabObjectGeometryData = InternalCompilerInterface.GetComponentLookup(
+                    ref __TypeHandle.__Game_Prefabs_ObjectGeometryData_RO_ComponentLookup,
+                    ref base.CheckedStateRef
+                ),
+                m_LaneObjects = InternalCompilerInterface.GetBufferLookup(ref __TypeHandle.__Game_Net_LaneObject_RO_BufferLookup, ref base.CheckedStateRef),
+                m_SubNets = InternalCompilerInterface.GetBufferLookup(ref __TypeHandle.__Game_Net_SubNet_RO_BufferLookup, ref base.CheckedStateRef),
+                m_SubLanes = InternalCompilerInterface.GetBufferLookup(ref __TypeHandle.__Game_Net_SubLane_RO_BufferLookup, ref base.CheckedStateRef),
+                m_ConnectedEdges = InternalCompilerInterface.GetBufferLookup(ref __TypeHandle.__Game_Net_ConnectedEdge_RO_BufferLookup, ref base.CheckedStateRef),
+                m_LaneSignalData = InternalCompilerInterface.GetComponentLookup(ref __TypeHandle.__Game_Net_LaneSignal_RW_ComponentLookup, ref base.CheckedStateRef),
+                m_TrafficLightData = InternalCompilerInterface.GetComponentLookup(ref __TypeHandle.__Game_Objects_TrafficLight_RW_ComponentLookup, ref base.CheckedStateRef),
+                m_PointOfInterestData = InternalCompilerInterface.GetComponentLookup(ref __TypeHandle.__Game_Common_PointOfInterest_RW_ComponentLookup, ref base.CheckedStateRef),
+                m_EntityCommandBuffer = m_EndFrameBarrier.CreateCommandBuffer().AsParallelWriter(),
+                m_ExtraTypeHandle = m_ExtraTypeHandle.Update(ref base.CheckedStateRef),
+                m_TrafficLightGroupData = InternalCompilerInterface.GetComponentLookup(ref __TypeHandle.__TrafficLightGroupData_RO_ComponentLookup, ref base.CheckedStateRef),
+                m_CustomPhaseDataData = InternalCompilerInterface.GetBufferLookup(ref __TypeHandle.__CustomPhaseData_RO_BufferLookup, ref base.CheckedStateRef),
+            },
+            m_TrafficLightsQuery,
+            base.Dependency
+        );
+        base.Dependency = dependency;
+        m_EndFrameBarrier.AddJobHandleForProducer(base.Dependency);
+    }
+
     [BurstCompile]
     public struct UpdateTrafficLightsJob : IJobChunk
     {
@@ -100,11 +153,9 @@ public partial class PatchedTrafficLightSystem : GameSystemBase
         [NativeDisableParallelForRestriction]
         public ComponentLookup<PointOfInterest> m_PointOfInterestData;
 
-        public EntityCommandBuffer.ParallelWriter m_CommandBuffer;
+        public EntityCommandBuffer.ParallelWriter m_EntityCommandBuffer;
 
         public ExtraTypeHandle m_ExtraTypeHandle;
-
-        public ExtraData m_ExtraData;
 
         [ReadOnly]
         public ComponentLookup<TrafficLightGroup> m_TrafficLightGroupData;
@@ -137,7 +188,7 @@ public partial class PatchedTrafficLightSystem : GameSystemBase
                 CustomTrafficLights customTrafficLights = i < customTrafficLightsArray.Length ? customTrafficLightsArray[i] : new CustomTrafficLights();
                 if (customTrafficLightsArray.Length > 0 && !m_EntityStorageInfoLookup.Exists(customTrafficLights.m_TrafficLightGroupEntity))
                 {
-                    m_CommandBuffer.RemoveComponent<CustomTrafficLights>(unfilteredChunkIndex, e);
+                    m_EntityCommandBuffer.RemoveComponent<CustomTrafficLights>(unfilteredChunkIndex, e);
                     continue;
                 }
 
@@ -146,6 +197,7 @@ public partial class PatchedTrafficLightSystem : GameSystemBase
                 if (trafficLightGroupEntity != Entity.Null)
                 {
                     trafficLightGroup = m_TrafficLightGroupData[trafficLightGroupEntity];
+                    m_EntityCommandBuffer.AddComponent<Sync>(unfilteredChunkIndex, trafficLightGroupEntity);
                 }
 
                 DynamicBuffer<CustomPhaseData>? customPhaseDataBuffer = null;
@@ -165,11 +217,7 @@ public partial class PatchedTrafficLightSystem : GameSystemBase
 
                 if (customPhaseDataBuffer.HasValue && (trafficLights.m_Flags & TrafficLightFlags.MoveableBridge) == 0)
                 {
-                    DynamicBuffer<CustomPhaseData> customPhaseDataBufferValue = customPhaseDataBuffer.Value;
-                    CustomStateMachine.CalculatePriority(this, subLanes, customPhaseDataBufferValue);
-                    CustomStateMachine.CalculateFlow(this, unfilteredChunkIndex, subLanes, trafficLights, customPhaseDataBufferValue);
-                    CustomStateMachine.UpdateTrafficLightState(ref trafficLights, ref customTrafficLights, customPhaseDataBufferValue);
-                    UpdateLaneSignals(laneSignals, trafficLights);
+                    customTrafficLights.m_Status++;
                     UpdateTrafficLightObjects(subObjects, trafficLights);
                 }
                 else if (UpdateTrafficLightState(laneSignals, moveableBridgeData, ref trafficLights, ref customTrafficLights))
@@ -180,7 +228,7 @@ public partial class PatchedTrafficLightSystem : GameSystemBase
                     {
                         ref PointOfInterest valueRW = ref m_PointOfInterestData.GetRefRW(entity).ValueRW;
                         UpdateMoveableBridge(trafficLights, m_TransformData[entity], moveableBridgeData, ref valueRW);
-                        m_CommandBuffer.AddComponent<EffectsUpdated>(unfilteredChunkIndex, nativeArray[i]);
+                        m_EntityCommandBuffer.AddComponent<EffectsUpdated>(unfilteredChunkIndex, nativeArray[i]);
                     }
                 }
 
@@ -931,60 +979,6 @@ public partial class PatchedTrafficLightSystem : GameSystemBase
             ComponentType.Exclude<Temp>()
         );
         RequireForUpdate(m_TrafficLightsQuery);
-    }
-
-    [Preserve]
-    protected override void OnUpdate()
-    {
-        m_TrafficLightsQuery.ResetFilter();
-        m_TrafficLightsQuery.SetSharedComponentFilter(
-            new UpdateFrame(SimulationUtils.GetUpdateFrameWithInterval(m_SimulationSystem.frameIndex, (uint)GetUpdateInterval(SystemUpdatePhase.GameSimulation), 16))
-        );
-        JobHandle dependency = //JobChunkExtensions.Schedule(
-        JobChunkExtensions.ScheduleParallel(
-            new UpdateTrafficLightsJob
-            {
-                m_EntityStorageInfoLookup = GetEntityStorageInfoLookup(),
-                m_EntityType = InternalCompilerInterface.GetEntityTypeHandle(ref __TypeHandle.__Unity_Entities_Entity_TypeHandle, ref base.CheckedStateRef),
-                m_SubLaneType = InternalCompilerInterface.GetBufferTypeHandle(ref __TypeHandle.__Game_Net_SubLane_RO_BufferTypeHandle, ref base.CheckedStateRef),
-                m_ConnectedEdgeType = InternalCompilerInterface.GetBufferTypeHandle(ref __TypeHandle.__Game_Net_ConnectedEdge_RO_BufferTypeHandle, ref base.CheckedStateRef),
-                m_SubObjectType = InternalCompilerInterface.GetBufferTypeHandle(ref __TypeHandle.__Game_Objects_SubObject_RO_BufferTypeHandle, ref base.CheckedStateRef),
-                m_TrafficLightsType = InternalCompilerInterface.GetComponentTypeHandle(ref __TypeHandle.__Game_Net_TrafficLights_RW_ComponentTypeHandle, ref base.CheckedStateRef),
-                m_OwnerData = InternalCompilerInterface.GetComponentLookup(ref __TypeHandle.__Game_Common_Owner_RO_ComponentLookup, ref base.CheckedStateRef),
-                m_NodeData = InternalCompilerInterface.GetComponentLookup(ref __TypeHandle.__Game_Net_Node_RO_ComponentLookup, ref base.CheckedStateRef),
-                m_EdgeData = InternalCompilerInterface.GetComponentLookup(ref __TypeHandle.__Game_Net_Edge_RO_ComponentLookup, ref base.CheckedStateRef),
-                m_CurveData = InternalCompilerInterface.GetComponentLookup(ref __TypeHandle.__Game_Net_Curve_RO_ComponentLookup, ref base.CheckedStateRef),
-                m_LaneData = InternalCompilerInterface.GetComponentLookup(ref __TypeHandle.__Game_Net_Lane_RO_ComponentLookup, ref base.CheckedStateRef),
-                m_LaneReservationData = InternalCompilerInterface.GetComponentLookup(ref __TypeHandle.__Game_Net_LaneReservation_RO_ComponentLookup, ref base.CheckedStateRef),
-                m_TransformData = InternalCompilerInterface.GetComponentLookup(ref __TypeHandle.__Game_Objects_Transform_RO_ComponentLookup, ref base.CheckedStateRef),
-                m_PrefabRefData = InternalCompilerInterface.GetComponentLookup(ref __TypeHandle.__Game_Prefabs_PrefabRef_RO_ComponentLookup, ref base.CheckedStateRef),
-                m_PrefabCarLaneData = InternalCompilerInterface.GetComponentLookup(ref __TypeHandle.__Game_Prefabs_CarLaneData_RO_ComponentLookup, ref base.CheckedStateRef),
-                m_PrefabMoveableBridgeData = InternalCompilerInterface.GetComponentLookup(
-                    ref __TypeHandle.__Game_Prefabs_MoveableBridgeData_RO_ComponentLookup,
-                    ref base.CheckedStateRef
-                ),
-                m_PrefabObjectGeometryData = InternalCompilerInterface.GetComponentLookup(
-                    ref __TypeHandle.__Game_Prefabs_ObjectGeometryData_RO_ComponentLookup,
-                    ref base.CheckedStateRef
-                ),
-                m_LaneObjects = InternalCompilerInterface.GetBufferLookup(ref __TypeHandle.__Game_Net_LaneObject_RO_BufferLookup, ref base.CheckedStateRef),
-                m_SubNets = InternalCompilerInterface.GetBufferLookup(ref __TypeHandle.__Game_Net_SubNet_RO_BufferLookup, ref base.CheckedStateRef),
-                m_SubLanes = InternalCompilerInterface.GetBufferLookup(ref __TypeHandle.__Game_Net_SubLane_RO_BufferLookup, ref base.CheckedStateRef),
-                m_ConnectedEdges = InternalCompilerInterface.GetBufferLookup(ref __TypeHandle.__Game_Net_ConnectedEdge_RO_BufferLookup, ref base.CheckedStateRef),
-                m_LaneSignalData = InternalCompilerInterface.GetComponentLookup(ref __TypeHandle.__Game_Net_LaneSignal_RW_ComponentLookup, ref base.CheckedStateRef),
-                m_TrafficLightData = InternalCompilerInterface.GetComponentLookup(ref __TypeHandle.__Game_Objects_TrafficLight_RW_ComponentLookup, ref base.CheckedStateRef),
-                m_PointOfInterestData = InternalCompilerInterface.GetComponentLookup(ref __TypeHandle.__Game_Common_PointOfInterest_RW_ComponentLookup, ref base.CheckedStateRef),
-                m_CommandBuffer = m_EndFrameBarrier.CreateCommandBuffer().AsParallelWriter(),
-                m_ExtraTypeHandle = m_ExtraTypeHandle.Update(ref base.CheckedStateRef),
-                m_ExtraData = new ExtraData(this),
-                m_TrafficLightGroupData = InternalCompilerInterface.GetComponentLookup(ref __TypeHandle.__TrafficLightGroupData_RO_ComponentLookup, ref base.CheckedStateRef),
-                m_CustomPhaseDataData = InternalCompilerInterface.GetBufferLookup(ref __TypeHandle.__CustomPhaseData_RO_BufferLookup, ref base.CheckedStateRef),
-            },
-            m_TrafficLightsQuery,
-            base.Dependency
-        );
-        base.Dependency = dependency;
-        m_EndFrameBarrier.AddJobHandleForProducer(base.Dependency);
     }
 
     public static void UpdateLaneSignal(TrafficLights trafficLights, ref LaneSignal laneSignal)

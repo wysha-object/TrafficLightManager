@@ -56,7 +56,8 @@ public struct CustomPhaseData : IBufferElementData, ISerializable
     public void Serialize<TWriter>(TWriter writer)
         where TWriter : IWriter
     {
-        writer.Write((ushort) 2);
+        ushort schemaVersion = 2;
+        writer.Write(schemaVersion);
         writer.Write(m_TurnsSinceLastRun);
         writer.Write(m_LowFlowTimer);
         writer.Write(m_LowPriorityTimer);
