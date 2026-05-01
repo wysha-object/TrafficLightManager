@@ -65,7 +65,7 @@ const AddButton = () => {
   const { t } = useTranslate();
   return (
     <Row onClick={() => {
-      call("TrafficLightManager", "CallAddCustomPhase")
+      call("TrafficLightManager", "CallAddCustomPhase", "{}")
     }}><Button label={t("CustomPhaseEditor.Add")} /></Row>
   );
 };
