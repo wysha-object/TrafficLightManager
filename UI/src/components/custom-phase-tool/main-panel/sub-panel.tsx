@@ -223,7 +223,10 @@ export default function SubPanel(props: { data: CustomPhaseItem | null, itemInde
       <ItemTitle title="CustomPhaseEditor.Statistics.Priority" secondaryText={`${data.priority}`} dim={true} />
       <ItemTitle title="CustomPhaseEditor.Statistics.LastRun" secondaryText={`${data.turnsSinceLastRun}`} dim={true} />
       <ItemTitle title="CustomPhaseEditor.Statistics.CarFlow" secondaryText={`${data.carFlow}`} dim={true} />
-      <ItemTitle title="CustomPhaseEditor.Statistics.LanesOccupied" secondaryText={`${data.carLaneOccupied}, ${data.publicCarLaneOccupied}, ${data.trackLaneOccupied}, ${data.pedestrianLaneOccupied}`} dim={true} />
+      <ItemTitle title="CustomPhaseEditor.Statistics.CarLaneOccupied" secondaryText={`${data.carLaneOccupied}`} dim={true} tooltip={<TooltipContainer>{t("CustomPhaseEditor.Statistics.CarLaneOccupied.Tooltip")}</TooltipContainer>} />
+      <ItemTitle title="CustomPhaseEditor.Statistics.PublicCarLaneOccupied" secondaryText={`${data.publicCarLaneOccupied}`} dim={true} tooltip={<TooltipContainer>{t("CustomPhaseEditor.Statistics.PublicCarLaneOccupied.Tooltip")}</TooltipContainer>} />
+      <ItemTitle title="CustomPhaseEditor.Statistics.TrackLaneOccupied" secondaryText={`${data.trackLaneOccupied}`} dim={true} tooltip={<TooltipContainer>{t("CustomPhaseEditor.Statistics.TrackLaneOccupied.Tooltip")}</TooltipContainer>} />
+      <ItemTitle title="CustomPhaseEditor.Statistics.CrossWalkOccupied" secondaryText={`${data.pedestrianLaneOccupied}`} dim={true} tooltip={<TooltipContainer>{t("CustomPhaseEditor.Statistics.CrossWalkOccupied.Tooltip")}</TooltipContainer>} />
       <ItemTitle title="CustomPhaseEditor.Statistics.WeightedWaiting" secondaryText={`${Round(data.weightedWaiting)}`} dim={true} />
       {manualSignalGroup < 0 && currentSignalGroup == props.itemIndex && <EndPhaseButton index={props.itemIndex} disabled={data.endPhasePrematurely} />}
     </>

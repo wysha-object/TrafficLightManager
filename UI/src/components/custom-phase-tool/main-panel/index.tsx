@@ -104,12 +104,10 @@ export default function MainPanel() {
   let [currentItemState, setCurrentItemState] = useState(ItemState.None);
   let [manualControl, setManualControl] = useState(false);
 
+  const currentPhaseIndex: number = useValue(bindValue("TrafficLightManager", "GetCurrentPhaseIndex"));
+
   const trafficLightsMembers = JSON.parse(useValue(bindValue("TrafficLightManager", "GetTrafficLightsMembers"))) as any[];
   const customPhaseItems = JSON.parse(useValue(bindValue("TrafficLightManager", "GetCustomPhaseItems"))) as CustomPhaseItem[];
-
-  if (currentIndex >= customPhaseItems.length) {
-    setCurrentIndex(customPhaseItems.length - 1);
-  }
 
   useEffect(() => {
     if (currentItemState === ItemState.Editing) {
@@ -128,7 +126,8 @@ export default function MainPanel() {
     }
   }, [currentIndex, currentItemState]);
 
-  let currentItem: CustomPhaseItem | null = currentIndex >= 0 && currentItemState !== ItemState.None ? customPhaseItems[currentIndex] : null;
+  let subPanelIndex = currentIndex >= 0 ? currentIndex : currentPhaseIndex;
+  let subPanelItem = subPanelIndex >= 0 ? customPhaseItems[subPanelIndex] : null;
 
   const { t } = useTranslate();
   return (
@@ -180,7 +179,7 @@ export default function MainPanel() {
       </LeftPanelContainer>
       <RightPanelContainer>
         <Scrollable style={{ flex: 1 }} contentStyle={{ flex: 1 }} trackStyle={{ marginLeft: "0.25em" }}>
-          <SubPanel data={currentItem} itemIndex={currentIndex} statisticsOnly={currentItemState !== ItemState.Editing} />
+          <SubPanel data={subPanelItem} itemIndex={subPanelIndex} statisticsOnly={subPanelIndex !== currentIndex || currentItemState !== ItemState.Editing} />
         </Scrollable>
       </RightPanelContainer>
     </Container>
