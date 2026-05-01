@@ -57,8 +57,7 @@ function Item(props: { data: CustomPhaseItem, itemIndex: number, manualPhaseInde
 }
 
 export default function ManualControlPanel(props: { items: CustomPhaseItem[], onBack: () => void }) {
-  const manualPhaseIndex: number = useValue(bindValue("TrafficLightManager", "GetManualPhaseIndex"));
-  console.log("ManualControlPanel render", { manualPhaseIndex });
+  const trafficLightGroup = JSON.parse(useValue(bindValue("TrafficLightManager", "GetTrafficLightGroup")));
 
   const { t } = useTranslate();
   return (
@@ -67,7 +66,7 @@ export default function ManualControlPanel(props: { items: CustomPhaseItem[], on
         <Row>
           <Label dim={false}>{t("CustomPhaseEditor.ManualControl")}</Label>
         </Row>
-        {props.items.map((item, index) => <Item data={item} itemIndex={index} manualPhaseIndex={manualPhaseIndex} />)}
+        {props.items.map((item, index) => <Item data={item} itemIndex={index} manualPhaseIndex={trafficLightGroup.manualPhaseIndex} />)}
       </Scrollable>
       <Divider />
       <BackButton onClick={props.onBack} />
