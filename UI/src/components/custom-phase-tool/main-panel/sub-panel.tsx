@@ -218,7 +218,7 @@ export default function SubPanel(props: { data: CustomPhaseItem | null, itemInde
         />
         <Divider />
       </>}
-      <ItemTitle title="CustomPhaseEditor.Statistics.Title" />
+      <ItemTitle title="CustomPhaseEditor.Statistics.Title" tooltip={<TooltipContainer>{t("CustomPhaseEditor.Statistics.Tooltip")}</TooltipContainer>} />
       <ItemTitle title="CustomPhaseEditor.Statistics.Timer" secondaryText={`${currentSignalGroup == props.itemIndex ? timer : 0}/ ${Round(Math.min(Math.max(data.targetDuration, data.minimumDuration), data.maximumDuration))}`} dim={true} />
       <ItemTitle title="CustomPhaseEditor.Statistics.Priority" secondaryText={`${data.priority}`} dim={true} />
       <ItemTitle title="CustomPhaseEditor.Statistics.LastRun" secondaryText={`${data.turnsSinceLastRun}`} dim={true} />
