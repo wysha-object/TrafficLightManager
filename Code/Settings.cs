@@ -163,8 +163,6 @@ public class Settings : ModSetting
             new DropdownItem<string> { value = "ru-RU", displayName = "Russian" },
             new DropdownItem<string> { value = "zh-HANS", displayName = "Chinese (Simplified)" },
             new DropdownItem<string> { value = "zh-HANT", displayName = "Chinese (Traditional)" },
-            new DropdownItem<string> { value = "zh-HK", displayName = "Chinese (Hong Kong)" },
-            new DropdownItem<string> { value = "zh-TW", displayName = "Chinese (Taiwan)" },
         ];
         return list;
     }

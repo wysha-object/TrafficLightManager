@@ -88,6 +88,10 @@ export default function SubPanel(props: { data: CustomPhaseItem | null, itemInde
         >
           <Checkbox isChecked={data.prioritiseTrack} />
           <DimLabel>{t("CustomPhaseEditor.Options.PrioritiseTrack")}</DimLabel>
+          <div style={{ flex: 1 }}></div>
+          <Tooltip position="right-start" tooltip={<TooltipContainer>{t("CustomPhaseEditor.Options.PrioritiseTrack.Tooltip")}</TooltipContainer>}>
+            <TooltipIcon style={{ marginLeft: "0.25em" }} />
+          </Tooltip>
         </Row>
         <Row hoverEffect={true} data={{
           itemType: "checkbox",
@@ -102,6 +106,10 @@ export default function SubPanel(props: { data: CustomPhaseItem | null, itemInde
         >
           <Checkbox isChecked={data.prioritisePublicCar} />
           <DimLabel>{t("CustomPhaseEditor.Options.PrioritisePublicCar")}</DimLabel>
+          <div style={{ flex: 1 }}></div>
+          <Tooltip position="right-start" tooltip={<TooltipContainer>{t("CustomPhaseEditor.Options.PrioritisePublicCar.Tooltip")}</TooltipContainer>}>
+            <TooltipIcon style={{ marginLeft: "0.25em" }} />
+          </Tooltip>
         </Row>
         <Row hoverEffect={true} data={{
           itemType: "checkbox",
@@ -116,6 +124,10 @@ export default function SubPanel(props: { data: CustomPhaseItem | null, itemInde
         >
           <Checkbox isChecked={data.prioritisePedestrian} />
           <DimLabel>{t("CustomPhaseEditor.Options.PrioritisePedestrian")}</DimLabel>
+          <div style={{ flex: 1 }}></div>
+          <Tooltip position="right-start" tooltip={<TooltipContainer>{t("CustomPhaseEditor.Options.PrioritisePedestrian.Tooltip")}</TooltipContainer>}>
+            <TooltipIcon style={{ marginLeft: "0.25em" }} />
+          </Tooltip>
         </Row>
         <Divider />
         <ItemTitle title="CustomPhaseEditor.Adjustments.Title" />
