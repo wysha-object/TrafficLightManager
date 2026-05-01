@@ -9,14 +9,15 @@ namespace TrafficLightManager.Code.Components
     {
         private int m_SchemaVersion;
 
-        // 同步字段
+        // Schema 1
         public TrafficLightState m_State;
         public byte m_CurrentSignalGroup;
         public byte m_NextSignalGroup;
         public uint m_Timer;
-
-        // 控制字段
         public byte m_ManualSignalGroup;
+
+        // Schema 2
+        public float m_TargetDuration;
 
         public void Deserialize<TReader>(TReader reader)
             where TReader : IReader

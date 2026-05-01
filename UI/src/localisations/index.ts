@@ -2,8 +2,8 @@ import { LocalisationContext } from "@/context";
 import { useContext } from "react";
 
 const useTranslate = () => {
-  let localisation: any = useContext(LocalisationContext);
-  let t = (key: string) => localisation[key] || key;
+  const localisation: any = useContext(LocalisationContext);
+  const t = (key: string) => localisation[key] || key;
   return {
     t
   }

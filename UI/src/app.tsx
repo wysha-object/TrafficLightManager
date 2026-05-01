@@ -8,7 +8,7 @@ import CustomPhaseTool from "./components/custom-phase-tool";
 export default function App() {
   let localisation = JSON.parse(useValue(bindValue("TrafficLightManager", "GetLocalisation")));
 
-  const cityConfigurationJson = useValue(bindValue("C2VM.TLE", "GetCityConfiguration", JSON.stringify(defaultCityConfiguration)));
+  const cityConfigurationJson = useValue(bindValue("TrafficLightManager", "GetCityConfiguration", JSON.stringify(defaultCityConfiguration)));
   const cityConfiguration = JSON.parse(cityConfigurationJson);
 
   return (

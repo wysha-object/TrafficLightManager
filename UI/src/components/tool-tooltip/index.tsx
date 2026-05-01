@@ -37,7 +37,7 @@ export default function ToolTooltip() {
   const [top, setTop] = useState(0);
   const [left, setLeft] = useState(0);
 
-  const tooltipMessage: ToolTooltipMessage[] = useValue(bindValue("C2VM.TLE", "GetToolTooltipMessage", []));
+  const tooltipMessage: ToolTooltipMessage[] = useValue(bindValue("TrafficLightManager", "GetToolTooltipMessage", []));
 
   useEffect(() => {
     const mouseMoveHandler = (e: MouseEvent) => {

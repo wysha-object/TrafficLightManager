@@ -1,75 +1,3 @@
-type MainPanelItem = MainPanelItemTitle | MainPanelItemMessage | MainPanelItemDivider | MainPanelItemRadio | MainPanelItemCheckbox | MainPanelItemButton | MainPanelItemNotification | MainPanelItemRange | CustomPhaseItem;
-
-interface MainPanelItemTitle {
-  itemType: "title",
-  title: string,
-  secondaryText?: string
-}
-
-interface MainPanelItemMessage {
-  message: string
-}
-
-interface MainPanelItemDivider {
-  itemType: "divider"
-}
-
-interface MainPanelItemRadio {
-  itemType: "radio",
-  type: string,
-  isChecked: boolean,
-  key: string,
-  value: string,
-  label: string,
-  engineEventName: string
-}
-
-interface MainPanelItemCheckbox {
-  itemType: "checkbox",
-  type: string,
-  isChecked: boolean,
-  key: string,
-  value: string,
-  label: string,
-  engineEventName: string
-  index: number
-}
-
-interface MainPanelItemButton {
-  itemType: "button",
-  type: "button",
-  key: string,
-  value: string,
-  label: string,
-  engineEventName: string
-}
-
-interface MainPanelItemNotification {
-  itemType: "notification",
-  type: "notification",
-  label: string,
-  notificationType: "warning" | "notice",
-  key?: string,
-  value?: string,
-  engineEventName?: string
-}
-
-interface MainPanelItemRange {
-  itemType: "range",
-  key: string,
-  label: string,
-  value: number,
-  valuePrefix: string,
-  valueSuffix: string,
-  min: number,
-  max: number,
-  step: number,
-  defaultValue: number,
-  enableTextField?: boolean,
-  textFieldRegExp?: string,
-  engineEventName: string
-}
-
 interface CustomPhaseItem {
   turnsSinceLastRun: number,
   lowFlowTimer: number,
@@ -91,6 +19,13 @@ interface CustomPhaseItem {
   prioritisePedestrian: boolean,
   linkedWithNextPhase: boolean,
   endPhasePrematurely: boolean,
+}
+
+interface TrafficLightGroup {
+  timer: number,
+  currentPhaseIndex: number,
+  manualPhaseIndex: number,
+  targetDuration: number
 }
 
 interface WorldPosition {

@@ -64,7 +64,7 @@ namespace TrafficLightManager.Code.Systems.TrafficLightSystems.Simulation
                 CustomPhaseData phase = customPhaseDataBuffer[currentSignalIndex];
                 float targetDuration = 10f * (phase.AverageCarFlow() + (float)(phase.m_TrackLaneOccupied * 0.5)) * phase.m_TargetDurationMultiplier;
                 bool preferChange = false;
-                phase.m_TargetDuration = targetDuration;
+                //phase.m_TargetDuration = targetDuration;
                 if (customTrafficLights.m_Timer <= phase.m_MinimumDuration)
                 {
                     phase.m_LowFlowTimer = 0;

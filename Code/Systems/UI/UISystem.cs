@@ -112,8 +112,7 @@ public partial class UISystem : UISystemBase
     public void SimulationUpdate()
     {
         m_CustomPhaseItemsBinding.Update();
-        m_CurrentSignalGroupBinding.Update();
-        m_TimerBinding.Update();
+        m_TrafficLightGroupBinding.Update();
         RedrawGizmo();
     }
 
@@ -286,9 +285,7 @@ public partial class UISystem : UISystemBase
         RedrawIcon();
         m_SelectedTrafficLightGroupEntity = entity;
         m_CustomPhaseItemsBinding.Update();
-        m_TimerBinding.Update();
-        m_CurrentSignalGroupBinding.Update();
-        m_ManualSignalGroupBinding.Update();
+        m_TrafficLightGroupBinding.Update();
         m_TrafficLightsMembersBinding.Update();
     }
 

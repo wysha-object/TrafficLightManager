@@ -92,7 +92,7 @@ export default function MainPanel() {
   const mouseUpHandler = useCallback((_event: MouseEvent) => {
     if (container) {
       const rect = container.getBoundingClientRect();
-      engine.call("C2VM.TLE.CallMainPanelUpdatePosition", JSON.stringify({ top: Math.floor(rect.top), left: Math.floor(rect.left) }));
+      engine.call("TrafficLightManager.CallMainPanelUpdatePosition", JSON.stringify({ top: Math.floor(rect.top), left: Math.floor(rect.left) }));
     }
     setDragging(false);
   }, [container]);

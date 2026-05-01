@@ -1,4 +1,3 @@
-import { useTranslate } from '@/localisations';
 import styled from 'styled-components';
 
 const Container = styled.div`
@@ -22,12 +21,11 @@ const SecondaryText = styled.div`
   margin-left: 6rem;
 `;
 
-export default function TitleDim(props: MainPanelItemTitle) {
-  const { t } = useTranslate();
+export default function TitleDim(props: { title: string, secondaryText?: string }) {
   return (
     <Container>
-      <TitleText>{t(props.title)}</TitleText>
-      {props.secondaryText && <SecondaryText>{t(props.secondaryText)}</SecondaryText>}
+      <TitleText>{props.title}</TitleText>
+      {props.secondaryText && <SecondaryText>{props.secondaryText}</SecondaryText>}
     </Container>
   );
 }

@@ -38,12 +38,10 @@ const Thumb = styled.div<{active: boolean}>`
 `;
 
 export default function Range(props: {
-  data: {min: number, max: number, step: number, value: number},
+  min: number, max: number, step: number, value: number,
   onChange?: (value: number) => void,
   onUpdate?: (value: number) => void
 }) {
-  const data = props.data;
-
   const [dragging, setDragging] = useState(false);
   const [value, setValue] = useState(0);
   const sliderRef = useRef<HTMLDivElement>(null);
@@ -56,15 +54,15 @@ export default function Range(props: {
       sliderLeft = rect.left;
       sliderWidth = rect.right - rect.left;
     }
-    let newValue = (Math.round((((clientX - sliderLeft) / sliderWidth) * (data.max - data.min)) / data.step) * data.step) + data.min;
-    if (newValue < data.min) {
-      newValue = data.min;
+    let newValue = (Math.round((((clientX - sliderLeft) / sliderWidth) * (props.max - props.min)) / props.step) * props.step) + props.min;
+    if (newValue < props.min) {
+      newValue = props.min;
     }
-    if (newValue > data.max) {
-      newValue = data.max;
+    if (newValue > props.max) {
+      newValue = props.max;
     }
     return newValue;
-  }, [data]);
+  }, [props.min, props.max, props.step]);
 
   const mouseDownHandler = (_event: React.MouseEvent<HTMLElement>) => {
     setDragging(true);
@@ -98,17 +96,17 @@ export default function Range(props: {
 
   useEffect(() => {
     if (!dragging) {
-      if (data.value < data.min || isNaN(data.value)) {
-        setValue(data.min);
-      } else if (data.value > data.max) {
-        setValue(data.max);
+      if (props.value < props.min || isNaN(props.value)) {
+        setValue(props.min);
+      } else if (props.value > props.max) {
+        setValue(props.max);
       } else {
-        setValue(data.value);
+        setValue(props.value);
       }
     }
-  }, [data, dragging]);
+  }, [props.value, props.min, props.max, dragging]);
 
-  const sliderValue = (value - data.min) / (data.max - data.min) * 100;
+  const sliderValue = (value - props.min) / (props.max - props.min) * 100;
 
   return (
     <RangeComponent onMouseDown={mouseDownHandler}>

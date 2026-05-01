@@ -40,7 +40,7 @@ const IconStyle = {
 
 export default function ItemDivider(props: {index: number, linked: boolean}) {
   const clickHandler = () => {
-    call("C2VM.TLE", "CallUpdateCustomPhaseData", JSON.stringify({key: "LinkedWithNextPhase", index: props.index}));
+    call("TrafficLightManager", "CallUpdateCustomPhaseData", JSON.stringify({ key: "LinkedWithNextPhase", index: props.index }));
   };
   return (
     <Container>

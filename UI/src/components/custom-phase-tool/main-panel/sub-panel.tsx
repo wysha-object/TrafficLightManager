@@ -1,6 +1,6 @@
 import styled from "styled-components";
 
-import { bindValue, call, useValue } from "cs2/api";
+import { call } from "cs2/api";
 
 import { useTranslate } from "@/localisations";
 
@@ -24,14 +24,10 @@ const DimLabel = styled.div`
 `;
 
 const ItemTitle = (props: { title: string, secondaryText?: string, tooltip?: React.ReactNode, dim?: boolean }) => {
-  const item: MainPanelItemTitle = {
-    itemType: "title",
-    ...props
-  };
   return (
-    <Row data={item}>
-      {props.dim && <TitleDim {...item} />}
-      {!props.dim && <Title {...item} />}
+    <Row>
+      {props.dim && <TitleDim title={props.title} secondaryText={props.secondaryText} />}
+      {!props.dim && <Title title={props.title} secondaryText={props.secondaryText} />}
       {props.tooltip && <>
         <Tooltip position="right-start" tooltip={props.tooltip}>
           <TooltipIcon style={{ marginLeft: "0.25em" }} />
@@ -44,7 +40,7 @@ const ItemTitle = (props: { title: string, secondaryText?: string, tooltip?: Rea
 const EndPhaseButton = (props: { index: number, disabled?: boolean }) => {
   const clickHandler = () => {
     if (!props.disabled) {
-      call("C2VM.TLE", "CallUpdateCustomPhaseData", JSON.stringify({ key: "EndPhasePrematurely", index: props.index }));
+      call("TrafficLightManager", "CallUpdateCustomPhaseData", JSON.stringify({ key: "EndPhasePrematurely", index: props.index }));
     }
   };
   const { t } = useTranslate();
@@ -59,12 +55,8 @@ const EndPhaseButton = (props: { index: number, disabled?: boolean }) => {
   );
 };
 
-export default function SubPanel(props: { data: CustomPhaseItem | null, itemIndex: number, statisticsOnly?: boolean }) {
+export default function SubPanel(props: { data: CustomPhaseItem | null, itemIndex: number, statisticsOnly?: boolean, trafficLightGroup: TrafficLightGroup }) {
   const data = props.data;
-
-  const timer = useValue(bindValue("TrafficLightManager", "GetTimer"));
-  const currentSignalGroup: number = useValue(bindValue("TrafficLightManager", "GetCurrentPhaseIndex"));
-  const manualSignalGroup: number = useValue(bindValue("TrafficLightManager", "GetManualPhaseIndex"));
 
   if (!data) {
     return <></>;
@@ -73,162 +65,180 @@ export default function SubPanel(props: { data: CustomPhaseItem | null, itemInde
   const { t } = useTranslate();
   return (
     <>
-      {!props.statisticsOnly && <>
-        <ItemTitle title="CustomPhaseEditor.Options.Title" tooltip={<TooltipContainer>{t("CustomPhaseEditor.Options.Tooltip")}</TooltipContainer>} />
-        <Row hoverEffect={true} data={{
-          itemType: "checkbox",
-          type: "",
-          isChecked: data.prioritiseTrack,
-          key: "PrioritiseTrack",
-          value: "0",
-          label: "",
-          engineEventName: "C2VM.TLE.CallUpdateCustomPhaseData",
-          index: props.itemIndex
-        }}
-        >
-          <Checkbox isChecked={data.prioritiseTrack} />
-          <DimLabel>{t("CustomPhaseEditor.Options.PrioritiseTrack")}</DimLabel>
-          <div style={{ flex: 1 }}></div>
-          <Tooltip position="right-start" tooltip={<TooltipContainer>{t("CustomPhaseEditor.Options.PrioritiseTrack.Tooltip")}</TooltipContainer>}>
-            <TooltipIcon style={{ marginLeft: "0.25em" }} />
-          </Tooltip>
-        </Row>
-        <Row hoverEffect={true} data={{
-          itemType: "checkbox",
-          type: "",
-          isChecked: data.prioritisePublicCar,
-          key: "PrioritisePublicCar",
-          value: "0",
-          label: "",
-          engineEventName: "C2VM.TLE.CallUpdateCustomPhaseData",
-          index: props.itemIndex
-        }}
-        >
-          <Checkbox isChecked={data.prioritisePublicCar} />
-          <DimLabel>{t("CustomPhaseEditor.Options.PrioritisePublicCar")}</DimLabel>
-          <div style={{ flex: 1 }}></div>
-          <Tooltip position="right-start" tooltip={<TooltipContainer>{t("CustomPhaseEditor.Options.PrioritisePublicCar.Tooltip")}</TooltipContainer>}>
-            <TooltipIcon style={{ marginLeft: "0.25em" }} />
-          </Tooltip>
-        </Row>
-        <Row hoverEffect={true} data={{
-          itemType: "checkbox",
-          type: "",
-          isChecked: data.prioritisePedestrian,
-          key: "PrioritisePedestrian",
-          value: "0",
-          label: "",
-          engineEventName: "C2VM.TLE.CallUpdateCustomPhaseData",
-          index: props.itemIndex
-        }}
-        >
-          <Checkbox isChecked={data.prioritisePedestrian} />
-          <DimLabel>{t("CustomPhaseEditor.Options.PrioritisePedestrian")}</DimLabel>
-          <div style={{ flex: 1 }}></div>
-          <Tooltip position="right-start" tooltip={<TooltipContainer>{t("CustomPhaseEditor.Options.PrioritisePedestrian.Tooltip")}</TooltipContainer>}>
-            <TooltipIcon style={{ marginLeft: "0.25em" }} />
-          </Tooltip>
-        </Row>
-        <Divider />
-        <ItemTitle title="CustomPhaseEditor.Adjustments.Title" />
-        <MainPanelRange data={{
-          itemType: "range",
-          key: "MinimumDuration",
-          label: "CustomPhaseEditor.Adjustments.MinimumDuration",
-          value: data.minimumDuration,
-          valuePrefix: "",
-          valueSuffix: "s",
-          min: 0,
-          max: 30,
-          step: 1,
-          defaultValue: 2,
-          enableTextField: true,
-          textFieldRegExp: "^\\d{0,4}$",
-          engineEventName: "C2VM.TLE.CallUpdateCustomPhaseData"
-        }}
-          index={props.itemIndex}
-        />
-        <MainPanelRange data={{
-          itemType: "range",
-          key: "MaximumDuration",
-          label: "CustomPhaseEditor.Adjustments.MaximumDuration",
-          value: data.maximumDuration,
-          valuePrefix: "",
-          valueSuffix: "s",
-          min: 5,
-          max: 300,
-          step: 5,
-          defaultValue: 300,
-          enableTextField: true,
-          textFieldRegExp: "^\\d{0,4}$",
-          engineEventName: "C2VM.TLE.CallUpdateCustomPhaseData"
-        }}
-          index={props.itemIndex}
-        />
-        <MainPanelRange data={{
-          itemType: "range",
-          key: "TargetDurationMultiplier",
-          label: "CustomPhaseEditor.Adjustments.TargetDurationMultiplier",
-          value: data.targetDurationMultiplier,
-          valuePrefix: "",
-          valueSuffix: "CustomPedestrianDurationMultiplierSuffix",
-          min: 0.1,
-          max: 10,
-          step: 0.1,
-          defaultValue: 1,
-          enableTextField: true,
-          textFieldRegExp: "^\\d{0,4}(\\.\\d{0,2})?$",
-          engineEventName: "C2VM.TLE.CallUpdateCustomPhaseData"
-        }}
-          index={props.itemIndex}
-        />
-        <MainPanelRange data={{
-          itemType: "range",
-          key: "LaneOccupiedMultiplier",
-          label: "CustomPhaseEditor.Adjustments.LaneOccupiedMultiplier",
-          value: data.laneOccupiedMultiplier,
-          valuePrefix: "",
-          valueSuffix: "CustomPedestrianDurationMultiplierSuffix",
-          min: 0.1,
-          max: 10,
-          step: 0.1,
-          defaultValue: 1,
-          enableTextField: true,
-          textFieldRegExp: "^\\d{0,4}(\\.\\d{0,2})?$",
-          engineEventName: "C2VM.TLE.CallUpdateCustomPhaseData"
-        }}
-          index={props.itemIndex}
-        />
-        <MainPanelRange data={{
-          itemType: "range",
-          key: "IntervalExponent",
-          label: "CustomPhaseEditor.Adjustments.IntervalExponent",
-          value: data.intervalExponent,
-          valuePrefix: "",
-          valueSuffix: "",
-          min: 0.1,
-          max: 10,
-          step: 0.1,
-          defaultValue: 2,
-          enableTextField: true,
-          textFieldRegExp: "^\\d{0,4}(\\.\\d{0,2})?$",
-          engineEventName: "C2VM.TLE.CallUpdateCustomPhaseData"
-        }}
-          index={props.itemIndex}
-        />
-        <Divider />
-      </>}
-      <ItemTitle title="CustomPhaseEditor.Statistics.Title" tooltip={<TooltipContainer>{t("CustomPhaseEditor.Statistics.Tooltip")}</TooltipContainer>} />
-      <ItemTitle title="CustomPhaseEditor.Statistics.Timer" secondaryText={`${currentSignalGroup == props.itemIndex ? timer : 0}/ ${Round(Math.min(Math.max(data.targetDuration, data.minimumDuration), data.maximumDuration))}`} dim={true} />
-      <ItemTitle title="CustomPhaseEditor.Statistics.Priority" secondaryText={`${data.priority}`} dim={true} />
-      <ItemTitle title="CustomPhaseEditor.Statistics.LastRun" secondaryText={`${data.turnsSinceLastRun}`} dim={true} />
-      <ItemTitle title="CustomPhaseEditor.Statistics.CarFlow" secondaryText={`${data.carFlow}`} dim={true} />
-      <ItemTitle title="CustomPhaseEditor.Statistics.CarLaneOccupied" secondaryText={`${data.carLaneOccupied}`} dim={true} tooltip={<TooltipContainer>{t("CustomPhaseEditor.Statistics.CarLaneOccupied.Tooltip")}</TooltipContainer>} />
-      <ItemTitle title="CustomPhaseEditor.Statistics.PublicCarLaneOccupied" secondaryText={`${data.publicCarLaneOccupied}`} dim={true} tooltip={<TooltipContainer>{t("CustomPhaseEditor.Statistics.PublicCarLaneOccupied.Tooltip")}</TooltipContainer>} />
-      <ItemTitle title="CustomPhaseEditor.Statistics.TrackLaneOccupied" secondaryText={`${data.trackLaneOccupied}`} dim={true} tooltip={<TooltipContainer>{t("CustomPhaseEditor.Statistics.TrackLaneOccupied.Tooltip")}</TooltipContainer>} />
-      <ItemTitle title="CustomPhaseEditor.Statistics.CrossWalkOccupied" secondaryText={`${data.pedestrianLaneOccupied}`} dim={true} tooltip={<TooltipContainer>{t("CustomPhaseEditor.Statistics.CrossWalkOccupied.Tooltip")}</TooltipContainer>} />
-      <ItemTitle title="CustomPhaseEditor.Statistics.WeightedWaiting" secondaryText={`${Round(data.weightedWaiting)}`} dim={true} />
-      {manualSignalGroup < 0 && currentSignalGroup == props.itemIndex && <EndPhaseButton index={props.itemIndex} disabled={data.endPhasePrematurely} />}
+      {!props.statisticsOnly &&
+        <>
+          <ItemTitle title="CustomPhaseEditor.Options.Title" tooltip={<TooltipContainer>{t("CustomPhaseEditor.Options.Tooltip")}</TooltipContainer>} />
+          <Row hoverEffect={true}
+            onClick={() => {
+              call("TrafficLightManager", "CallUpdateCustomPhaseData", JSON.stringify({ key: "PrioritiseTrack", index: props.itemIndex }));
+            }}
+          >
+            <Checkbox isChecked={data.prioritiseTrack} />
+            <DimLabel>{t("CustomPhaseEditor.Options.PrioritiseTrack")}</DimLabel>
+            <div style={{ flex: 1 }}></div>
+            <Tooltip position="right-start" tooltip={<TooltipContainer>{t("CustomPhaseEditor.Options.PrioritiseTrack.Tooltip")}</TooltipContainer>}>
+              <TooltipIcon style={{ marginLeft: "0.25em" }} />
+            </Tooltip>
+          </Row>
+          <Row hoverEffect={true}
+            onClick={() => {
+              call("TrafficLightManager", "CallUpdateCustomPhaseData", JSON.stringify({ key: "PrioritisePublicCar", index: props.itemIndex }));
+            }}
+          >
+            <Checkbox isChecked={data.prioritisePublicCar} />
+            <DimLabel>{t("CustomPhaseEditor.Options.PrioritisePublicCar")}</DimLabel>
+            <div style={{ flex: 1 }}></div>
+            <Tooltip position="right-start" tooltip={<TooltipContainer>{t("CustomPhaseEditor.Options.PrioritisePublicCar.Tooltip")}</TooltipContainer>}>
+              <TooltipIcon style={{ marginLeft: "0.25em" }} />
+            </Tooltip>
+          </Row>
+          <Row hoverEffect={true}
+            onClick={() => {
+              call("TrafficLightManager", "CallUpdateCustomPhaseData", JSON.stringify({ key: "PrioritisePedestrian", index: props.itemIndex }));
+            }}
+          >
+            <Checkbox isChecked={data.prioritisePedestrian} />
+            <DimLabel>{t("CustomPhaseEditor.Options.PrioritisePedestrian")}</DimLabel>
+            <div style={{ flex: 1 }}></div>
+            <Tooltip position="right-start" tooltip={<TooltipContainer>{t("CustomPhaseEditor.Options.PrioritisePedestrian.Tooltip")}</TooltipContainer>}>
+              <TooltipIcon style={{ marginLeft: "0.25em" }} />
+            </Tooltip>
+          </Row>
+          <Divider />
+          <ItemTitle title="CustomPhaseEditor.Adjustments.Title" />
+          <MainPanelRange
+            onChange={(value) => {
+              call("TrafficLightManager", "CallUpdateCustomPhaseData", JSON.stringify({ key: "MinimumDuration", value: value, index: props.itemIndex }));
+            }}
+            label={t("CustomPhaseEditor.Adjustments.MinimumDuration")}
+            value={data.minimumDuration}
+            valuePrefix={""}
+            valueSuffix={"s"}
+            min={0}
+            max={30}
+            step={1}
+            defaultValue={2}
+            enableTextField={true}
+            textFieldRegExp={"^\\d{0,4}$"}
+          />
+          <MainPanelRange
+            onChange={(value) => {
+              call("TrafficLightManager", "CallUpdateCustomPhaseData", JSON.stringify({ key: "MaximumDuration", value: value, index: props.itemIndex }));
+            }}
+            label={t("CustomPhaseEditor.Adjustments.MaximumDuration")}
+            value={data.maximumDuration}
+            valuePrefix={""}
+            valueSuffix={"s"}
+            min={5}
+            max={300}
+            step={5}
+            defaultValue={30}
+            enableTextField={true}
+            textFieldRegExp={"^\\d{0,4}$"}
+          />
+          <MainPanelRange
+            onChange={(value) => {
+              call("TrafficLightManager", "CallUpdateCustomPhaseData", JSON.stringify({ key: "TargetDurationMultiplier", value: value, index: props.itemIndex }));
+            }}
+            label={t("CustomPhaseEditor.Adjustments.TargetDurationMultiplier")}
+            value={data.targetDurationMultiplier}
+            valuePrefix={""}
+            valueSuffix={t("CustomPedestrianDurationMultiplierSuffix")}
+            min={0.1}
+            max={10}
+            step={0.1}
+            defaultValue={1}
+            enableTextField={true}
+            textFieldRegExp={"^\\d{0,4}(\\.\\d{0,2})?$"}
+          />
+          <MainPanelRange
+            onChange={(value) => {
+              call("TrafficLightManager", "CallUpdateCustomPhaseData", JSON.stringify({ key: "LaneOccupiedMultiplier", value: value, index: props.itemIndex }));
+            }}
+            label={t("CustomPhaseEditor.Adjustments.LaneOccupiedMultiplier")}
+            value={data.laneOccupiedMultiplier}
+            valuePrefix={""}
+            valueSuffix={t("CustomPedestrianDurationMultiplierSuffix")}
+            min={0.1}
+            max={10}
+            step={0.1}
+            defaultValue={1}
+            enableTextField={true}
+            textFieldRegExp={"^\\d{0,4}(\\.\\d{0,2})?$"}
+          />
+          <MainPanelRange
+            onChange={(value) => {
+              call("TrafficLightManager", "CallUpdateCustomPhaseData", JSON.stringify({ key: "IntervalExponent", value: value, index: props.itemIndex }));
+            }}
+            label={t("CustomPhaseEditor.Adjustments.IntervalExponent")}
+            value={data.intervalExponent}
+            valuePrefix={""}
+            valueSuffix={""}
+            min={0.1}
+            max={10}
+            step={0.1}
+            defaultValue={2}
+            enableTextField={true}
+            textFieldRegExp={"^\\d{0,4}(\\.\\d{0,2})?$"}
+          />
+          <Divider />
+        </>
+      }
+      <ItemTitle
+        title={t("CustomPhaseEditor.Statistics.Title")}
+        tooltip={<TooltipContainer>{t("CustomPhaseEditor.Statistics.Tooltip")}</TooltipContainer>}
+      />
+      <ItemTitle
+        title={t("CustomPhaseEditor.Statistics.Timer")}
+        secondaryText={`
+          ${props.trafficLightGroup.currentPhaseIndex == props.itemIndex ? props.trafficLightGroup.timer : 0}
+          / 
+          ${props.trafficLightGroup.currentPhaseIndex == props.itemIndex ? Round(Math.min(Math.max(props.trafficLightGroup.targetDuration, data.minimumDuration), data.maximumDuration)) : data.minimumDuration}
+        `}
+        dim={true}
+      />
+      <ItemTitle
+        title={t("CustomPhaseEditor.Statistics.Priority")}
+        secondaryText={`${data.priority}`}
+        dim={true} />
+      <ItemTitle
+        title={t("CustomPhaseEditor.Statistics.LastRun")}
+        secondaryText={`${data.turnsSinceLastRun}`}
+        dim={true} />
+      <ItemTitle
+        title={t("CustomPhaseEditor.Statistics.CarFlow")}
+        secondaryText={`${data.carFlow}`}
+        dim={true} />
+      <ItemTitle
+        title={t("CustomPhaseEditor.Statistics.CarLaneOccupied")}
+        secondaryText={`${data.carLaneOccupied}`}
+        dim={true}
+        tooltip={<TooltipContainer>{t("CustomPhaseEditor.Statistics.CarLaneOccupied.Tooltip")}</TooltipContainer>}
+      />
+      <ItemTitle
+        title={t("CustomPhaseEditor.Statistics.PublicCarLaneOccupied")}
+        secondaryText={`${data.publicCarLaneOccupied}`}
+        dim={true}
+        tooltip={<TooltipContainer>{t("CustomPhaseEditor.Statistics.PublicCarLaneOccupied.Tooltip")}</TooltipContainer>}
+      />
+      <ItemTitle
+        title={t("CustomPhaseEditor.Statistics.TrackLaneOccupied")}
+        secondaryText={`${data.trackLaneOccupied}`}
+        dim={true}
+        tooltip={<TooltipContainer>{t("CustomPhaseEditor.Statistics.TrackLaneOccupied.Tooltip")}</TooltipContainer>}
+      />
+      <ItemTitle
+        title={t("CustomPhaseEditor.Statistics.CrossWalkOccupied")}
+        secondaryText={`${data.pedestrianLaneOccupied}`}
+        dim={true}
+        tooltip={<TooltipContainer>{t("CustomPhaseEditor.Statistics.CrossWalkOccupied.Tooltip")}</TooltipContainer>}
+      />
+      <ItemTitle
+        title={t("CustomPhaseEditor.Statistics.WeightedWaiting")}
+        secondaryText={`${Round(data.weightedWaiting)}`}
+        dim={true}
+      />
+      {props.trafficLightGroup.manualPhaseIndex < 0 && props.trafficLightGroup.currentPhaseIndex == props.itemIndex && <EndPhaseButton index={props.itemIndex} disabled={data.endPhasePrematurely} />}
     </>
   );
 }

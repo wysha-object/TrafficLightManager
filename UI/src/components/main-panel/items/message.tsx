@@ -7,7 +7,7 @@ const Container = styled.div`
   text-align: center;
 `;
 
-export default function Message(props: MainPanelItemMessage) {
+export default function Message(props: { message: string }) {
   const { t } = useTranslate();
   return (
     <Container>

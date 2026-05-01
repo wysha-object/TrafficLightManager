@@ -1,7 +1,6 @@
 import { useTranslate } from '@/localisations';
 import styled from 'styled-components';
 
-
 const Container = styled.div`
   display: flex;
   justify-content: space-between;
@@ -23,7 +22,7 @@ const SecondaryText = styled.div`
   margin-left: 6rem;
 `;
 
-export default function Title(props: MainPanelItemTitle) {
+export default function Title(props: { title: string, secondaryText?: string }) {
   const { t } = useTranslate();
   return (
     <Container>

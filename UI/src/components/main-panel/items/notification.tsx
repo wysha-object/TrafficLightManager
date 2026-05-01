@@ -1,6 +1,5 @@
 import styled from 'styled-components';
 
-import { engineCall } from '@/engine';
 import { useTranslate } from '@/localisations';
 
 const Notice = styled.div`
@@ -30,24 +29,24 @@ const Label = styled.div`
   flex: 1;
 `;
 
-export default function Notification(props: { data: MainPanelItemNotification }) {
+export enum NotificationType {
+  Warning = 0,
+  Notice = 1
+}
+
+export default function Notification(props: { onClick: () => void, notificationType: NotificationType, label: string }) {
   const { t } = useTranslate();
-  const clickHandler = () => {
-    if (props.data.engineEventName && props.data.engineEventName.length > 0) {
-      engineCall(props.data.engineEventName, JSON.stringify(props.data));
-    }
-  };
   return (
     <>
-      {props.data.notificationType == "warning" &&
-        <Warning onClick={clickHandler}>
+      {props.notificationType == NotificationType.Warning &&
+        <Warning onClick={props.onClick}>
           <Image src="Media/Game/Icons/AdvisorNotifications.svg" />
-          <Label>{t(props.data.label)}</Label>
+          <Label>{t(props.label)}</Label>
         </Warning>}
-      {props.data.notificationType == "notice" &&
-        <Notice onClick={clickHandler}>
+      {props.notificationType == NotificationType.Notice &&
+        <Notice onClick={props.onClick}>
           <Image src="Media/Game/Icons/AdvisorNotifications.svg" />
-          <Label>{t(props.data.label)}</Label>
+          <Label>{t(props.label)}</Label>
         </Notice>}
     </>
   );

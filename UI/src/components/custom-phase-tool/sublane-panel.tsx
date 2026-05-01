@@ -162,13 +162,13 @@ export default function SubLanePanel(props: { edge: EdgeInfo, subLane: SubLaneIn
       newSignal = currentSignal == "stop" ? "go" : "stop";
       newGroupMask.m_Pedestrian.m_GoGroupMask = SetBit(newGroupMask.m_Pedestrian.m_GoGroupMask, index, newSignal != "stop" ? 1 : 0);
     }
-    call("C2VM.TLE", "CallUpdateSubLaneGroupMask", JSON.stringify({ groupMaskArray: [newGroupMask], entity: props.edge.m_TrafficLightsEntity }));
+    call("TrafficLightManager", "CallUpdateSubLaneGroupMask", JSON.stringify({ groupMaskArray: [newGroupMask], entity: props.edge.m_TrafficLightsEntity }));
   }, [props.subLane]);
 
   const linkHandler = useCallback(() => {
     const newGroupMask: EdgeGroupMask = JSON.parse(JSON.stringify(props.edge.m_EdgeGroupMask));
     newGroupMask.m_Options &= ~EdgeGroupMaskOptions.PerLaneSignal;
-    call("C2VM.TLE", "CallUpdateEdgeGroupMask", JSON.stringify({ groupMaskArray: [newGroupMask], entity: props.edge.m_TrafficLightsEntity }));
+    call("TrafficLightManager", "CallUpdateEdgeGroupMask", JSON.stringify({ groupMaskArray: [newGroupMask], entity: props.edge.m_TrafficLightsEntity }));
   }, [props.edge.m_EdgeGroupMask]);
 
   const carLaneCount = props.subLane.m_CarLaneLeftCount + props.subLane.m_CarLaneStraightCount + props.subLane.m_CarLaneRightCount + props.subLane.m_CarLaneUTurnCount;

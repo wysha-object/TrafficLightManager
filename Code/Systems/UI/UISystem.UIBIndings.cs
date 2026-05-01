@@ -23,11 +23,7 @@ public partial class UISystem : UISystemBase
 
     private GetterValueBinding<string> m_CustomPhaseItemsBinding;
 
-    private GetterValueBinding<uint> m_TimerBinding;
-
-    private GetterValueBinding<int> m_CurrentSignalGroupBinding;
-
-    private GetterValueBinding<int> m_ManualSignalGroupBinding;
+    private GetterValueBinding<string> m_TrafficLightGroupBinding;
 
     private GetterValueBinding<string> m_TrafficLightsMembersBinding;
 
@@ -55,7 +51,7 @@ public partial class UISystem : UISystemBase
         );
         AddBinding(
             m_CityConfigurationBinding = new GetterValueBinding<string>(
-                "C2VM.TLE",
+                "TrafficLightManager",
                 "GetCityConfiguration",
                 () =>
                 {
@@ -67,7 +63,7 @@ public partial class UISystem : UISystemBase
         );
         AddBinding(
             m_ScreenPointBinding = new GetterValueBinding<Dictionary<string, UITypes.ScreenPoint>>(
-                "C2VM.TLE",
+                "TrafficLightManager",
                 "GetScreenPoint",
                 () =>
                 {
@@ -89,7 +85,7 @@ public partial class UISystem : UISystemBase
         );
         AddBinding(
             m_EdgeInfoBinding = new GetterValueBinding<Dictionary<Entity, NativeArray<NodeUtils.EdgeInfo>>>(
-                "C2VM.TLE",
+                "TrafficLightManager",
                 "GetEdgeInfo",
                 () =>
                 {
@@ -105,18 +101,16 @@ public partial class UISystem : UISystemBase
                 "GetCustomPhaseItems",
                 () =>
                 {
-                    UITypes.CustomPhaseItem[] customPhaseItems;
+                    UITypes.CustomPhaseItem[] rs;
                     if (
-                        EntityManager.TryGetComponent<TrafficLightGroup>(m_SelectedTrafficLightGroupEntity, out var trafficLightGroup)
-                        && EntityManager.TryGetBuffer<CustomPhaseData>(m_SelectedTrafficLightGroupEntity, true, out var customPhaseDataBuffer)
+                        EntityManager.TryGetBuffer<CustomPhaseData>(m_SelectedTrafficLightGroupEntity, true, out var customPhaseDataBuffer)
                     )
                     {
-                        customPhaseItems = new UITypes.CustomPhaseItem[customPhaseDataBuffer.Length];
+                        rs = new UITypes.CustomPhaseItem[customPhaseDataBuffer.Length];
                         for (int i = 0; i < customPhaseDataBuffer.Length; i++)
                         {
                             CustomPhaseData item = customPhaseDataBuffer[i];
-                            customPhaseItems[i] = new UITypes.CustomPhaseItem
-                            {
+                            rs[i] = new UITypes.CustomPhaseItem{
                                 turnsSinceLastRun = item.m_TurnsSinceLastRun,
                                 lowFlowTimer = item.m_LowFlowTimer,
                                 carFlow = item.AverageCarFlow(),
@@ -125,7 +119,6 @@ public partial class UISystem : UISystemBase
                                 trackLaneOccupied = item.m_TrackLaneOccupied,
                                 pedestrianLaneOccupied = item.m_PedestrianLaneOccupied,
                                 weightedWaiting = item.m_WeightedWaiting,
-                                targetDuration = item.m_TargetDuration,
                                 priority = item.m_Priority,
                                 minimumDuration = item.m_MinimumDuration,
                                 maximumDuration = item.m_MaximumDuration,
@@ -142,51 +135,31 @@ public partial class UISystem : UISystemBase
                     }
                     else
                     {
-                        customPhaseItems = [];
+                        rs = [];
                     }
-                    return JsonConvert.SerializeObject(customPhaseItems);
+                    return JsonConvert.SerializeObject(rs);
                 }
             )
         );
         AddBinding(
-            m_TimerBinding = new GetterValueBinding<uint>(
+            m_TrafficLightGroupBinding = new GetterValueBinding<string>(
                 "TrafficLightManager",
-                "GetTimer",
+                "GetTrafficLightGroup",
                 () =>
                 {
+                    UITypes.TrafficLightGroup rs;
                     if (EntityManager.TryGetComponent<TrafficLightGroup>(m_SelectedTrafficLightGroupEntity, out var trafficLightGroup))
                     {
-                        return trafficLightGroup.m_Timer;
+                        rs = new UITypes.TrafficLightGroup {
+                            timer = trafficLightGroup.m_Timer,
+                            currentPhaseIndex = trafficLightGroup.m_CurrentSignalGroup - 1,
+                            manualPhaseIndex = trafficLightGroup.m_ManualSignalGroup - 1,
+                            targetDuration = trafficLightGroup.m_TargetDuration
+                        };
+                    } else {
+                        rs = new UITypes.TrafficLightGroup { };
                     }
-                    return 0;
-                }
-            )
-        );
-        AddBinding(
-            m_CurrentSignalGroupBinding = new GetterValueBinding<int>(
-                "TrafficLightManager",
-                "GetCurrentPhaseIndex",
-                () =>
-                {
-                    if (EntityManager.TryGetComponent<TrafficLightGroup>(m_SelectedTrafficLightGroupEntity, out var trafficLightGroup))
-                    {
-                        return trafficLightGroup.m_CurrentSignalGroup - 1;
-                    }
-                    return 0;
-                }
-            )
-        );
-        AddBinding(
-            m_ManualSignalGroupBinding = new GetterValueBinding<int>(
-                "TrafficLightManager",
-                "GetManualPhaseIndex",
-                () =>
-                {
-                    if (EntityManager.TryGetComponent<TrafficLightGroup>(m_SelectedTrafficLightGroupEntity, out var trafficLightGroup))
-                    {
-                        return trafficLightGroup.m_ManualSignalGroup - 1;
-                    }
-                    return 0;
+                    return JsonConvert.SerializeObject(rs);
                 }
             )
         );
@@ -211,7 +184,7 @@ public partial class UISystem : UISystemBase
 
         AddBinding(
             m_ToolTooltipMessageBinding = new ValueBinding<UITypes.ToolTooltipMessage[]>(
-                "C2VM.TLE",
+                "TrafficLightManager",
                 "GetToolTooltipMessage",
                 [],
                 new ListWriter<UITypes.ToolTooltipMessage>(new ValueWriter<UITypes.ToolTooltipMessage>())
@@ -223,7 +196,7 @@ public partial class UISystem : UISystemBase
 
         AddBinding(
             new CallBinding<string, string>(
-                "C2VM.TLE",
+                "TrafficLightManager",
                 "CallAddCustomPhase",
                 (_) =>
                 {
@@ -245,7 +218,7 @@ public partial class UISystem : UISystemBase
         );
         AddBinding(
             new CallBinding<string, string>(
-                "C2VM.TLE",
+                "TrafficLightManager",
                 "CallRemoveCustomPhase",
                 (input) =>
                 {
@@ -292,7 +265,7 @@ public partial class UISystem : UISystemBase
         );
         AddBinding(
             new CallBinding<string, string>(
-                "C2VM.TLE",
+                "TrafficLightManager",
                 "CallSwapCustomPhase",
                 (input) =>
                 {
@@ -335,7 +308,7 @@ public partial class UISystem : UISystemBase
         );
         AddBinding(
             new CallBinding<string, string>(
-                "C2VM.TLE",
+                "TrafficLightManager",
                 "CallUpdateEdgeGroupMask",
                 (input) =>
                 {
@@ -387,7 +360,7 @@ public partial class UISystem : UISystemBase
         );
         AddBinding(
             new CallBinding<string, string>(
-                "C2VM.TLE",
+                "TrafficLightManager",
                 "CallUpdateSubLaneGroupMask",
                 (input) =>
                 {
@@ -439,7 +412,7 @@ public partial class UISystem : UISystemBase
         );
         AddBinding(
             new CallBinding<string, string>(
-                "C2VM.TLE",
+                "TrafficLightManager",
                 "CallUpdateCustomPhaseData",
                 (jsonString) =>
                 {
@@ -518,7 +491,7 @@ public partial class UISystem : UISystemBase
         );
         AddBinding(
             new CallBinding<string, string>(
-                "C2VM.TLE",
+                "TrafficLightManager",
                 "CallAddWorldPosition",
                 (input) =>
                 {
@@ -534,7 +507,7 @@ public partial class UISystem : UISystemBase
         );
         AddBinding(
             new CallBinding<string, string>(
-                "C2VM.TLE",
+                "TrafficLightManager",
                 "CallRemoveWorldPosition",
                 (input) =>
                 {
@@ -550,7 +523,7 @@ public partial class UISystem : UISystemBase
         );
         AddBinding(
             new CallBinding<string, string>(
-                "C2VM.TLE",
+                "TrafficLightManager",
                 "CallOpenBrowser",
                 (jsonString) =>
                 {
@@ -574,7 +547,7 @@ public partial class UISystem : UISystemBase
         );
         AddBinding(
             new TriggerBinding<int>(
-                "C2VM.TLE",
+                "TrafficLightManager",
                 "SetDebugDisplayGroup",
                 (group) =>
                 {
@@ -606,7 +579,7 @@ public partial class UISystem : UISystemBase
             EntityManager.TryGetComponent(m_SelectedTrafficLightGroupEntity, out TrafficLightGroup trafficLightGroup);
             trafficLightGroup.m_ManualSignalGroup = (byte)(index + 1);
             EntityManager.SetComponentData(m_SelectedTrafficLightGroupEntity, trafficLightGroup);
-            m_ManualSignalGroupBinding.Update();
+            m_TrafficLightGroupBinding.Update();
             RedrawGizmo();
         }
     }

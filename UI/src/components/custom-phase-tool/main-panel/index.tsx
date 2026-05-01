@@ -1,7 +1,7 @@
 import { CSSProperties, useEffect, useState } from "react";
 import styled from "styled-components";
 
-import { bindValue, trigger, useValue } from "cs2/api";
+import { bindValue, call, trigger, useValue } from "cs2/api";
 
 import Button from "@/components/common/button";
 import Scrollable from "@/components/common/scrollable";
@@ -62,16 +62,11 @@ const ItemContainerStyle: CSSProperties = {
 };
 
 const AddButton = () => {
-  const data: MainPanelItemButton = {
-    itemType: "button",
-    type: "button",
-    key: "add",
-    value: "add",
-    label: "CustomPhaseEditor.Add",
-    engineEventName: "C2VM.TLE.CallAddCustomPhase"
-  };
+  const { t } = useTranslate();
   return (
-    <Row data={data}><Button {...data} /></Row>
+    <Row onClick={() => {
+      call("TrafficLightManager", "CallAddCustomPhase")
+    }}><Button label={t("CustomPhaseEditor.Add")} /></Row>
   );
 };
 
@@ -104,7 +99,7 @@ export default function MainPanel() {
   let [currentItemState, setCurrentItemState] = useState(ItemState.None);
   let [manualControl, setManualControl] = useState(false);
 
-  const currentPhaseIndex: number = useValue(bindValue("TrafficLightManager", "GetCurrentPhaseIndex"));
+  const trafficLightGroup = JSON.parse(useValue(bindValue("TrafficLightManager", "GetTrafficLightGroup")));
 
   const trafficLightsMembers = JSON.parse(useValue(bindValue("TrafficLightManager", "GetTrafficLightsMembers"))) as any[];
   const customPhaseItems = JSON.parse(useValue(bindValue("TrafficLightManager", "GetCustomPhaseItems"))) as CustomPhaseItem[];
@@ -126,7 +121,7 @@ export default function MainPanel() {
     }
   }, [currentIndex, currentItemState]);
 
-  let subPanelIndex = currentIndex >= 0 ? currentIndex : currentPhaseIndex;
+  let subPanelIndex = currentIndex >= 0 ? currentIndex : trafficLightGroup.currentPhaseIndex;
   let subPanelItem = subPanelIndex >= 0 ? customPhaseItems[subPanelIndex] : null;
 
   const { t } = useTranslate();
@@ -156,6 +151,7 @@ export default function MainPanel() {
                 itemState={index === currentIndex ? currentItemState : ItemState.None}
                 currentIndex={currentIndex}
                 itemCount={customPhaseItems.length}
+                trafficLightGroup={trafficLightGroup}
                 updateItemState={(state) => {
                   if (state === ItemState.None) {
                     setCurrentIndex(-1);
@@ -179,7 +175,7 @@ export default function MainPanel() {
       </LeftPanelContainer>
       <RightPanelContainer>
         <Scrollable style={{ flex: 1 }} contentStyle={{ flex: 1 }} trackStyle={{ marginLeft: "0.25em" }}>
-          <SubPanel data={subPanelItem} itemIndex={subPanelIndex} statisticsOnly={subPanelIndex !== currentIndex || currentItemState !== ItemState.Editing} />
+          <SubPanel data={subPanelItem} itemIndex={subPanelIndex} statisticsOnly={subPanelIndex !== currentIndex || currentItemState !== ItemState.Editing} trafficLightGroup={trafficLightGroup} />
         </Scrollable>
       </RightPanelContainer>
     </Container>

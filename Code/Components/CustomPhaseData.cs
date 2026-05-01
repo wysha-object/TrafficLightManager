@@ -19,8 +19,6 @@ public struct CustomPhaseData : IBufferElementData, ISerializable
         EndPhasePrematurely = 1 << 4,
     }
 
-    private ushort m_SchemaVersion;
-
     // Statistics
     public ushort m_TurnsSinceLastRun;
 
@@ -40,8 +38,6 @@ public struct CustomPhaseData : IBufferElementData, ISerializable
 
     public float m_WeightedWaiting;
 
-    public float m_TargetDuration;
-
     public int m_Priority;
 
     // User configurable variables
@@ -60,7 +56,7 @@ public struct CustomPhaseData : IBufferElementData, ISerializable
     public void Serialize<TWriter>(TWriter writer)
         where TWriter : IWriter
     {
-        writer.Write(m_SchemaVersion);
+        writer.Write((ushort) 2);
         writer.Write(m_TurnsSinceLastRun);
         writer.Write(m_LowFlowTimer);
         writer.Write(m_LowPriorityTimer);
@@ -70,7 +66,6 @@ public struct CustomPhaseData : IBufferElementData, ISerializable
         writer.Write(m_TrackLaneOccupied);
         writer.Write(m_PedestrianLaneOccupied);
         writer.Write(m_WeightedWaiting);
-        writer.Write(m_TargetDuration);
         writer.Write(m_Priority);
         writer.Write((uint)m_Options);
         writer.Write(m_MinimumDuration);
@@ -83,8 +78,8 @@ public struct CustomPhaseData : IBufferElementData, ISerializable
     public void Deserialize<TReader>(TReader reader)
         where TReader : IReader
     {
+        reader.Read(out ushort schemaVersion);
         Initialisation();
-        reader.Read(out m_SchemaVersion);
         reader.Read(out m_TurnsSinceLastRun);
         reader.Read(out m_LowFlowTimer);
         reader.Read(out m_LowPriorityTimer);
@@ -94,7 +89,10 @@ public struct CustomPhaseData : IBufferElementData, ISerializable
         reader.Read(out m_TrackLaneOccupied);
         reader.Read(out m_PedestrianLaneOccupied);
         reader.Read(out m_WeightedWaiting);
-        reader.Read(out m_TargetDuration);
+        if (schemaVersion <= 1)
+        {
+            reader.Read(out float _);
+        }
         reader.Read(out m_Priority);
         reader.Read(out uint options);
         reader.Read(out m_MinimumDuration);
@@ -107,7 +105,6 @@ public struct CustomPhaseData : IBufferElementData, ISerializable
 
     private void Initialisation()
     {
-        m_SchemaVersion = 1;
         m_TurnsSinceLastRun = 0;
         m_LowFlowTimer = 0;
         m_LowPriorityTimer = 0;
@@ -117,7 +114,6 @@ public struct CustomPhaseData : IBufferElementData, ISerializable
         m_TrackLaneOccupied = 0;
         m_PedestrianLaneOccupied = 0;
         m_WeightedWaiting = 0;
-        m_TargetDuration = 0;
         m_Priority = 0;
         m_Options = Options.PrioritiseTrack;
         m_MinimumDuration = 2;

@@ -8,8 +8,6 @@ public static class UITypes
 {
     public struct CustomPhaseItem
     {
-        public uint timer;
-
         public ushort turnsSinceLastRun;
 
         public ushort lowFlowTimer;
@@ -25,8 +23,6 @@ public static class UITypes
         public ushort pedestrianLaneOccupied;
 
         public float weightedWaiting;
-
-        public float targetDuration;
 
         public int priority;
 
@@ -49,6 +45,14 @@ public static class UITypes
         public bool linkedWithNextPhase;
 
         public bool endPhasePrematurely;
+    }
+
+    public struct TrafficLightGroup
+    {
+        public uint timer;
+        public int currentPhaseIndex;
+        public int manualPhaseIndex;
+        public float targetDuration;
     }
 
     public struct UpdateCustomPhaseData

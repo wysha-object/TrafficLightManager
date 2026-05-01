@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import styled from "styled-components";
 
-import { bindValue, call, useValue } from "cs2/api";
+import { call } from "cs2/api";
 
 import Check from "@/components/common/icons/check";
 import ChevronDown from "@/components/common/icons/chevron-down";
@@ -69,6 +69,7 @@ export default function Item(
     itemState: ItemState,
     currentIndex: number,
     itemCount: number,
+    trafficLightGroup: TrafficLightGroup,
     updateItemState: (state: ItemState) => void,
     updateCurrentIndex: (index: number) => void,
   }
@@ -76,7 +77,7 @@ export default function Item(
   const { t } = useTranslate();
   const [isActiveLabel, setIsActiveLabel] = useState(false);
   const swapItem = (index1: number, index2: number) => {
-    call("C2VM.TLE", "CallSwapCustomPhase", JSON.stringify({ index1, index2 }))
+    call("TrafficLightManager", "CallSwapCustomPhase", JSON.stringify({ index1, index2 }))
 
     if (index1 === props.currentIndex) {
       props.updateCurrentIndex(index2);
@@ -84,7 +85,6 @@ export default function Item(
       props.updateCurrentIndex(index1);
     }
   };
-  const currentIndex = useValue(bindValue("TrafficLightManager", "GetCurrentPhaseIndex"));
   useEffect(() => {
     if (props.itemState == ItemState.Viewing) {
       setIsActiveLabel(true);
@@ -98,7 +98,7 @@ export default function Item(
     <>
       <Row style={{ padding: "0.25em" }}>
         <Label dim={!isActiveLabel}>
-          {t("Phase") + " #" + (props.itemIndex + 1)}{currentIndex === props.itemIndex && <ActiveDot />}
+          {t("Phase") + " #" + (props.itemIndex + 1)}{props.trafficLightGroup.currentPhaseIndex === props.itemIndex && <ActiveDot />}
         </Label>
         <IconBarContainer>
           {props.itemState != ItemState.Editing && <>
@@ -115,7 +115,7 @@ export default function Item(
           {props.itemState == ItemState.Editing && <>
             <IconContainer>
               <Delete style={IconStyle} onClick={() => {
-                call("C2VM.TLE", "CallRemoveCustomPhase", JSON.stringify({ index: props.itemIndex }))
+                call("TrafficLightManager", "CallRemoveCustomPhase", JSON.stringify({ index: props.itemIndex }))
                 if (props.currentIndex === props.itemIndex) {
                   props.updateCurrentIndex(props.currentIndex - 1);
                 }

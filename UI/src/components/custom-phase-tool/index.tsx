@@ -9,20 +9,20 @@ import SubLanePanel from "./sublane-panel";
 
 export default function CustomPhaseTool() {
   const editingPhaseIndex: number = useValue(bindValue("TrafficLightManager", "GetEditingPhaseIndex"));
-  const edgeInfoList: EdgeInfo[] = useValue(bindValue("C2VM.TLE", "GetEdgeInfo"));
+  const edgeInfoList: EdgeInfo[] = useValue(bindValue("TrafficLightManager", "GetEdgeInfo"));
 
   useEffect(() => {
     const edgePositionArray = JSON.stringify(edgeInfoList.filter(edge => (edge.m_EdgeGroupMask.m_Options & EdgeGroupMaskOptions.PerLaneSignal) == 0).map(item => item.m_Position));
     const subLanePositionArray = JSON.stringify(edgeInfoList.filter(edge => (edge.m_EdgeGroupMask.m_Options & EdgeGroupMaskOptions.PerLaneSignal) != 0).map(item => item.m_SubLaneInfoList.map(subLane => subLane.m_Position)).flat());
-    call("C2VM.TLE", "CallAddWorldPosition", edgePositionArray);
-    call("C2VM.TLE", "CallAddWorldPosition", subLanePositionArray);
+    call("TrafficLightManager", "CallAddWorldPosition", edgePositionArray);
+    call("TrafficLightManager", "CallAddWorldPosition", subLanePositionArray);
     return () => {
-      call("C2VM.TLE", "CallRemoveWorldPosition", edgePositionArray);
-      call("C2VM.TLE", "CallRemoveWorldPosition", subLanePositionArray);
+      call("TrafficLightManager", "CallRemoveWorldPosition", edgePositionArray);
+      call("TrafficLightManager", "CallRemoveWorldPosition", subLanePositionArray);
     };
   }, [edgeInfoList]);
 
-  const screenPointMap = useValue<ScreenPointMap>(bindValue("C2VM.TLE", "GetScreenPoint", {}));
+  const screenPointMap = useValue<ScreenPointMap>(bindValue("TrafficLightManager", "GetScreenPoint", {}));
 
   return (
     <>

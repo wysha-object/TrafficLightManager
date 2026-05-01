@@ -194,13 +194,13 @@ export default function EdgePanel(props: { data: EdgeInfo, index: number, positi
       newSignal = currentSignal == "stop" ? "go" : "stop";
       newGroupMask.m_PedestrianNonStopLine.m_GoGroupMask = SetBit(newGroupMask.m_PedestrianNonStopLine.m_GoGroupMask, index, newSignal != "stop" ? 1 : 0);
     }
-    call("C2VM.TLE", "CallUpdateEdgeGroupMask", JSON.stringify({ groupMaskArray: [newGroupMask], entity: props.data.m_TrafficLightsEntity }));
+    call("TrafficLightManager", "CallUpdateEdgeGroupMask", JSON.stringify({ groupMaskArray: [newGroupMask], entity: props.data.m_TrafficLightsEntity }));
   }, [props.data.m_EdgeGroupMask]);
 
   const unlinkHandler = useCallback(() => {
     const newGroupMask: EdgeGroupMask = JSON.parse(JSON.stringify(props.data.m_EdgeGroupMask));
     newGroupMask.m_Options |= EdgeGroupMaskOptions.PerLaneSignal;
-    call("C2VM.TLE", "CallUpdateEdgeGroupMask", JSON.stringify({ groupMaskArray: [newGroupMask], entity: props.data.m_TrafficLightsEntity }));
+    call("TrafficLightManager", "CallUpdateEdgeGroupMask", JSON.stringify({ groupMaskArray: [newGroupMask], entity: props.data.m_TrafficLightsEntity }));
   }, [props.data.m_EdgeGroupMask]);
 
   const cityConfiguration = useContext(CityConfigurationContext);
