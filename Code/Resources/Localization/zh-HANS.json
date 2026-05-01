@@ -36,7 +36,7 @@
     "CustomPhaseEditor.Statistics.Priority": "优先级",
     "CustomPhaseEditor.Statistics.Timer": "计时器",
     "CustomPhaseEditor.Statistics.Title": "统计信息",
-    "CustomPhaseEditor.Statistics.Tooltip": "推进相位时, 会先选优先级最高的相位, 其次选权重最高的相位",
+    "CustomPhaseEditor.Statistics.Tooltip": "模拟过程中, 会先计算出一个目标持续时间, 当前相位持续时间达到目标持续时间后, 将会推进相位. 推进相位时, 会先选优先级最高的相位, 其次选权重最高的相位",
     "CustomPhaseEditor.Statistics.WeightedWaiting": "权重",
     "CustomPhaseEditor.TrafficLightsMembers": "联动组成员",
     "Default": "默认设定",

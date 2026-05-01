@@ -36,7 +36,7 @@
     "CustomPhaseEditor.Statistics.Priority": "Priority",
     "CustomPhaseEditor.Statistics.Timer": "Timer",
     "CustomPhaseEditor.Statistics.Title": "Statistics",
-    "CustomPhaseEditor.Statistics.Tooltip": "When advancing phases, the system first chooses the highest-priority phase, then the one with the highest weight",
+    "CustomPhaseEditor.Statistics.Tooltip": "During simulation, a target duration is calculated first. Once the current phase duration reaches that target duration, the phase advances. When advancing phases, the system first chooses the highest-priority phase, then the one with the highest weight",
     "CustomPhaseEditor.Statistics.WeightedWaiting": "Weight",
     "CustomPhaseEditor.TrafficLightsMembers": "Group Members",
     "Default": "Default",

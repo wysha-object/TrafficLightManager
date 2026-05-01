@@ -36,7 +36,7 @@
     "CustomPhaseEditor.Statistics.Priority": "Priorite",
     "CustomPhaseEditor.Statistics.Timer": "Minuteur",
     "CustomPhaseEditor.Statistics.Title": "Statistiques",
-    "CustomPhaseEditor.Statistics.Tooltip": "Lors du passage a la phase suivante, le systeme choisit d abord la phase avec la priorite la plus elevee, puis celle avec le poids le plus eleve",
+    "CustomPhaseEditor.Statistics.Tooltip": "Pendant la simulation, une duree cible est d abord calculee. Lorsque la duree de la phase actuelle atteint cette duree cible, la phase suivante est engagee. Lors du passage a la phase suivante, le systeme choisit d abord la phase avec la priorite la plus elevee, puis celle avec le poids le plus eleve",
     "CustomPhaseEditor.Statistics.WeightedWaiting": "Poids",
     "CustomPhaseEditor.TrafficLightsMembers": "Membres du groupe",
     "Default": "Defaut",

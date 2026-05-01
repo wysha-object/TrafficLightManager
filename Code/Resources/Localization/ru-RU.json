@@ -36,7 +36,7 @@
     "CustomPhaseEditor.Statistics.Priority": "Приоритет",
     "CustomPhaseEditor.Statistics.Timer": "Таймер",
     "CustomPhaseEditor.Statistics.Title": "Статистика",
-    "CustomPhaseEditor.Statistics.Tooltip": "При переключении фаз система сначала выбирает фазу с наивысшим приоритетом, затем с наибольшим весом",
+    "CustomPhaseEditor.Statistics.Tooltip": "Во время симуляции сначала вычисляется целевая длительность. Когда длительность текущей фазы достигает этой целевой длительности, происходит переход к следующей фазе. При переключении фаз система сначала выбирает фазу с наивысшим приоритетом, затем с наибольшим весом",
     "CustomPhaseEditor.Statistics.WeightedWaiting": "Вес",
     "CustomPhaseEditor.TrafficLightsMembers": "Участники группы",
     "Default": "По умолчанию",

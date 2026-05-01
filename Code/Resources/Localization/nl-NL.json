@@ -36,7 +36,7 @@
     "CustomPhaseEditor.Statistics.Priority": "Prioriteit",
     "CustomPhaseEditor.Statistics.Timer": "Timer",
     "CustomPhaseEditor.Statistics.Title": "Statistieken",
-    "CustomPhaseEditor.Statistics.Tooltip": "Bij fasewissel kiest het systeem eerst de fase met hoogste prioriteit en daarna de fase met hoogste gewicht",
+    "CustomPhaseEditor.Statistics.Tooltip": "Tijdens de simulatie wordt eerst een doelduur berekend. Zodra de duur van de huidige fase die doelduur bereikt, gaat de fase verder. Bij fasewissel kiest het systeem eerst de fase met de hoogste prioriteit en daarna de fase met het hoogste gewicht",
     "CustomPhaseEditor.Statistics.WeightedWaiting": "Gewicht",
     "CustomPhaseEditor.TrafficLightsMembers": "Groepsleden",
     "Default": "Standaard",

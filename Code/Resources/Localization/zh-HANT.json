@@ -36,7 +36,7 @@
     "CustomPhaseEditor.Statistics.Priority": "優先級",
     "CustomPhaseEditor.Statistics.Timer": "計時器",
     "CustomPhaseEditor.Statistics.Title": "統計資訊",
-    "CustomPhaseEditor.Statistics.Tooltip": "推進相位時, 系統會先選擇優先級最高的相位, 再選擇權重最高的相位",
+    "CustomPhaseEditor.Statistics.Tooltip": "模擬過程中, 會先計算出一個目標持續時間, 當前相位持續時間達到目標持續時間後, 將會推進相位. 推進相位時, 系統會先選擇優先級最高的相位, 再選擇權重最高的相位",
     "CustomPhaseEditor.Statistics.WeightedWaiting": "權重",
     "CustomPhaseEditor.TrafficLightsMembers": "聯動群組成員",
     "Default": "預設",

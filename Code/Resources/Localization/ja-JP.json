@@ -36,7 +36,7 @@
     "CustomPhaseEditor.Statistics.Priority": "優先度",
     "CustomPhaseEditor.Statistics.Timer": "タイマー",
     "CustomPhaseEditor.Statistics.Title": "統計",
-    "CustomPhaseEditor.Statistics.Tooltip": "フェーズ移行時は, まず優先度が最も高いフェーズを選び, 次に重みが最も高いフェーズを選びます",
+    "CustomPhaseEditor.Statistics.Tooltip": "シミュレーション中は, まず目標継続時間を計算します. 現在のフェーズの継続時間がその目標継続時間に達すると, フェーズを進めます. フェーズ移行時は, まず優先度が最も高いフェーズを選び, 次に重みが最も高いフェーズを選びます",
     "CustomPhaseEditor.Statistics.WeightedWaiting": "重み",
     "CustomPhaseEditor.TrafficLightsMembers": "グループメンバー",
     "Default": "デフォルト",

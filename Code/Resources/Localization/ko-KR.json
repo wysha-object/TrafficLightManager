@@ -36,7 +36,7 @@
     "CustomPhaseEditor.Statistics.Priority": "우선순위",
     "CustomPhaseEditor.Statistics.Timer": "타이머",
     "CustomPhaseEditor.Statistics.Title": "통계",
-    "CustomPhaseEditor.Statistics.Tooltip": "단계 전환 시 먼저 우선순위가 가장 높은 단계를 선택하고, 그다음 가중치가 가장 높은 단계를 선택합니다",
+    "CustomPhaseEditor.Statistics.Tooltip": "시뮬레이션 중에는 먼저 목표 지속 시간을 계산합니다. 현재 단계의 지속 시간이 목표 지속 시간에 도달하면 다음 단계로 전환됩니다. 단계 전환 시 시스템은 먼저 우선순위가 가장 높은 단계를 선택하고, 그다음 가중치가 가장 높은 단계를 선택합니다",
     "CustomPhaseEditor.Statistics.WeightedWaiting": "가중치",
     "CustomPhaseEditor.TrafficLightsMembers": "그룹 멤버",
     "Default": "기본",

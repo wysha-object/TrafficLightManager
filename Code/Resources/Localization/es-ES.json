@@ -36,7 +36,7 @@
     "CustomPhaseEditor.Statistics.Priority": "Prioridad",
     "CustomPhaseEditor.Statistics.Timer": "Temporizador",
     "CustomPhaseEditor.Statistics.Title": "Estadisticas",
-    "CustomPhaseEditor.Statistics.Tooltip": "Al avanzar de fase, primero se elige la fase con mayor prioridad y luego la de mayor peso",
+    "CustomPhaseEditor.Statistics.Tooltip": "Durante la simulacion, primero se calcula una duracion objetivo. Cuando la duracion de la fase actual alcanza esa duracion objetivo, la fase avanza. Al avanzar de fase, el sistema primero elige la fase con mayor prioridad y luego la de mayor peso",
     "CustomPhaseEditor.Statistics.WeightedWaiting": "Peso",
     "CustomPhaseEditor.TrafficLightsMembers": "Miembros del grupo",
     "Default": "Predeterminado",

@@ -36,7 +36,7 @@
     "CustomPhaseEditor.Statistics.Priority": "Priorytet",
     "CustomPhaseEditor.Statistics.Timer": "Timer",
     "CustomPhaseEditor.Statistics.Title": "Statystyki",
-    "CustomPhaseEditor.Statistics.Tooltip": "Podczas zmiany fazy system najpierw wybiera faze o najwyzszym priorytecie, a nastepnie o najwyzszej wadze",
+    "CustomPhaseEditor.Statistics.Tooltip": "Podczas symulacji najpierw obliczany jest docelowy czas trwania. Gdy czas trwania biezacej fazy osiagnie ten docelowy czas, faza zostaje przelaczona. Podczas zmiany fazy system najpierw wybiera faze o najwyzszym priorytecie, a nastepnie o najwyzszej wadze",
     "CustomPhaseEditor.Statistics.WeightedWaiting": "Waga",
     "CustomPhaseEditor.TrafficLightsMembers": "Czlonkowie grupy",
     "Default": "Domyslne",

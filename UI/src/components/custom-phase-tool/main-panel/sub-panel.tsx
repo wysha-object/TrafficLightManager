@@ -222,7 +222,7 @@ export default function SubPanel(props: { data: CustomPhaseItem | null, itemInde
       <ItemTitle title="CustomPhaseEditor.Statistics.Timer" secondaryText={`${currentSignalGroup == props.itemIndex ? timer : 0}/ ${Round(Math.min(Math.max(data.targetDuration, data.minimumDuration), data.maximumDuration))}`} dim={true} />
       <ItemTitle title="CustomPhaseEditor.Statistics.Priority" secondaryText={`${data.priority}`} dim={true} />
       <ItemTitle title="CustomPhaseEditor.Statistics.LastRun" secondaryText={`${data.turnsSinceLastRun}`} dim={true} />
-      <ItemTitle title="CustomPhaseEditor.Statistics.LastRun" secondaryText={`${data.turnsSinceLastRun}`} dim={true} />
+      <ItemTitle title="CustomPhaseEditor.Statistics.CarFlow" secondaryText={`${data.carFlow}`} dim={true} />
       <ItemTitle title="CustomPhaseEditor.Statistics.LanesOccupied" secondaryText={`${data.carLaneOccupied}, ${data.publicCarLaneOccupied}, ${data.trackLaneOccupied}, ${data.pedestrianLaneOccupied}`} dim={true} />
       <ItemTitle title="CustomPhaseEditor.Statistics.WeightedWaiting" secondaryText={`${Round(data.weightedWaiting)}`} dim={true} />
       {manualSignalGroup < 0 && currentSignalGroup == props.itemIndex && <EndPhaseButton index={props.itemIndex} disabled={data.endPhasePrematurely} />}
