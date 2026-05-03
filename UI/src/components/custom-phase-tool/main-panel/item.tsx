@@ -118,6 +118,7 @@ export default function Item(
                 call("TrafficLightManager", "CallRemoveCustomPhase", JSON.stringify({ index: props.itemIndex }))
                 if (props.currentIndex === props.itemIndex) {
                   props.updateCurrentIndex(props.currentIndex - 1);
+                  props.updateItemState(ItemState.None);
                 }
               }} />
             </IconContainer>

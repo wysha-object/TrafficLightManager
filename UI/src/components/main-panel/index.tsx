@@ -90,10 +90,6 @@ export default function MainPanel() {
     }
   }, [container]);
   const mouseUpHandler = useCallback((_event: MouseEvent) => {
-    if (container) {
-      const rect = container.getBoundingClientRect();
-      engine.call("TrafficLightManager.CallMainPanelUpdatePosition", JSON.stringify({ top: Math.floor(rect.top), left: Math.floor(rect.left) }));
-    }
     setDragging(false);
   }, [container]);
   const mouseMoveHandler = useCallback((event: MouseEvent) => {
