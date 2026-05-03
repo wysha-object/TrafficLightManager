@@ -113,7 +113,9 @@ export default function MainPanel() {
   }, [currentItemState]);
 
   useEffect(() => {
-    trigger("TrafficLightManager", "SetDisplayPhaseIndex", currentIndex);
+    if (currentItemState !== ItemState.None) {
+      trigger("TrafficLightManager", "SetDisplayPhaseIndex", currentIndex);
+    }
     if (currentItemState === ItemState.Editing) {
       trigger("TrafficLightManager", "SetEditingPhaseIndex", currentIndex);
     } else {
@@ -152,7 +154,7 @@ export default function MainPanel() {
                 currentIndex={currentIndex}
                 itemCount={customPhaseItems.length}
                 trafficLightGroup={trafficLightGroup}
-                updateItemState={(state) => {
+                updateItemState={(index, state) => {
                   if (state === ItemState.None) {
                     setCurrentIndex(-1);
                   } else {

@@ -163,6 +163,72 @@ public struct CustomPhaseUtils
         return -1;
     }
 
+    public static void CopyBit(DynamicBuffer<EdgeGroupMask> buffer, int sourceIndex, int destIndex)
+    {
+        if (!buffer.IsCreated)
+        {
+            return;
+        }
+        for (int i = 0; i < buffer.Length; i++)
+        {
+            var phase = buffer[i];
+            CopyBit(ref phase, sourceIndex, destIndex);
+            buffer[i] = phase;
+        }
+    }
+
+    public static void CopyBit(DynamicBuffer<SubLaneGroupMask> buffer, int sourceIndex, int destIndex)
+    {
+        if (!buffer.IsCreated)
+        {
+            return;
+        }
+        for (int i = 0; i < buffer.Length; i++)
+        {
+            var phase = buffer[i];
+            CopyBit(ref phase, sourceIndex, destIndex);
+            buffer[i] = phase;
+        }
+    }
+
+    public static void CopyBit(ref EdgeGroupMask phase, int sourceIndex, int destIndex)
+    {
+        TurnCopyBit(ref phase.m_Car, sourceIndex, destIndex);
+        TurnCopyBit(ref phase.m_PublicCar, sourceIndex, destIndex);
+        TurnCopyBit(ref phase.m_Track, sourceIndex, destIndex);
+        SignalCopyBit(ref phase.m_PedestrianStopLine, sourceIndex, destIndex);
+        SignalCopyBit(ref phase.m_PedestrianNonStopLine, sourceIndex, destIndex);
+    }
+
+    public static void CopyBit(ref SubLaneGroupMask phase, int sourceIndex, int destIndex)
+    {
+        TurnCopyBit(ref phase.m_Car, sourceIndex, destIndex);
+        TurnCopyBit(ref phase.m_Track, sourceIndex, destIndex);
+        SignalCopyBit(ref phase.m_Pedestrian, sourceIndex, destIndex);
+    }
+
+    public static void TurnCopyBit(ref GroupMask.Turn signal, int sourceIndex, int destIndex)
+    {
+        SignalCopyBit(ref signal.m_Left, sourceIndex, destIndex);
+        SignalCopyBit(ref signal.m_Straight, sourceIndex, destIndex);
+        SignalCopyBit(ref signal.m_Right, sourceIndex, destIndex);
+        SignalCopyBit(ref signal.m_UTurn, sourceIndex, destIndex);
+    }
+
+    public static void SignalCopyBit(ref GroupMask.Signal signal, int sourceIndex, int destIndex)
+    {
+        signal.m_GoGroupMask = CopyBit(signal.m_GoGroupMask, sourceIndex, destIndex);
+        signal.m_YieldGroupMask = CopyBit(signal.m_YieldGroupMask, sourceIndex, destIndex);
+    }
+
+    public static ushort CopyBit(ushort input, int sourceIndex, int destIndex)
+    {
+        ushort sourceMask = (ushort)(1 << sourceIndex);
+        ushort destMask = (ushort)(1 << destIndex);
+        ushort sourceValue = (ushort)((input & sourceMask) >> sourceIndex);
+        return (ushort)((input & (~destMask)) | (sourceValue << destIndex));
+    }
+
     public static void SwapBit(DynamicBuffer<EdgeGroupMask> buffer, int index1, int index2)
     {
         if (!buffer.IsCreated)

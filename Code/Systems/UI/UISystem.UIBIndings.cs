@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using cohtml.Net;
 using Colossal.Entities;
 using Colossal.UI.Binding;
 using Game.UI;
@@ -102,15 +103,14 @@ public partial class UISystem : UISystemBase
                 () =>
                 {
                     UITypes.CustomPhaseItem[] rs;
-                    if (
-                        EntityManager.TryGetBuffer<CustomPhaseData>(m_SelectedTrafficLightGroupEntity, true, out var customPhaseDataBuffer)
-                    )
+                    if (EntityManager.TryGetBuffer<CustomPhaseData>(m_SelectedTrafficLightGroupEntity, true, out var customPhaseDataBuffer))
                     {
                         rs = new UITypes.CustomPhaseItem[customPhaseDataBuffer.Length];
                         for (int i = 0; i < customPhaseDataBuffer.Length; i++)
                         {
                             CustomPhaseData item = customPhaseDataBuffer[i];
-                            rs[i] = new UITypes.CustomPhaseItem{
+                            rs[i] = new UITypes.CustomPhaseItem
+                            {
                                 turnsSinceLastRun = item.m_TurnsSinceLastRun,
                                 lowFlowTimer = item.m_LowFlowTimer,
                                 carFlow = item.AverageCarFlow(),
@@ -150,13 +150,16 @@ public partial class UISystem : UISystemBase
                     UITypes.TrafficLightGroup rs;
                     if (EntityManager.TryGetComponent<TrafficLightGroup>(m_SelectedTrafficLightGroupEntity, out var trafficLightGroup))
                     {
-                        rs = new UITypes.TrafficLightGroup {
+                        rs = new UITypes.TrafficLightGroup
+                        {
                             timer = trafficLightGroup.m_Timer,
                             currentPhaseIndex = trafficLightGroup.m_CurrentSignalGroup - 1,
                             manualPhaseIndex = trafficLightGroup.m_ManualSignalGroup - 1,
-                            targetDuration = trafficLightGroup.m_TargetDuration
+                            targetDuration = trafficLightGroup.m_TargetDuration,
                         };
-                    } else {
+                    }
+                    else
+                    {
                         rs = new UITypes.TrafficLightGroup { };
                     }
                     return JsonConvert.SerializeObject(rs);
@@ -531,6 +534,47 @@ public partial class UISystem : UISystemBase
                     var parsedKey = JsonConvert.DeserializeAnonymousType(jsonString, keyDefinition);
                     System.Diagnostics.Process.Start(parsedKey.value);
                     return "";
+                }
+            )
+        );
+        AddBinding(
+            new CallBinding<int, int>(
+                "TrafficLightManager",
+                "CallCopyPhase",
+                (sourceIndex) =>
+                {
+                    if (EntityManager.TryGetBuffer(m_SelectedTrafficLightGroupEntity, false, out DynamicBuffer<CustomPhaseData> customPhaseDataBuffer))
+                    {
+                        CustomPhaseData source = customPhaseDataBuffer[sourceIndex];
+                        customPhaseDataBuffer.Add(source);
+                        int destIndex = customPhaseDataBuffer.Length - 1;
+
+                        ForEachTrafficLight(
+                            (e) =>
+                            {
+                                DynamicBuffer<EdgeGroupMask> edgeGroupMaskBuffer;
+                                if (!EntityManager.TryGetBuffer(e, false, out edgeGroupMaskBuffer))
+                                {
+                                    edgeGroupMaskBuffer = EntityManager.AddBuffer<EdgeGroupMask>(e);
+                                }
+                                DynamicBuffer<SubLaneGroupMask> subLaneGroupMaskBuffer;
+                                if (!EntityManager.TryGetBuffer(e, false, out subLaneGroupMaskBuffer))
+                                {
+                                    subLaneGroupMaskBuffer = EntityManager.AddBuffer<SubLaneGroupMask>(e);
+                                }
+
+                                CustomPhaseUtils.CopyBit(edgeGroupMaskBuffer, sourceIndex, destIndex);
+                                CustomPhaseUtils.CopyBit(subLaneGroupMaskBuffer, sourceIndex, destIndex);
+                                UpdateEdgeInfo(e);
+                            }
+                        );
+
+                        m_CustomPhaseItemsBinding.Update();
+                        AddUpdate();
+
+                        return destIndex;
+                    }
+                    return -1;
                 }
             )
         );

@@ -14,6 +14,7 @@ import Row from "@/components/main-panel/items/row";
 
 import ItemDivider from "./item-divider";
 import { useTranslate } from "@/localisations";
+import Copy from "@/components/common/icons/copy";
 
 const Label = styled.div<{ dim?: boolean }>`
   color: ${props => props.dim ? "var(--textColorDim)" : "var(--textColor)"};
@@ -70,7 +71,7 @@ export default function Item(
     currentIndex: number,
     itemCount: number,
     trafficLightGroup: TrafficLightGroup,
-    updateItemState: (state: ItemState) => void,
+    updateItemState: (index: number, state: ItemState) => void,
     updateCurrentIndex: (index: number) => void,
   }
 ) {
@@ -103,13 +104,20 @@ export default function Item(
         <IconBarContainer>
           {props.itemState != ItemState.Editing && <>
             {props.itemState == ItemState.Viewing && <IconContainer>
-              <VisibilityOff style={IconStyle} onClick={() => props.updateItemState(ItemState.None)} />
+              <VisibilityOff style={IconStyle} onClick={() => props.updateItemState(props.itemIndex, ItemState.None)} />
             </IconContainer>}
             {props.itemState == ItemState.None && <IconContainer>
-              <Visibility style={IconStyle} onClick={() => props.updateItemState(ItemState.Viewing)} />
+              <Visibility style={IconStyle} onClick={() => props.updateItemState(props.itemIndex, ItemState.Viewing)} />
             </IconContainer>}
             <IconContainer>
-              <Tune style={IconStyle} onClick={() => props.updateItemState(ItemState.Editing)} />
+              <Tune style={IconStyle} onClick={() => props.updateItemState(props.itemIndex, ItemState.Editing)} />
+            </IconContainer>
+            <IconContainer>
+              <Copy style={IconStyle} onClick={async () => {
+                let newIndex: number = await call("TrafficLightManager", "CallCopyPhase", props.itemIndex);
+                props.updateCurrentIndex(newIndex);
+                props.updateItemState(newIndex, ItemState.Viewing);
+              }} />
             </IconContainer>
           </>}
           {props.itemState == ItemState.Editing && <>
@@ -118,12 +126,12 @@ export default function Item(
                 call("TrafficLightManager", "CallRemoveCustomPhase", JSON.stringify({ index: props.itemIndex }))
                 if (props.currentIndex === props.itemIndex) {
                   props.updateCurrentIndex(props.currentIndex - 1);
-                  props.updateItemState(ItemState.None);
+                  props.updateItemState(props.itemIndex, ItemState.None);
                 }
               }} />
             </IconContainer>
             <IconContainer>
-              <Check style={IconStyle} onClick={() => props.updateItemState(ItemState.None)} />
+              <Check style={IconStyle} onClick={() => props.updateItemState(props.itemIndex, ItemState.None)} />
             </IconContainer>
             <IconContainer>
               {(props.itemIndex - 1) >= 0 && <ChevronUp style={{ ...IconStyle, ...IconStyleDisabled }} onClick={() => swapItem(props.itemIndex, props.itemIndex - 1)} />}

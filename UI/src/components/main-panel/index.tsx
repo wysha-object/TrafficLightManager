@@ -1,7 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import styled from 'styled-components';
 
-import engine from 'cohtml/cohtml';
 import { bindValue, trigger, useValue } from 'cs2/api';
 
 import Header from './header';
