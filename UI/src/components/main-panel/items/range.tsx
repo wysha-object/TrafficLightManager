@@ -10,6 +10,8 @@ import ResetSettings from '@/components/common/icons/reset-settings';
 
 import TitleDim from './title-dim';
 import { useTranslate } from '@/localisations';
+import Tooltip from '@/components/common/tooltip';
+import TooltipIcon from '@/components/common/tooltip-icon';
 
 const Container = styled.div`
   padding: 4rem 8rem;
@@ -53,7 +55,8 @@ export default function MainPanelRange(
     textFieldRegExp?: string,
     min: number,
     max: number,
-    step: number
+    step: number,
+    tooltip?: React.ReactNode
   }
 ) {
   const { t } = useTranslate();
@@ -110,6 +113,11 @@ export default function MainPanelRange(
           {!textFieldActive && <IconContainer><Edit style={IconStyle} onClick={enableTextField} /></IconContainer>}
         </>}
         <IconContainer><ResetSettings style={IconStyle} onClick={resetHandler} /></IconContainer>
+        {props.tooltip && <>
+          <Tooltip position="right-start" tooltip={props.tooltip}>
+            <TooltipIcon style={{ marginLeft: "0.25em" }} />
+          </Tooltip>
+        </>}
       </TitleContainer>
       <Gap />
       <Range min={props.min} max={props.max} step={props.step} value={props.value} onChange={props.onChange} onUpdate={updateHandler} />

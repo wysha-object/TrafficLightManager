@@ -165,6 +165,7 @@ export default function SubPanel(props: { data: CustomPhaseItem | null, itemInde
             defaultValue={1}
             enableTextField={true}
             textFieldRegExp={"^\\d{0,4}(\\.\\d{0,2})?$"}
+            tooltip={<TooltipContainer>{t("CustomPhaseEditor.Adjustments.LaneOccupiedMultiplier.Tooltip")}</TooltipContainer>}
           />
           <MainPanelRange
             onChange={(value) => {
@@ -180,6 +181,7 @@ export default function SubPanel(props: { data: CustomPhaseItem | null, itemInde
             defaultValue={2}
             enableTextField={true}
             textFieldRegExp={"^\\d{0,4}(\\.\\d{0,2})?$"}
+            tooltip={<TooltipContainer>{t("CustomPhaseEditor.Adjustments.IntervalExponent.Tooltip")}</TooltipContainer>}
           />
           <Divider />
         </>
