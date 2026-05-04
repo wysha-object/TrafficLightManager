@@ -11,27 +11,19 @@ namespace TrafficLightManager.Code;
 
 [FileLocation("ModsSettings/TrafficLightManager.Code/Settings")]
 [SettingsUITabOrder(kTabGeneral, kTabKeyBindings)]
-[SettingsUIGroupOrder(kGroupGeneral, kGroupDefault, kGroupVersion, kGroupMainPanel, kGroupKeyBindingReset)]
+[SettingsUIGroupOrder(kGroupGeneral, kGroupDefault, kGroupDisplay, kGroupMainPanel, kGroupKeyBindingReset)]
 [SettingsUIShowGroupName]
 public class Settings : ModSetting
 {
     public const string kTabGeneral = "TabGeneral";
+    public const string kGroupGeneral = "GroupGeneral";
+    public const string kGroupDefault = "GroupDefault";
+    public const string kGroupDisplay = "GroupDisplay";
 
     public const string kTabKeyBindings = "TabKeyBindings";
-
-    public const string kGroupGeneral = "GroupGeneral";
-
-    public const string kGroupLanguage = "GroupLanguage";
-
-    public const string kGroupDefault = "GroupDefault";
-
-    public const string kGroupVersion = "GroupVersion";
-
     public const string kGroupMainPanel = "GroupMainPanel";
-
-    public const string kGroupKeyBindingReset = "GroupKeyBindingReset";
-
     public const string kKeyboardBindingMainPanelToggle = "KeyboardBindingMainPanelToggle";
+    public const string kGroupKeyBindingReset = "GroupKeyBindingReset";
 
     public struct Values
     {
@@ -61,26 +53,21 @@ public class Settings : ModSetting
             localizationManager.GetType().GetTypeInfo().GetDeclaredMethod("NotifyActiveDictionaryChanged").Invoke(localizationManager, null);
         }
     }
-
     public string m_Locale { get; private set; }
 
     [SettingsUISection(kTabGeneral, kGroupDefault)]
-    [SettingsUIHideByCondition(typeof(Settings), "IsCompatibilityMode")]
     public bool m_DefaultSplitPhasing { get; set; }
 
     [SettingsUISection(kTabGeneral, kGroupDefault)]
-    [SettingsUIHideByCondition(typeof(Settings), "IsCompatibilityMode")]
     public bool m_DefaultAlwaysGreenKerbsideTurn { get; set; }
 
     [SettingsUISection(kTabGeneral, kGroupDefault)]
-    [SettingsUIHideByCondition(typeof(Settings), "IsCompatibilityMode")]
     public bool m_DefaultExclusivePedestrian { get; set; }
 
     [SettingsUISection(kTabGeneral, kGroupDefault)]
     [SettingsUIButton]
     [SettingsUIConfirmation(null, null)]
     [SettingsUIDisableByCondition(typeof(Settings), "IsNotInGame")]
-    [SettingsUIHideByCondition(typeof(Settings), "IsCompatibilityMode")]
     public bool m_ForceNodeUpdate
     {
         get { return false; }
@@ -91,24 +78,12 @@ public class Settings : ModSetting
         }
     }
 
-    [SettingsUISection(kTabGeneral, kGroupVersion)]
-    [SettingsUIButton]
-    [SettingsUIConfirmation(null, null)]
-    [SettingsUIHideByCondition(typeof(Settings), "IsNotCanary")]
-    public bool m_SuppressCanaryWarning
-    {
-        get { return false; }
-        set
-        {
-            if (value == true)
-            {
-                m_SuppressCanaryWarningVersion = Mod.m_InformationalVersion;
-                //Systems.UI.UISystem.m_MainPanelBinding?.Update();
-            }
-        }
-    }
+    [SettingsUISection(kTabGeneral, kGroupDisplay)]
+    public bool m_DisplayCurrentPhase { get; set; }
 
-    public string m_SuppressCanaryWarningVersion;
+    [SettingsUISection(kTabGeneral, kGroupDisplay)]
+    [SettingsUIDisableByCondition(typeof(Settings), "m_DisplayCurrentPhase", true)]
+    public bool m_DisplayCurrentPhaseWhenToolDisabled { get; set; }
 
     [SettingsUIKeyboardBinding(BindingKeyboard.None, kKeyboardBindingMainPanelToggle)]
     [SettingsUISection(kTabKeyBindings, kGroupMainPanel)]
@@ -137,7 +112,8 @@ public class Settings : ModSetting
         m_DefaultSplitPhasing = false;
         m_DefaultAlwaysGreenKerbsideTurn = false;
         m_DefaultExclusivePedestrian = false;
-        m_SuppressCanaryWarningVersion = "";
+        m_DisplayCurrentPhase = true;
+        m_DisplayCurrentPhaseWhenToolDisabled = false;
     }
 
     public override void Apply()
@@ -170,10 +146,5 @@ public class Settings : ModSetting
     public bool IsNotInGame()
     {
         return GameManager.instance.gameMode != Game.GameMode.Game;
-    }
-
-    public bool IsNotCanary()
-    {
-        return !Mod.IsCanary();
     }
 }

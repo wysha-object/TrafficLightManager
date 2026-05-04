@@ -56,8 +56,6 @@ public partial class UISystem : UISystemBase
 
     private Dictionary<Entity, NativeArray<NodeUtils.EdgeInfo>> m_EdgeInfoDictionary;
 
-    private int m_DebugDisplayGroup;
-
     private UITypes.ScreenPoint m_MainPanelPosition;
 
     public TypeHandle m_TypeHandle;
@@ -73,8 +71,6 @@ public partial class UISystem : UISystemBase
 
         m_WorldPositionList = [];
         m_EdgeInfoDictionary = [];
-
-        m_DebugDisplayGroup = -1;
 
         m_CameraUpdateSystem = World.GetOrCreateSystemManaged<CameraUpdateSystem>();
         m_CityConfigurationSystem = World.GetOrCreateSystemManaged<Game.City.CityConfigurationSystem>();

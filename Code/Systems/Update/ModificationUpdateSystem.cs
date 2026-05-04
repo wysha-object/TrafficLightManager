@@ -16,20 +16,6 @@ public partial class ModificationUpdateSystem : GameSystemBase
 
     protected override void OnUpdate()
     {
-        bool hasModification = false;
-        m_UISystem.ForEachTrafficLight(
-            (e) =>
-            {
-                if (m_UISystem.m_SelectedTrafficLightGroupEntity != Entity.Null && EntityManager.HasComponent<Updated>(e))
-                {
-                    hasModification = true;
-                    m_UISystem.UpdateEdgeInfo(e);
-                }
-            }
-        );
-        if (hasModification)
-        {
-            m_UISystem.RedrawGizmo();
-        }
+        m_UISystem.RedrawGizmo();
     }
 }

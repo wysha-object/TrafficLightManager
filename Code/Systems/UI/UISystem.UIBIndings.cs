@@ -525,19 +525,6 @@ public partial class UISystem : UISystemBase
             )
         );
         AddBinding(
-            new CallBinding<string, string>(
-                "TrafficLightManager",
-                "CallOpenBrowser",
-                (jsonString) =>
-                {
-                    var keyDefinition = new { key = "", value = "" };
-                    var parsedKey = JsonConvert.DeserializeAnonymousType(jsonString, keyDefinition);
-                    System.Diagnostics.Process.Start(parsedKey.value);
-                    return "";
-                }
-            )
-        );
-        AddBinding(
             new CallBinding<int, int>(
                 "TrafficLightManager",
                 "CallCopyPhase",
@@ -586,17 +573,6 @@ public partial class UISystem : UISystemBase
                 (state) =>
                 {
                     SetToolState((ToolState)state);
-                }
-            )
-        );
-        AddBinding(
-            new TriggerBinding<int>(
-                "TrafficLightManager",
-                "SetDebugDisplayGroup",
-                (group) =>
-                {
-                    m_DebugDisplayGroup = group;
-                    RedrawGizmo();
                 }
             )
         );

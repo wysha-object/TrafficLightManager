@@ -100,39 +100,37 @@ public class LocalisationUtils
             return;
         }
         dictionary.Add(Mod.m_Settings.GetSettingsLocaleID(), "Traffic Light Manager");
+
         dictionary.Add(Mod.m_Settings.GetOptionTabLocaleID(Settings.kTabGeneral), this.GetString("General"));
-        dictionary.Add(Mod.m_Settings.GetOptionTabLocaleID(Settings.kTabKeyBindings), this.GetString("KeyBindings"));
         dictionary.Add(Mod.m_Settings.GetOptionGroupLocaleID(Settings.kGroupGeneral), this.GetString("General"));
-        dictionary.Add(Mod.m_Settings.GetOptionGroupLocaleID(Settings.kGroupLanguage), this.GetString("LocaleLabel"));
-        dictionary.Add(Mod.m_Settings.GetOptionGroupLocaleID(Settings.kGroupDefault), this.GetString("Default"));
-        dictionary.Add(Mod.m_Settings.GetOptionGroupLocaleID(Settings.kGroupVersion), this.GetString("Version"));
-        dictionary.Add(Mod.m_Settings.GetOptionGroupLocaleID(Settings.kGroupMainPanel), this.GetString("MainPanel"));
-        dictionary.Add(Mod.m_Settings.GetOptionGroupLocaleID(Settings.kGroupKeyBindingReset), this.GetString("Reset"));
         dictionary.Add(Mod.m_Settings.GetOptionLabelLocaleID("m_LocaleOption"), this.GetString("LocaleLabel"));
-        dictionary.Add(Mod.m_Settings.GetOptionLabelLocaleID("m_CompatibilityModeOption"), this.GetString("CompatibilityModeLabel"));
-        dictionary.Add(Mod.m_Settings.GetOptionLabelLocaleID("m_DefaultSplitPhasing"), this.GetString("DefaultSplitPhasingLabel"));
-        dictionary.Add(Mod.m_Settings.GetOptionLabelLocaleID("m_DefaultAlwaysGreenKerbsideTurn"), this.GetString("DefaultAlwaysGreenKerbsideTurnLabel"));
-        dictionary.Add(Mod.m_Settings.GetOptionLabelLocaleID("m_DefaultExclusivePedestrian"), this.GetString("DefaultExclusivePedestrianLabel"));
-        dictionary.Add(Mod.m_Settings.GetOptionLabelLocaleID("m_ForceNodeUpdate"), this.GetString("ForceAllNodesUpdateLabel"));
-        dictionary.Add(Mod.m_Settings.GetOptionLabelLocaleID("m_ReleaseChannel"), this.GetString("ReleaseChannel"));
-        dictionary.Add(Mod.m_Settings.GetOptionLabelLocaleID("m_TleVersion"), Mod.m_Id);
-        dictionary.Add(Mod.m_Settings.GetOptionLabelLocaleID("m_LaneSystemVersion"), C2VM.CommonLibraries.LaneSystem.Mod.m_Id);
-        dictionary.Add(Mod.m_Settings.GetOptionLabelLocaleID("m_SuppressCanaryWarning"), this.GetString("SuppressCanaryWarningLabel"));
-        dictionary.Add(Mod.m_Settings.GetOptionLabelLocaleID("m_MainPanelToggleKeyboardBinding"), this.GetString("MainPanelToggleKeyboardBindingLabel"));
-        dictionary.Add(Mod.m_Settings.GetOptionLabelLocaleID("m_ResetBindings"), this.GetString("ResetBindingsLabel"));
         dictionary.Add(Mod.m_Settings.GetOptionDescLocaleID("m_LocaleOption"), this.GetString("LocaleDesc"));
-        dictionary.Add(Mod.m_Settings.GetOptionDescLocaleID("m_CompatibilityModeOption"), this.GetString("CompatibilityModeDesc"));
+        dictionary.Add(Mod.m_Settings.GetOptionGroupLocaleID(Settings.kGroupDefault), this.GetString("Default"));
+        dictionary.Add(Mod.m_Settings.GetOptionLabelLocaleID("m_DefaultSplitPhasing"), this.GetString("DefaultSplitPhasingLabel"));
         dictionary.Add(Mod.m_Settings.GetOptionDescLocaleID("m_DefaultSplitPhasing"), this.GetString("DefaultSplitPhasingDesc"));
+        dictionary.Add(Mod.m_Settings.GetOptionLabelLocaleID("m_DefaultAlwaysGreenKerbsideTurn"), this.GetString("DefaultAlwaysGreenKerbsideTurnLabel"));
         dictionary.Add(Mod.m_Settings.GetOptionDescLocaleID("m_DefaultAlwaysGreenKerbsideTurn"), this.GetString("DefaultAlwaysGreenKerbsideTurnDesc"));
+        dictionary.Add(Mod.m_Settings.GetOptionLabelLocaleID("m_DefaultExclusivePedestrian"), this.GetString("DefaultExclusivePedestrianLabel"));
         dictionary.Add(Mod.m_Settings.GetOptionDescLocaleID("m_DefaultExclusivePedestrian"), this.GetString("DefaultExclusivePedestrianDesc"));
+        dictionary.Add(Mod.m_Settings.GetOptionLabelLocaleID("m_ForceNodeUpdate"), this.GetString("ForceAllNodesUpdateLabel"));
         dictionary.Add(Mod.m_Settings.GetOptionDescLocaleID("m_ForceNodeUpdate"), this.GetString("ForceAllNodesUpdateDesc"));
-        dictionary.Add(Mod.m_Settings.GetOptionDescLocaleID("m_TleVersion"), Mod.m_InformationalVersion);
-        dictionary.Add(Mod.m_Settings.GetOptionDescLocaleID("m_LaneSystemVersion"), C2VM.CommonLibraries.LaneSystem.Mod.m_InformationalVersion);
-        dictionary.Add(Mod.m_Settings.GetOptionDescLocaleID("m_SuppressCanaryWarning"), this.GetString("SuppressCanaryWarningDesc"));
-        dictionary.Add(Mod.m_Settings.GetOptionDescLocaleID("m_MainPanelToggleKeyboardBinding"), this.GetString("MainPanelToggleKeyboardBindingDesc"));
-        dictionary.Add(Mod.m_Settings.GetOptionDescLocaleID("m_ResetBindings"), this.GetString("ResetBindingsDesc"));
         dictionary.Add(Mod.m_Settings.GetOptionWarningLocaleID("m_ForceNodeUpdate"), this.GetString("ForceAllNodesUpdateWarning"));
-        dictionary.Add(Mod.m_Settings.GetOptionWarningLocaleID("m_SuppressCanaryWarning"), this.GetString("SuppressCanaryWarningDesc"));
+        dictionary.Add(Mod.m_Settings.GetOptionGroupLocaleID(Settings.kGroupDisplay), this.GetString("Settings.Display"));
+        dictionary.Add(Mod.m_Settings.GetOptionLabelLocaleID("m_DisplayCurrentPhase"), this.GetString("Settings.Display.DisplayCurrentPhase.Label"));
+        dictionary.Add(Mod.m_Settings.GetOptionDescLocaleID("m_DisplayCurrentPhase"), this.GetString("Settings.Display.DisplayCurrentPhase.Desc"));
+        dictionary.Add(
+            Mod.m_Settings.GetOptionLabelLocaleID("m_DisplayCurrentPhaseWhenToolDisabled"),
+            this.GetString("Settings.Display.DisplayCurrentPhaseWhenToolDisabled.Label")
+        );
+        dictionary.Add(Mod.m_Settings.GetOptionDescLocaleID("m_DisplayCurrentPhaseWhenToolDisabled"), this.GetString("Settings.Display.DisplayCurrentPhaseWhenToolDisabled.Desc"));
+
+        dictionary.Add(Mod.m_Settings.GetOptionTabLocaleID(Settings.kTabKeyBindings), this.GetString("KeyBindings"));
+        dictionary.Add(Mod.m_Settings.GetOptionGroupLocaleID(Settings.kGroupMainPanel), this.GetString("MainPanel"));
+        dictionary.Add(Mod.m_Settings.GetOptionLabelLocaleID("m_MainPanelToggleKeyboardBinding"), this.GetString("MainPanelToggleKeyboardBindingLabel"));
+        dictionary.Add(Mod.m_Settings.GetOptionDescLocaleID("m_MainPanelToggleKeyboardBinding"), this.GetString("MainPanelToggleKeyboardBindingDesc"));
+        dictionary.Add(Mod.m_Settings.GetOptionGroupLocaleID(Settings.kGroupKeyBindingReset), this.GetString("Reset"));
+        dictionary.Add(Mod.m_Settings.GetOptionLabelLocaleID("m_ResetBindings"), this.GetString("ResetBindingsLabel"));
+        dictionary.Add(Mod.m_Settings.GetOptionDescLocaleID("m_ResetBindings"), this.GetString("ResetBindingsDesc"));
         dictionary.Add(Mod.m_Settings.GetOptionWarningLocaleID("m_ResetBindings"), this.GetString("ResetBindingsDesc"));
     }
 }

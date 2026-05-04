@@ -120,8 +120,4 @@
     <PropertyGroup Condition="'$(Verbosity)' == 'Debug'">
         <DefineConstants>$(DefineConstants);VERBOSITY_VERBOSE;VERBOSITY_DEBUG</DefineConstants>
     </PropertyGroup>
-
-    <PropertyGroup Condition="'$(ShowCanaryBuildWarning)' == 'true'">
-        <DefineConstants>$(DefineConstants);SHOW_CANARY_BUILD_WARNING</DefineConstants>
-    </PropertyGroup>
 </Project>

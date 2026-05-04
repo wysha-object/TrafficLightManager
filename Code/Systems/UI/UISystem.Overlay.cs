@@ -14,34 +14,30 @@ public partial class UISystem : UISystemBase
 {
     public void RedrawGizmo()
     {
-        if (m_SelectedTrafficLightGroupEntity != Entity.Null)
+        m_RenderSystem.ClearLineMesh("gizmo");
+        if (Mod.m_Settings.m_DisplayCurrentPhase)
         {
-            m_RenderSystem.ClearLineMesh("gizmo");
-            ForEachTrafficLight(
-                (e) =>
+            if (GetToolState() != ToolState.Disabled || Mod.m_Settings.m_DisplayCurrentPhaseWhenToolDisabled)
+            {
+                var entityQuery = EntityManager.CreateEntityQuery(ComponentType.ReadOnly<CustomTrafficLights>());
+                var entityArray = entityQuery.ToEntityArray(Allocator.Temp);
+                var customTrafficLightsArray = entityQuery.ToComponentDataArray<CustomTrafficLights>(Allocator.Temp);
+                var TrafficLightsArray = entityQuery.ToComponentDataArray<TrafficLights>(Allocator.Temp);
+                for (int i = 0; i < entityArray.Length; i++)
                 {
-                    if (EntityManager.TryGetBuffer<SubLane>(e, true, out var subLaneBuffer))
+                    var entity = entityArray[i];
+                    var customTrafficLights = customTrafficLightsArray[i];
+                    var trafficLights = TrafficLightsArray[i];
+                    int displayIndex = trafficLights.m_CurrentSignalGroup - 1;
+                    if (
+                        customTrafficLights.m_TrafficLightGroupEntity == m_SelectedTrafficLightGroupEntity
+                        && (m_DisplayPhaseIndexBinding.value < 0 || m_DisplayPhaseIndexBinding.value == displayIndex)
+                    )
                     {
-                        int displayIndex = 16;
-                        if (
-                            EntityManager.TryGetComponent<TrafficLightGroup>(m_SelectedTrafficLightGroupEntity, out var trafficLightGroup)
-                            && trafficLightGroup.m_ManualSignalGroup > 0
-                        )
-                        {
-                            displayIndex = trafficLightGroup.m_ManualSignalGroup - 1;
-                        }
-                        else if (m_DisplayPhaseIndexBinding.value >= 0)
-                        {
-                            displayIndex = m_DisplayPhaseIndexBinding.value;
-                        }
-                        else if (EntityManager.TryGetComponent<TrafficLights>(e, out var trafficLights))
-                        {
-                            displayIndex = trafficLights.m_CurrentSignalGroup - 1;
-                        }
-                        if (m_DebugDisplayGroup > 0)
-                        {
-                            displayIndex = m_DebugDisplayGroup - 1;
-                        }
+                        continue;
+                    }
+                    if (EntityManager.TryGetBuffer<SubLane>(entity, true, out var subLaneBuffer))
+                    {
                         foreach (var subLane in subLaneBuffer)
                         {
                             Entity subLaneEntity = subLane.m_SubLane;
@@ -68,17 +64,71 @@ public partial class UISystem : UISystemBase
                                 {
                                     color = Color.blue;
                                 }
+                                color = new Color(color.r * 0.3f, color.g * 0.3f, color.b * 0.3f, color.a * 0.3f);
                                 if ((laneSignal.m_GroupMask & 1 << displayIndex) != 0)
                                 {
-                                    m_RenderSystem.AddBezier("gizmo", curve.m_Bezier, color, curve.m_Length, 0.25f);
+                                    m_RenderSystem.AddBezier("gizmo", curve.m_Bezier, color, curve.m_Length, 1f);
                                 }
                             }
                         }
                     }
                 }
-            );
-            m_RenderSystem.BuildLineMesh();
+            }
         }
+        ForEachTrafficLight(
+            (e) =>
+            {
+                if (EntityManager.TryGetBuffer<SubLane>(e, true, out var subLaneBuffer))
+                {
+                    int displayIndex = 16;
+                    if (EntityManager.TryGetComponent<TrafficLightGroup>(m_SelectedTrafficLightGroupEntity, out var trafficLightGroup) && trafficLightGroup.m_ManualSignalGroup > 0)
+                    {
+                        displayIndex = trafficLightGroup.m_ManualSignalGroup - 1;
+                    }
+                    else if (m_DisplayPhaseIndexBinding.value >= 0)
+                    {
+                        displayIndex = m_DisplayPhaseIndexBinding.value;
+                    }
+                    else if (EntityManager.TryGetComponent<TrafficLights>(e, out var trafficLights))
+                    {
+                        displayIndex = trafficLights.m_CurrentSignalGroup - 1;
+                    }
+                    foreach (var subLane in subLaneBuffer)
+                    {
+                        Entity subLaneEntity = subLane.m_SubLane;
+                        bool isPedestrian = EntityManager.TryGetComponent<PedestrianLane>(subLaneEntity, out var pedestrianLane);
+                        if (EntityManager.HasComponent<MasterLane>(subLaneEntity))
+                        {
+                            continue;
+                        }
+                        if (!EntityManager.HasComponent<CarLane>(subLaneEntity) && !EntityManager.HasComponent<TrackLane>(subLaneEntity) && !isPedestrian)
+                        {
+                            continue;
+                        }
+                        if (isPedestrian && (pedestrianLane.m_Flags & PedestrianLaneFlags.Crosswalk) == 0)
+                        {
+                            continue;
+                        }
+                        if (EntityManager.TryGetComponent<LaneSignal>(subLaneEntity, out var laneSignal) && EntityManager.TryGetComponent<Curve>(subLaneEntity, out var curve))
+                        {
+                            Color color = Color.green;
+                            if (
+                                EntityManager.TryGetComponent<ExtraLaneSignal>(subLaneEntity, out var extraLaneSignal)
+                                && (extraLaneSignal.m_YieldGroupMask & 1 << displayIndex) != 0
+                            )
+                            {
+                                color = Color.blue;
+                            }
+                            if ((laneSignal.m_GroupMask & 1 << displayIndex) != 0)
+                            {
+                                m_RenderSystem.AddBezier("gizmo", curve.m_Bezier, color, curve.m_Length, 0.25f);
+                            }
+                        }
+                    }
+                }
+            }
+        );
+        m_RenderSystem.BuildLineMesh();
     }
 
     public void RedrawIcon()

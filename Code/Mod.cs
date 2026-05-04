@@ -101,15 +101,6 @@ public class Mod : IMod
         m_TrafficLightSystem.Enabled = false;
     }
 
-    public static bool IsCanary()
-    {
-#if SHOW_CANARY_BUILD_WARNING
-        return true;
-#else
-        return false;
-#endif
-    }
-
     public static void Assert(
         bool condition,
         string message = "",
