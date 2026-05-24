@@ -13,9 +13,10 @@ import ManualControlPanel from "./manual-control-panel";
 import SubPanel from "./sub-panel";
 import { useTranslate } from "@/localisations";
 import { ToolState } from "@/constants";
+import Tooltip from "@/components/common/tooltip";
+import TextField from "@/components/common/text-field";
 
 const Container = styled.div`
-  width: 40em;
   display: flex;
   flex-direction: row;
   flex-grow: 1;
@@ -24,7 +25,7 @@ const Container = styled.div`
 `;
 
 const TrafficLightsMembersContainer = styled.div`
-  width: 10em;
+  width: 11em;
   background-color: var(--panelColorNormal);
   backdrop-filter: var(--panelBlur);
   color: var(--textColor);
@@ -100,6 +101,7 @@ export default function MainPanel() {
   let [manualControl, setManualControl] = useState(false);
 
   const trafficLightGroup = JSON.parse(useValue(bindValue("TrafficLightManager", "GetTrafficLightGroup")));
+  const trafficLightGroupName: string = useValue(bindValue("TrafficLightManager", "GetTrafficLightManagerGroupName"));
 
   const trafficLightsMembers = JSON.parse(useValue(bindValue("TrafficLightManager", "GetTrafficLightsMembers"))) as any[];
   const customPhaseItems = JSON.parse(useValue(bindValue("TrafficLightManager", "GetCustomPhaseItems"))) as CustomPhaseItem[];
@@ -130,11 +132,17 @@ export default function MainPanel() {
   return (
     <Container>
       <TrafficLightsMembersContainer>
+        <Tooltip position="bottom-start" tooltip={t("CustomPhaseEditor.TrafficLightGroupName")}>
+          <TextField
+            onChange={(value) => trigger("TrafficLightManager", "SetTrafficLightGroupName", value)}
+            value={trafficLightGroupName}
+            displayWhenEmpty={"Traffic Light Group"} />
+          </Tooltip>
         <Row>{t("CustomPhaseEditor.TrafficLightsMembers")}</Row>
         <Scrollable contentStyle={ItemContainerStyle}>
           {
             trafficLightsMembers.map(
-              (item, _) => <Row>#{item.entityIndex}</Row>
+              (item, _) => <Row key={item.entityIndex}>#{item.entityIndex}</Row>
             )
           }
         </Scrollable>
@@ -148,6 +156,7 @@ export default function MainPanel() {
           <Scrollable style={{ flex: 1 }} contentStyle={ItemContainerStyle}>
             {customPhaseItems.map(
               (item, index) => <Item
+                key={index}
                 data={item}
                 itemIndex={index}
                 itemState={index === currentIndex ? currentItemState : ItemState.None}

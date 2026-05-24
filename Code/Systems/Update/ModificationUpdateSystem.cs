@@ -16,6 +16,6 @@ public partial class ModificationUpdateSystem : GameSystemBase
 
     protected override void OnUpdate()
     {
-        m_UISystem.RedrawGizmo();
+        m_UISystem.ModificationUpdate();
     }
 }

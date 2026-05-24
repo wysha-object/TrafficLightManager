@@ -1,3 +1,8 @@
+interface Settings {
+  customPhaseTemplates: CustomPhaseTemplate[],
+  defaultCustomPhaseTemplate: CustomPhaseTemplate
+}
+
 interface CustomPhaseItem {
   turnsSinceLastRun: number,
   lowFlowTimer: number,
@@ -19,6 +24,9 @@ interface CustomPhaseItem {
   prioritisePedestrian: boolean,
   linkedWithNextPhase: boolean,
   endPhasePrematurely: boolean,
+  bindWithTemplate: boolean,
+  name: string,
+  bindTemplate: string
 }
 
 interface TrafficLightGroup {
@@ -135,4 +143,27 @@ interface SubLaneInfo {
 interface ToolTooltipMessage {
   image: string,
   message: string
+}
+
+interface CustomPhaseTemplate {
+  m_Name: string,
+
+  m_IsPrioritiseTrack: boolean,
+  m_IsPrioritisePublicCar: boolean,
+  m_IsPrioritisePedestrian: boolean,
+
+  m_MinimumDuration: number,
+
+  m_MaximumDuration: number,
+
+  m_TargetDurationMultiplier: number,
+
+  m_LaneOccupiedMultiplier: number,
+
+  m_IntervalExponent: number,
+}
+
+interface TrafficLightGroupName {
+  name: string,
+  worldPosition: WorldPosition
 }

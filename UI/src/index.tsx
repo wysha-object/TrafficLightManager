@@ -4,9 +4,7 @@ import App from './app';
 
 const register: ModRegistrar = (moduleRegistry) => {
   moduleRegistry.append("GameTopLeft", () => (
-    <div id="c2vm-tle" style={{margin: 0}}>
-      <App />
-    </div>
+    <App />
   ));
 };
 

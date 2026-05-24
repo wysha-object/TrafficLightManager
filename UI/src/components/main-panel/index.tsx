@@ -5,12 +5,12 @@ import { bindValue, trigger, useValue } from 'cs2/api';
 
 import Header from './header';
 
-import FloatingButton from '@/components/common/floating-button';
 import CustomPhaseMainPanel from '@/components/custom-phase-tool/main-panel';
 import { useTranslate } from '@/localisations';
 import { ToolState } from '@/constants';
 import Row from './items/row';
 import Message from './items/message';
+import { Button as CS2Button, Tooltip } from 'cs2/ui';
 import Button from '../common/button';
 
 const HeaderContainer = styled.div`
@@ -37,13 +37,12 @@ const Container = styled.div`
 const BackButton = () => {
   return (
     <Row>
-      <Button label="CustomPhaseEditor.Back" onClick={() => trigger("TrafficLightManager", "SetToolState", ToolState.Choosed)} />
+      <Button label={"CustomPhaseEditor.Back"} onClick={() => trigger("TrafficLightManager", "SetToolState", ToolState.Choosed)} />
     </Row>
   )
 }
 
 export default function MainPanel() {
-  const [showFloatingButton, _] = useState(true);
   const [showPanel, setShowPanel] = useState(false);
 
   const [top, setTop] = useState(-999999);
@@ -127,12 +126,13 @@ export default function MainPanel() {
   const { t } = useTranslate();
   return (
     <>
-      <FloatingButton
-        show={showFloatingButton}
-        src="Media/Game/Icons/TrafficLights.svg"
-        tooltip={t("TrafficLightManager")}
-        onClick={floatingButtonClickHandler}
-      />
+      <Tooltip tooltip={t("TrafficLightManager")}>
+        <CS2Button
+          src="Media/Game/Icons/TrafficLights.svg"
+          variant="floating"
+          onSelect={floatingButtonClickHandler}
+        />
+      </Tooltip>
       <HeaderContainer
         ref={containerRef}
         style={style}

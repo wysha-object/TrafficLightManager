@@ -45,6 +45,12 @@ public static class UITypes
         public bool linkedWithNextPhase;
 
         public bool endPhasePrematurely;
+
+        public bool bindWithTemplate;
+
+        public string name;
+
+        public string bindTemplate;
     }
 
     public struct TrafficLightGroup
@@ -63,7 +69,7 @@ public static class UITypes
 
         public string key;
 
-        public double value;
+        public string value;
     }
 
     public struct WorldPosition : IJsonWritable

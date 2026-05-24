@@ -1,6 +1,6 @@
 import styled from "styled-components";
 
-import { call } from "cs2/api";
+import { trigger } from "cs2/api";
 
 import LinkVariant from "@/components/common/icons/link-variant";
 import LinkVariantOff from "@/components/common/icons/link-variant-off";
@@ -40,7 +40,7 @@ const IconStyle = {
 
 export default function ItemDivider(props: {index: number, linked: boolean}) {
   const clickHandler = () => {
-    call("TrafficLightManager", "CallUpdateCustomPhaseData", JSON.stringify({ key: "LinkedWithNextPhase", index: props.index }));
+    trigger("TrafficLightManager", "CallUpdateCustomPhaseData", JSON.stringify({ key: "LinkedWithNextPhase", index: props.index, value: !props.linked }));
   };
   return (
     <Container>

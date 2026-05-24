@@ -3,6 +3,7 @@ using Colossal.Entities;
 using Game.Common;
 using Game.Net;
 using Game.Prefabs;
+using Game.Rendering;
 using Game.Tools;
 using Game.UI.Localization;
 using Game.UI.Tooltip;
@@ -19,8 +20,6 @@ public partial class ToolSystem : ToolBaseSystem
 {
     public override string toolID => "TrafficLightManager Tool";
 
-    private RenderSystem m_RenderSystem;
-
     private UI.TooltipSystem m_TooltipSystem;
 
     private UI.UISystem m_UISystem;
@@ -36,7 +35,6 @@ public partial class ToolSystem : ToolBaseSystem
     protected override void OnCreate()
     {
         base.OnCreate();
-        m_RenderSystem = World.GetOrCreateSystemManaged<RenderSystem>();
         m_TooltipSystem = World.GetOrCreateSystemManaged<UI.TooltipSystem>();
         m_UISystem = World.GetOrCreateSystemManaged<UI.UISystem>();
         m_ToolSystem.EventToolChanged += ToolChanged;
@@ -134,7 +132,9 @@ public partial class ToolSystem : ToolBaseSystem
                 }
             }
 
-            m_RenderSystem.ClearLineMesh("node_bound");
+            var overlayRenderSystem = World.GetOrCreateSystemManaged<OverlayRenderSystem>();
+            var overlayBuffer = overlayRenderSystem.GetBuffer(out JobHandle dependencies);
+            dependencies.Complete();
             if (IsValidEntity(entity) && EntityManager.TryGetComponent<NodeGeometry>(entity, out var nodeGeometry))
             {
                 if (
@@ -147,15 +147,21 @@ public partial class ToolSystem : ToolBaseSystem
                     {
                         if (EntityManager.TryGetComponent<NodeGeometry>(item.m_Entity, out var itemNodeGeometry))
                         {
-                            m_RenderSystem.AddBounds("node_bound", itemNodeGeometry.m_Bounds, new UnityEngine.Color(0.5f, 1.0f, 2.0f, 1.0f), 0.5f);
-                            m_RenderSystem.BuildLineMesh();
+                            overlayBuffer.DrawCircle(
+                                new UnityEngine.Color(0.5f, 1.0f, 2.0f, 0.5f),
+                                (itemNodeGeometry.m_Bounds.min + itemNodeGeometry.m_Bounds.max) / 2,
+                                itemNodeGeometry.m_Bounds.max.x - itemNodeGeometry.m_Bounds.min.x
+                            );
                         }
                     }
                 }
                 else
                 {
-                    m_RenderSystem.AddBounds("node_bound", nodeGeometry.m_Bounds, new UnityEngine.Color(0.5f, 1.0f, 2.0f, 1.0f), 0.5f);
-                    m_RenderSystem.BuildLineMesh();
+                    overlayBuffer.DrawCircle(
+                        new UnityEngine.Color(0.5f, 1.0f, 2.0f, 0.5f),
+                        (nodeGeometry.m_Bounds.min + nodeGeometry.m_Bounds.max) / 2,
+                        nodeGeometry.m_Bounds.max.x - nodeGeometry.m_Bounds.min.x
+                    );
                 }
             }
         }

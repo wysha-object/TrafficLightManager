@@ -4,6 +4,7 @@ using Game.Net;
 using Game.Simulation;
 using Game.Tools;
 using TrafficLightManager.Code.Components;
+using TrafficLightManager.Code.Utils;
 using Unity.Burst;
 using Unity.Burst.Intrinsics;
 using Unity.Collections;
@@ -23,12 +24,22 @@ public partial class TrafficLightGroupSystem : GameSystemBase
     [Preserve]
     protected override void OnUpdate()
     {
+        var templateList = Mod.m_Settings?.GetCustomPhaseTemplates();
+        int templateCount = templateList?.Count ?? 0;
+        NativeArray<CustomPhaseTemplate.Values> customPhaseTemplates = new NativeArray<CustomPhaseTemplate.Values>(templateCount, Allocator.TempJob);
+        for (int i = 0; i < templateCount; i++)
+        {
+            customPhaseTemplates[i] = new CustomPhaseTemplate.Values(templateList[i]);
+        }
+
+        var ecb = new EntityCommandBuffer(Allocator.TempJob);
+
         JobHandle dependency = //JobChunkExtensions.Schedule(
         JobChunkExtensions.ScheduleParallel(
             new UpdateTrafficLightGroupJob
             {
                 m_EntityStorageInfoLookup = GetEntityStorageInfoLookup(),
-                m_EntityCommandBuffer = m_EndFrameBarrier.CreateCommandBuffer().AsParallelWriter(),
+                m_EntityCommandBuffer = ecb.AsParallelWriter(),
                 m_EntityType = GetEntityTypeHandle(),
                 m_TrafficLightGroupType = GetComponentTypeHandle<TrafficLightGroup>(isReadOnly: false),
                 m_TrafficLightsMemberRefType = GetBufferTypeHandle<TrafficLightsMemberRef>(isReadOnly: false),
@@ -45,12 +56,17 @@ public partial class TrafficLightGroupSystem : GameSystemBase
                 m_LaneSignalLookup = GetComponentLookup<LaneSignal>(isReadOnly: false),
                 m_SubLaneBufferLookup = GetBufferLookup<SubLane>(isReadOnly: true),
                 m_ExtraData = new ExtraData(this),
+                m_Settings = new Settings.Values(Mod.m_Settings),
+                m_CustomPhaseTemplates = customPhaseTemplates,
             },
             m_TrafficLightGroupQuery,
             base.Dependency
         );
-        base.Dependency = dependency;
-        m_EndFrameBarrier.AddJobHandleForProducer(base.Dependency);
+
+        dependency.Complete();
+        ecb.Playback(base.World.EntityManager);
+        ecb.Dispose();
+        base.Dependency = customPhaseTemplates.Dispose(dependency);
     }
 
     [BurstCompile]
@@ -100,6 +116,10 @@ public partial class TrafficLightGroupSystem : GameSystemBase
 
         public ExtraData m_ExtraData;
 
+        public Settings.Values m_Settings;
+
+        public NativeArray<CustomPhaseTemplate.Values> m_CustomPhaseTemplates;
+
         public void Execute(in ArchetypeChunk chunk, int unfilteredChunkIndex, bool useEnabledMask, in v128 chunkEnabledMask)
         {
             NativeArray<Entity> entityArray = chunk.GetNativeArray(m_EntityType);
@@ -113,8 +133,6 @@ public partial class TrafficLightGroupSystem : GameSystemBase
                 TrafficLightGroup trafficLightGroup = trafficLightGroupArray[i];
                 DynamicBuffer<TrafficLightsMemberRef> trafficLightsMemberRefBuffer = trafficLightsMemberRefAccessor[i];
                 DynamicBuffer<CustomPhaseData> customPhaseDataBuffer = customPhaseDataBufferAccessor[i];
-
-                m_EntityCommandBuffer.RemoveComponent<Sync>(unfilteredChunkIndex, entity);
 
                 // 验证
                 NativeList<Entity> memberEntities = new NativeList<Entity>(trafficLightsMemberRefBuffer.Length, Allocator.Temp);
@@ -154,6 +172,47 @@ public partial class TrafficLightGroupSystem : GameSystemBase
                 uint diff1 = (byte)(newStatus - trafficLightGroup.m_Status);
                 uint diff2 = (byte)(trafficLightGroup.m_Status - newStatus);
                 byte diff = (byte)math.min(diff1, diff2);
+
+                // 从template同步
+                for (int j = 0; j < customPhaseDataBuffer.Length; j++)
+                {
+                    CustomPhaseData customPhaseData = customPhaseDataBuffer[j];
+                    if ((customPhaseData.m_Options & CustomPhaseData.Options.BindWithTemplate) != 0)
+                    {
+                        int templateIndex = -1;
+                        for (int k = 0; k < m_CustomPhaseTemplates.Length; k++)
+                        {
+                            var template = m_CustomPhaseTemplates[k];
+                            if (template.m_Name == customPhaseData.m_BindTemplate)
+                            {
+                                templateIndex = k;
+                                break;
+                            }
+                        }
+                        if (templateIndex >= 0)
+                        {
+                            var template = m_CustomPhaseTemplates[templateIndex];
+                            if (template.m_IsPrioritiseTrack)
+                                customPhaseData.m_Options |= CustomPhaseData.Options.PrioritiseTrack;
+                            else
+                                customPhaseData.m_Options &= ~CustomPhaseData.Options.PrioritiseTrack;
+                            if (template.m_IsPrioritisePublicCar)
+                                customPhaseData.m_Options |= CustomPhaseData.Options.PrioritisePublicCar;
+                            else
+                                customPhaseData.m_Options &= ~CustomPhaseData.Options.PrioritisePublicCar;
+                            if (template.m_IsPrioritisePedestrian)
+                                customPhaseData.m_Options |= CustomPhaseData.Options.PrioritisePedestrian;
+                            else
+                                customPhaseData.m_Options &= ~CustomPhaseData.Options.PrioritisePedestrian;
+                            customPhaseData.m_MinimumDuration = template.m_MinimumDuration;
+                            customPhaseData.m_MaximumDuration = template.m_MaximumDuration;
+                            customPhaseData.m_TargetDurationMultiplier = template.m_TargetDurationMultiplier;
+                            customPhaseData.m_LaneOccupiedMultiplier = template.m_LaneOccupiedMultiplier;
+                            customPhaseData.m_IntervalExponent = template.m_IntervalExponent;
+                            customPhaseDataBuffer[j] = customPhaseData;
+                        }
+                    }
+                }
 
                 // 更新相位数据
                 if (diff > 0)
@@ -742,8 +801,6 @@ public partial class TrafficLightGroupSystem : GameSystemBase
 
     private EntityQuery m_TrafficLightGroupQuery;
 
-    private EndFrameBarrier m_EndFrameBarrier;
-
     public SimulationSystem m_SimulationSystem;
 
     public TimeSystem m_TimeSystem;
@@ -753,12 +810,10 @@ public partial class TrafficLightGroupSystem : GameSystemBase
     {
         base.OnCreate();
 
-        m_EndFrameBarrier = base.World.GetOrCreateSystemManaged<EndFrameBarrier>();
         m_SimulationSystem = base.World.GetOrCreateSystemManaged<SimulationSystem>();
         m_TimeSystem = base.World.GetOrCreateSystemManaged<TimeSystem>();
         m_TrafficLightGroupQuery = GetEntityQuery(
             ComponentType.ReadWrite<TrafficLightGroup>(),
-            ComponentType.ReadOnly<Sync>(),
             ComponentType.Exclude<Deleted>(),
             ComponentType.Exclude<Destroyed>(),
             ComponentType.Exclude<Temp>()

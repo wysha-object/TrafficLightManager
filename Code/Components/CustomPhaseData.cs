@@ -1,4 +1,6 @@
 using Colossal.Serialization.Entities;
+using TrafficLightManager.Code.Utils;
+using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
 
@@ -17,6 +19,8 @@ public struct CustomPhaseData : IBufferElementData, ISerializable
         LinkedWithNextPhase = 1 << 3,
 
         EndPhasePrematurely = 1 << 4,
+
+        BindWithTemplate = 1 << 5,
     }
 
     // Statistics
@@ -53,10 +57,15 @@ public struct CustomPhaseData : IBufferElementData, ISerializable
 
     public float m_IntervalExponent;
 
+    // Schema 3
+    public FixedString64Bytes m_Name;
+
+    public FixedString64Bytes m_BindTemplate;
+
     public void Serialize<TWriter>(TWriter writer)
         where TWriter : IWriter
     {
-        ushort schemaVersion = 2;
+        ushort schemaVersion = 3;
         writer.Write(schemaVersion);
         writer.Write(m_TurnsSinceLastRun);
         writer.Write(m_LowFlowTimer);
@@ -74,6 +83,8 @@ public struct CustomPhaseData : IBufferElementData, ISerializable
         writer.Write(m_TargetDurationMultiplier);
         writer.Write(m_LaneOccupiedMultiplier);
         writer.Write(m_IntervalExponent);
+        writer.Write(m_Name.ToString());
+        writer.Write(m_BindTemplate.ToString());
     }
 
     public void Deserialize<TReader>(TReader reader)
@@ -81,7 +92,7 @@ public struct CustomPhaseData : IBufferElementData, ISerializable
     {
         ushort schemaVersion;
         reader.Read(out schemaVersion);
-        Initialisation();
+        Initialisation(Mod.m_Settings != null ? Mod.m_Settings.m_DefaultCustomPhaseTemplate : CustomPhaseTemplate.Default);
         reader.Read(out m_TurnsSinceLastRun);
         reader.Read(out m_LowFlowTimer);
         reader.Read(out m_LowPriorityTimer);
@@ -102,11 +113,24 @@ public struct CustomPhaseData : IBufferElementData, ISerializable
         reader.Read(out m_TargetDurationMultiplier);
         reader.Read(out m_LaneOccupiedMultiplier);
         reader.Read(out m_IntervalExponent);
+        if (schemaVersion >= 3)
+        {
+            reader.Read(out string name);
+            m_Name = name;
+            reader.Read(out string bindTemplate);
+            m_BindTemplate = bindTemplate;
+        }
+        else
+        {
+            m_Name = "";
+            m_BindTemplate = "";
+        }
         m_Options = (Options)options;
     }
 
-    private void Initialisation()
+    private void Initialisation(CustomPhaseTemplate customPhaseTemplate)
     {
+        m_Name = "";
         m_TurnsSinceLastRun = 0;
         m_LowFlowTimer = 0;
         m_LowPriorityTimer = 0;
@@ -117,17 +141,35 @@ public struct CustomPhaseData : IBufferElementData, ISerializable
         m_PedestrianLaneOccupied = 0;
         m_WeightedWaiting = 0;
         m_Priority = 0;
-        m_Options = Options.PrioritiseTrack;
-        m_MinimumDuration = 2;
-        m_MaximumDuration = 300;
-        m_TargetDurationMultiplier = 1f;
-        m_LaneOccupiedMultiplier = 1f;
-        m_IntervalExponent = 2f;
+        m_Options = 0;
+        if (customPhaseTemplate.m_IsPrioritiseTrack)
+        {
+            m_Options |= Options.PrioritiseTrack;
+        }
+        if (customPhaseTemplate.m_IsPrioritisePublicCar)
+        {
+            m_Options |= Options.PrioritisePublicCar;
+        }
+        if (customPhaseTemplate.m_IsPrioritisePedestrian)
+        {
+            m_Options |= Options.PrioritisePedestrian;
+        }
+        m_MinimumDuration = customPhaseTemplate.m_MinimumDuration;
+        m_MaximumDuration = customPhaseTemplate.m_MaximumDuration;
+        m_TargetDurationMultiplier = customPhaseTemplate.m_TargetDurationMultiplier;
+        m_LaneOccupiedMultiplier = customPhaseTemplate.m_LaneOccupiedMultiplier;
+        m_IntervalExponent = customPhaseTemplate.m_IntervalExponent;
+        m_BindTemplate = "";
     }
 
     public CustomPhaseData()
     {
-        Initialisation();
+        Initialisation(CustomPhaseTemplate.Default);
+    }
+
+    public CustomPhaseData(CustomPhaseTemplate customPhaseTemplate)
+    {
+        Initialisation(customPhaseTemplate);
     }
 
     public readonly float AverageCarFlow()

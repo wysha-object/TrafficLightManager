@@ -4,8 +4,6 @@
 
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using Colossal.Mathematics;
 using Game;
 using Game.Prefabs;
 using Game.Rendering;
@@ -33,18 +31,6 @@ namespace TrafficLightManager.Code.Systems.Overlay
 
         private PrefabSystem m_PrefabSystem;
 
-        private MaterialPropertyBlock m_Block;
-
-        private Dictionary<string, Mesh> m_LineMeshMap;
-
-        private Material m_LineMaterial;
-
-        private Dictionary<string, List<Color>> m_LineColorsMap;
-
-        private Dictionary<string, List<int>> m_LineIndicesMap;
-
-        private Dictionary<string, List<Vector3>> m_LineVerticesMap;
-
         private Mesh m_IconMesh;
 
         private Material m_IconMaterial;
@@ -70,13 +56,6 @@ namespace TrafficLightManager.Code.Systems.Overlay
             base.OnCreate();
 
             m_PrefabSystem = base.World.GetOrCreateSystemManaged<PrefabSystem>();
-
-            m_Block = new MaterialPropertyBlock();
-            m_LineColorsMap = new();
-            m_LineVerticesMap = new();
-            m_LineIndicesMap = new();
-            m_LineMeshMap = new();
-            m_LineMaterial = new Material(Shader.Find("Coherent/ViewShader"));
 
             IconSetup();
 
@@ -137,12 +116,6 @@ namespace TrafficLightManager.Code.Systems.Overlay
         {
             RenderPipelineManager.beginContextRendering -= Render;
 
-            foreach (var item in m_LineMeshMap)
-            {
-                Object.Destroy(item.Value);
-            }
-            Object.Destroy(m_LineMaterial);
-
             Object.Destroy(m_IconMesh);
             Object.Destroy(m_IconMaterial);
             Object.Destroy(m_IconTextureArray);
@@ -158,13 +131,6 @@ namespace TrafficLightManager.Code.Systems.Overlay
             {
                 if (camera.cameraType == CameraType.Game)
                 {
-                    foreach (var item in m_LineMeshMap)
-                    {
-                        if (item.Value.subMeshCount > 0)
-                        {
-                            Graphics.DrawMesh(item.Value, Matrix4x4.identity, m_LineMaterial, 0, camera, 0, m_Block, castShadows: false, receiveShadows: false);
-                        }
-                    }
                     if (m_IconInstanceData.Count > 0)
                     {
                         var cameraPosition = camera.transform.position;
@@ -199,112 +165,6 @@ namespace TrafficLightManager.Code.Systems.Overlay
                     }
                 }
             }
-        }
-
-        public void AddBezier(string tag, Bezier4x3 bezier, Color color, float length = 1f, float thickness = 0.25f)
-        {
-            CreateTagIfNotExist(tag);
-            int segmentCount = (int)math.min(math.max(4f, length * 2f), 16f);
-            int maxSegmentIndex = segmentCount - 1;
-            int verticesCount = m_LineVerticesMap[tag].Count;
-            Vector3 p1 = new(),
-                p2 = new(),
-                v1 = new(),
-                v2 = new();
-            for (int i = 0; i < maxSegmentIndex; i++)
-            {
-                p1 = MathUtils.Position(bezier, (float)i / maxSegmentIndex);
-                p2 = MathUtils.Position(bezier, (float)(i + 1) / maxSegmentIndex);
-                v1 = Quaternion.AngleAxis(-90, Vector3.up) * (p2 - p1).normalized * thickness;
-                v2 = v1 * -1.0f;
-                m_LineVerticesMap[tag].Add(p1 + v1);
-                m_LineVerticesMap[tag].Add(p1 + v2);
-                m_LineColorsMap[tag].Add(color);
-                m_LineColorsMap[tag].Add(color);
-            }
-            m_LineVerticesMap[tag].Add(p2 + v1);
-            m_LineVerticesMap[tag].Add(p2 + v2);
-            m_LineColorsMap[tag].Add(color);
-            m_LineColorsMap[tag].Add(color);
-            for (int i = 0; i < maxSegmentIndex; i++)
-            {
-                m_LineIndicesMap[tag].Add(verticesCount + i * 2);
-                m_LineIndicesMap[tag].Add(verticesCount + i * 2 + 1);
-                m_LineIndicesMap[tag].Add(verticesCount + i * 2 + 2);
-                m_LineIndicesMap[tag].Add(verticesCount + i * 2 + 1);
-                m_LineIndicesMap[tag].Add(verticesCount + i * 2 + 2);
-                m_LineIndicesMap[tag].Add(verticesCount + i * 2 + 3);
-            }
-        }
-
-        public void AddBounds(string tag, Bounds3 bounds, Color color, float scale = 1f)
-        {
-            CreateTagIfNotExist(tag);
-            Vector3 centre = (bounds.min + bounds.max) / 2;
-            Vector3 vector = (centre - (Vector3)bounds.min) * scale;
-            Quaternion quaternion = Quaternion.AngleAxis(10, Vector3.up);
-            int verticesCount = m_LineVerticesMap[tag].Count;
-            m_LineVerticesMap[tag].Add(centre);
-            m_LineColorsMap[tag].Add(color);
-            for (int i = 0; i < 36; i++)
-            {
-                vector = quaternion * vector;
-                m_LineVerticesMap[tag].Add(centre + vector);
-                m_LineColorsMap[tag].Add(color);
-                m_LineIndicesMap[tag].Add(verticesCount);
-                m_LineIndicesMap[tag].Add(verticesCount + i);
-                m_LineIndicesMap[tag].Add(verticesCount + (i < 35 ? i : 0) + 1);
-            }
-        }
-
-        private void CreateTagIfNotExist(string tag)
-        {
-            if (!m_LineMeshMap.ContainsKey(tag))
-            {
-                m_LineMeshMap[tag] = new Mesh();
-                m_LineMeshMap[tag].hideFlags = HideFlags.HideAndDontSave;
-                m_LineMeshMap[tag].indexFormat = IndexFormat.UInt32;
-                m_LineMeshMap[tag].MarkDynamic();
-                m_LineColorsMap[tag] = new(128);
-                m_LineIndicesMap[tag] = new(384);
-                m_LineVerticesMap[tag] = new(128);
-            }
-        }
-
-        public void BuildLineMesh()
-        {
-            foreach (var item in m_LineMeshMap)
-            {
-                var lineMesh = item.Value;
-                var lineVerticesList = m_LineVerticesMap[item.Key];
-                var lineColorsList = m_LineColorsMap[item.Key];
-                var lineIndicesList = m_LineIndicesMap[item.Key];
-
-                lineMesh.Clear();
-                lineMesh.SetVertices(lineVerticesList, 0, lineVerticesList.Count);
-                lineMesh.SetColors(lineColorsList, 0, lineColorsList.Count);
-                lineMesh.SetIndices(lineIndicesList, 0, lineIndicesList.Count, MeshTopology.Triangles, 0);
-            }
-        }
-
-        public void ClearAllLineMesh()
-        {
-            foreach (var item in m_LineMeshMap)
-            {
-                item.Value.Clear();
-                m_LineColorsMap[item.Key].Clear();
-                m_LineIndicesMap[item.Key].Clear();
-                m_LineVerticesMap[item.Key].Clear();
-            }
-        }
-
-        public void ClearLineMesh(string tag)
-        {
-            CreateTagIfNotExist(tag);
-            m_LineMeshMap[tag].Clear();
-            m_LineColorsMap[tag].Clear();
-            m_LineIndicesMap[tag].Clear();
-            m_LineVerticesMap[tag].Clear();
         }
 
         public unsafe void AddIcon(Vector3 position, Icon type)

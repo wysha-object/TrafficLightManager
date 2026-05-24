@@ -14,6 +14,7 @@ using TrafficLightManager.Code.Systems.Update;
 using TrafficLightManager.Code.Utils;
 using Unity.Collections;
 using Unity.Entities;
+using Unity.Jobs;
 using Unity.Mathematics;
 using UnityEngine;
 using static TrafficLightManager.Code.Components.CustomTrafficLights;
@@ -43,6 +44,8 @@ public partial class UISystem : UISystemBase
     private Update.ModificationUpdateSystem m_ModificationUpdateSystem;
 
     private SimulationUpdateSystem m_SimulationUpdateSystem;
+
+    private NameSystem m_NameSystem;
 
     private Camera m_Camera;
 
@@ -78,6 +81,7 @@ public partial class UISystem : UISystemBase
         m_ToolSystem = World.GetOrCreateSystemManaged<Tool.ToolSystem>();
         m_ModificationUpdateSystem = World.GetOrCreateSystemManaged<Update.ModificationUpdateSystem>();
         m_SimulationUpdateSystem = World.GetOrCreateSystemManaged<SimulationUpdateSystem>();
+        m_NameSystem = World.GetOrCreateSystemManaged<NameSystem>();
 
         AddUIBindings();
         SetupKeyBindings();
@@ -107,9 +111,19 @@ public partial class UISystem : UISystemBase
 
     public void SimulationUpdate()
     {
-        m_CustomPhaseItemsBinding.Update();
         m_TrafficLightGroupBinding.Update();
-        RedrawGizmo();
+    }
+
+    public void ModificationUpdate()
+    {
+        DrawIcon();
+        var overlayRenderSystem = World.GetOrCreateSystemManaged<OverlayRenderSystem>();
+        var overlayBuffer = overlayRenderSystem.GetBuffer(out JobHandle dependencies);
+        dependencies.Complete();
+        DrawGizmo(overlayBuffer);
+        DrawEdge(overlayBuffer);
+        DrawTrafficLightGroupName(overlayBuffer);
+        m_CustomPhaseItemsBinding.Update();
     }
 
     public static string GetLocaleCode()
@@ -136,11 +150,14 @@ public partial class UISystem : UISystemBase
 
     public void ForEachTrafficLight(Action<Entity> action)
     {
-        if (EntityManager.TryGetBuffer(m_SelectedTrafficLightGroupEntity, true, out DynamicBuffer<TrafficLightsMemberRef> trafficLightsMemberRefs))
+        if (m_TrafficLightGroupBinding != null)
         {
-            for (int i = 0; i < trafficLightsMemberRefs.Length; i++)
+            if (EntityManager.TryGetBuffer(m_SelectedTrafficLightGroupEntity, true, out DynamicBuffer<TrafficLightsMemberRef> trafficLightsMemberRefs))
             {
-                action(trafficLightsMemberRefs[i].m_Entity);
+                for (int i = 0; i < trafficLightsMemberRefs.Length; i++)
+                {
+                    action(trafficLightsMemberRefs[i].m_Entity);
+                }
             }
         }
     }
@@ -274,11 +291,11 @@ public partial class UISystem : UISystemBase
 
         SetToolState(ToolState.Choosed);
         AddUpdate();
+        m_TrafficLightManagerGroupNameBinding.Update();
     }
 
     public void SetSelectedTrafficLightGroupEntity(Entity entity)
     {
-        RedrawIcon();
         m_SelectedTrafficLightGroupEntity = entity;
         m_CustomPhaseItemsBinding.Update();
         m_TrafficLightGroupBinding.Update();
@@ -313,12 +330,10 @@ public partial class UISystem : UISystemBase
         }
         m_ToolStateBinding.Update((int)toolState);
 
-        m_RenderSystem.ClearAllLineMesh();
         ClearEdgeInfo();
         ForEachTrafficLight(UpdateEdgeInfo);
 
         m_DisplayPhaseIndexBinding.Update(-1);
-        RedrawIcon();
     }
 
     public void AddUpdate()

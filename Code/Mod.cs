@@ -36,14 +36,6 @@ public class Mod : IMod
     {
         m_Log.Info($"Loading {m_Id} v{m_InformationalVersion}");
 
-        var outdatedType =
-            System.Type.GetType("TrafficLightManager.Code.Plugin, TrafficLightManager.Code")
-            ?? System.Type.GetType("C2VM.CommonLibraries.LaneSystem.Plugin, C2VM.CommonLibraries.LaneSystem");
-        if (outdatedType != null)
-        {
-            throw new System.Exception($"An outdated version of Traffic Lights Enhancement has been detected at {outdatedType.Assembly.Location}");
-        }
-
         if (GameManager.instance.modManager.TryGetExecutableAsset(this, out var asset))
         {
             m_Log.Info($"Current mod asset at {asset.path}");
@@ -87,14 +79,11 @@ public class Mod : IMod
         updateSystem.UpdateBefore<TrafficLightManager.Code.Systems.TrafficLightSystems.Simulation.PatchedTrafficLightSystem, Game.Simulation.TrafficLightSystem>(
             SystemUpdatePhase.GameSimulation
         );
-        updateSystem.UpdateAfter<
-            TrafficLightManager.Code.Systems.TrafficLightSystems.Simulation.TrafficLightGroupSystem,
-            TrafficLightManager.Code.Systems.TrafficLightSystems.Simulation.PatchedTrafficLightSystem
-        >(SystemUpdatePhase.GameSimulation);
         updateSystem.UpdateAt<TrafficLightManager.Code.Systems.UI.TooltipSystem>(SystemUpdatePhase.UITooltip);
         updateSystem.UpdateAt<TrafficLightManager.Code.Systems.UI.UISystem>(SystemUpdatePhase.UIUpdate);
         updateSystem.UpdateAt<TrafficLightManager.Code.Systems.Tool.ToolSystem>(SystemUpdatePhase.ToolUpdate);
         updateSystem.UpdateAt<TrafficLightManager.Code.Systems.Update.ModificationUpdateSystem>(SystemUpdatePhase.ModificationEnd);
+        updateSystem.UpdateAt<TrafficLightManager.Code.Systems.TrafficLightSystems.Simulation.TrafficLightGroupSystem>(SystemUpdatePhase.ModificationEnd);
         updateSystem.UpdateAfter<TrafficLightManager.Code.Systems.Update.SimulationUpdateSystem>(SystemUpdatePhase.GameSimulation);
 
         m_TrafficLightInitializationSystem.Enabled = false;

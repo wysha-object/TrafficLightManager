@@ -1,6 +1,6 @@
 import styled from "styled-components";
 
-import { call } from "cs2/api";
+import { bindValue, trigger, useValue } from "cs2/api";
 
 import { useTranslate } from "@/localisations";
 
@@ -14,6 +14,8 @@ import Row from "@/components/main-panel/items/row";
 import Title from "@/components/main-panel/items/title";
 import TitleDim from "@/components/main-panel/items/title-dim";
 import TooltipContainer from "@/components/common/tooltip-container";
+import { PanelFoldout } from "cs2/ui";
+import Template from "./sub-panel-panel/template";
 
 const DimLabel = styled.div`
   color: var(--textColorDim);
@@ -40,7 +42,7 @@ const ItemTitle = (props: { title: string, secondaryText?: string, tooltip?: Rea
 const EndPhaseButton = (props: { index: number, disabled?: boolean }) => {
   const clickHandler = () => {
     if (!props.disabled) {
-      call("TrafficLightManager", "CallUpdateCustomPhaseData", JSON.stringify({ key: "EndPhasePrematurely", index: props.index }));
+      trigger("TrafficLightManager", "CallUpdateCustomPhaseData", JSON.stringify({ key: "EndPhasePrematurely", index: props.index }));
     }
   };
   const { t } = useTranslate();
@@ -58,131 +60,163 @@ const EndPhaseButton = (props: { index: number, disabled?: boolean }) => {
 export default function SubPanel(props: { data: CustomPhaseItem | null, itemIndex: number, statisticsOnly?: boolean, trafficLightGroup: TrafficLightGroup }) {
   const data = props.data;
 
+  const settings = JSON.parse(useValue(bindValue("TrafficLightManager", "GetSettings", "{}"))) as Settings;
+
   if (!data) {
     return <></>;
   }
 
   const { t } = useTranslate();
   return (
-    <>
+    <div style={{maxHeight: "54em", overflowY: "auto"}}>
       {!props.statisticsOnly &&
         <>
-          <ItemTitle title="CustomPhaseEditor.Options.Title" tooltip={<TooltipContainer>{t("CustomPhaseEditor.Options.Tooltip")}</TooltipContainer>} />
-          <Row hoverEffect={true}
-            onClick={() => {
-              call("TrafficLightManager", "CallUpdateCustomPhaseData", JSON.stringify({ key: "PrioritiseTrack", index: props.itemIndex }));
-            }}
+          <PanelFoldout
+            initialExpanded={true}
+            header={
+              <ItemTitle
+                title="CustomPhaseEditor.Template.Title"
+                tooltip={
+                  <TooltipContainer>{t("CustomPhaseEditor.Template.Tooltip")}</TooltipContainer>
+                }
+              />
+            }
           >
-            <Checkbox isChecked={data.prioritiseTrack} />
-            <DimLabel>{t("CustomPhaseEditor.Options.PrioritiseTrack")}</DimLabel>
-            <div style={{ flex: 1 }}></div>
-            <Tooltip position="right-start" tooltip={<TooltipContainer>{t("CustomPhaseEditor.Options.PrioritiseTrack.Tooltip")}</TooltipContainer>}>
-              <TooltipIcon style={{ marginLeft: "0.25em" }} />
-            </Tooltip>
-          </Row>
-          <Row hoverEffect={true}
-            onClick={() => {
-              call("TrafficLightManager", "CallUpdateCustomPhaseData", JSON.stringify({ key: "PrioritisePublicCar", index: props.itemIndex }));
-            }}
-          >
-            <Checkbox isChecked={data.prioritisePublicCar} />
-            <DimLabel>{t("CustomPhaseEditor.Options.PrioritisePublicCar")}</DimLabel>
-            <div style={{ flex: 1 }}></div>
-            <Tooltip position="right-start" tooltip={<TooltipContainer>{t("CustomPhaseEditor.Options.PrioritisePublicCar.Tooltip")}</TooltipContainer>}>
-              <TooltipIcon style={{ marginLeft: "0.25em" }} />
-            </Tooltip>
-          </Row>
-          <Row hoverEffect={true}
-            onClick={() => {
-              call("TrafficLightManager", "CallUpdateCustomPhaseData", JSON.stringify({ key: "PrioritisePedestrian", index: props.itemIndex }));
-            }}
-          >
-            <Checkbox isChecked={data.prioritisePedestrian} />
-            <DimLabel>{t("CustomPhaseEditor.Options.PrioritisePedestrian")}</DimLabel>
-            <div style={{ flex: 1 }}></div>
-            <Tooltip position="right-start" tooltip={<TooltipContainer>{t("CustomPhaseEditor.Options.PrioritisePedestrian.Tooltip")}</TooltipContainer>}>
-              <TooltipIcon style={{ marginLeft: "0.25em" }} />
-            </Tooltip>
-          </Row>
+            <Template item={data} itemIndex={props.itemIndex}></Template>
+          </PanelFoldout>
           <Divider />
-          <ItemTitle title="CustomPhaseEditor.Adjustments.Title" />
-          <MainPanelRange
-            onChange={(value) => {
-              call("TrafficLightManager", "CallUpdateCustomPhaseData", JSON.stringify({ key: "MinimumDuration", value: value, index: props.itemIndex }));
-            }}
-            label={t("CustomPhaseEditor.Adjustments.MinimumDuration")}
-            value={data.minimumDuration}
-            valuePrefix={""}
-            valueSuffix={"s"}
-            min={0}
-            max={30}
-            step={1}
-            defaultValue={2}
-            enableTextField={true}
-            textFieldRegExp={"^\\d{0,4}$"}
-          />
-          <MainPanelRange
-            onChange={(value) => {
-              call("TrafficLightManager", "CallUpdateCustomPhaseData", JSON.stringify({ key: "MaximumDuration", value: value, index: props.itemIndex }));
-            }}
-            label={t("CustomPhaseEditor.Adjustments.MaximumDuration")}
-            value={data.maximumDuration}
-            valuePrefix={""}
-            valueSuffix={"s"}
-            min={5}
-            max={300}
-            step={5}
-            defaultValue={30}
-            enableTextField={true}
-            textFieldRegExp={"^\\d{0,4}$"}
-          />
-          <MainPanelRange
-            onChange={(value) => {
-              call("TrafficLightManager", "CallUpdateCustomPhaseData", JSON.stringify({ key: "TargetDurationMultiplier", value: value, index: props.itemIndex }));
-            }}
-            label={t("CustomPhaseEditor.Adjustments.TargetDurationMultiplier")}
-            value={data.targetDurationMultiplier}
-            valuePrefix={""}
-            valueSuffix={t("CustomPedestrianDurationMultiplierSuffix")}
-            min={0.1}
-            max={10}
-            step={0.1}
-            defaultValue={1}
-            enableTextField={true}
-            textFieldRegExp={"^\\d{0,4}(\\.\\d{0,2})?$"}
-          />
-          <MainPanelRange
-            onChange={(value) => {
-              call("TrafficLightManager", "CallUpdateCustomPhaseData", JSON.stringify({ key: "LaneOccupiedMultiplier", value: value, index: props.itemIndex }));
-            }}
-            label={t("CustomPhaseEditor.Adjustments.LaneOccupiedMultiplier")}
-            value={data.laneOccupiedMultiplier}
-            valuePrefix={""}
-            valueSuffix={t("CustomPedestrianDurationMultiplierSuffix")}
-            min={0.1}
-            max={10}
-            step={0.1}
-            defaultValue={1}
-            enableTextField={true}
-            textFieldRegExp={"^\\d{0,4}(\\.\\d{0,2})?$"}
-            tooltip={<TooltipContainer>{t("CustomPhaseEditor.Adjustments.LaneOccupiedMultiplier.Tooltip")}</TooltipContainer>}
-          />
-          <MainPanelRange
-            onChange={(value) => {
-              call("TrafficLightManager", "CallUpdateCustomPhaseData", JSON.stringify({ key: "IntervalExponent", value: value, index: props.itemIndex }));
-            }}
-            label={t("CustomPhaseEditor.Adjustments.IntervalExponent")}
-            value={data.intervalExponent}
-            valuePrefix={""}
-            valueSuffix={""}
-            min={0.1}
-            max={10}
-            step={0.1}
-            defaultValue={2}
-            enableTextField={true}
-            textFieldRegExp={"^\\d{0,4}(\\.\\d{0,2})?$"}
-            tooltip={<TooltipContainer>{t("CustomPhaseEditor.Adjustments.IntervalExponent.Tooltip")}</TooltipContainer>}
-          />
+          <PanelFoldout
+            initialExpanded={true}
+            header={
+              <ItemTitle
+                title="CustomPhaseEditor.Options.Title" tooltip={
+                  <TooltipContainer>{t("CustomPhaseEditor.Options.Tooltip")}</TooltipContainer>
+                }
+              />
+            }
+          >
+            <Row hoverEffect={true}
+              onClick={() => {
+                trigger("TrafficLightManager", "CallUpdateCustomPhaseData", JSON.stringify({ key: "PrioritiseTrack", index: props.itemIndex, value: !data.prioritiseTrack }));
+              }}
+            >
+              <Checkbox isChecked={data.prioritiseTrack} />
+              <DimLabel>{t("CustomPhaseEditor.Options.PrioritiseTrack")}</DimLabel>
+              <div style={{ flex: 1 }}></div>
+              <Tooltip position="right-start" tooltip={<TooltipContainer>{t("CustomPhaseEditor.Options.PrioritiseTrack.Tooltip")}</TooltipContainer>}>
+                <TooltipIcon style={{ marginLeft: "0.25em" }} />
+              </Tooltip>
+            </Row>
+            <Row hoverEffect={true}
+              onClick={() => {
+                trigger("TrafficLightManager", "CallUpdateCustomPhaseData", JSON.stringify({ key: "PrioritisePublicCar", index: props.itemIndex, value: !data.prioritisePublicCar }));
+              }}
+            >
+              <Checkbox isChecked={data.prioritisePublicCar} />
+              <DimLabel>{t("CustomPhaseEditor.Options.PrioritisePublicCar")}</DimLabel>
+              <div style={{ flex: 1 }}></div>
+              <Tooltip position="right-start" tooltip={<TooltipContainer>{t("CustomPhaseEditor.Options.PrioritisePublicCar.Tooltip")}</TooltipContainer>}>
+                <TooltipIcon style={{ marginLeft: "0.25em" }} />
+              </Tooltip>
+            </Row>
+            <Row hoverEffect={true}
+              onClick={() => {
+                trigger("TrafficLightManager", "CallUpdateCustomPhaseData", JSON.stringify({ key: "PrioritisePedestrian", index: props.itemIndex, value: !data.prioritisePedestrian }));
+              }}
+            >
+              <Checkbox isChecked={data.prioritisePedestrian} />
+              <DimLabel>{t("CustomPhaseEditor.Options.PrioritisePedestrian")}</DimLabel>
+              <div style={{ flex: 1 }}></div>
+              <Tooltip position="right-start" tooltip={<TooltipContainer>{t("CustomPhaseEditor.Options.PrioritisePedestrian.Tooltip")}</TooltipContainer>}>
+                <TooltipIcon style={{ marginLeft: "0.25em" }} />
+              </Tooltip>
+            </Row>
+          </PanelFoldout>
+          <Divider />
+          <PanelFoldout
+            initialExpanded={true}
+            header={
+              <ItemTitle title="CustomPhaseEditor.Adjustments.Title" />
+            }
+          >
+            <MainPanelRange
+              onChange={(value) => {
+                trigger("TrafficLightManager", "CallUpdateCustomPhaseData", JSON.stringify({ key: "MinimumDuration", value: value, index: props.itemIndex }));
+              }}
+              label={t("CustomPhaseEditor.Adjustments.MinimumDuration")}
+              value={data.minimumDuration}
+              valuePrefix={""}
+              valueSuffix={"s"}
+              min={0}
+              max={30}
+              step={1}
+              defaultValue={settings.defaultCustomPhaseTemplate.m_MinimumDuration}
+              enableTextField={true}
+              textFieldRegExp={"^\\d{0,4}$"}
+            />
+            <MainPanelRange
+              onChange={(value) => {
+                trigger("TrafficLightManager", "CallUpdateCustomPhaseData", JSON.stringify({ key: "MaximumDuration", value: value, index: props.itemIndex }));
+              }}
+              label={t("CustomPhaseEditor.Adjustments.MaximumDuration")}
+              value={data.maximumDuration}
+              valuePrefix={""}
+              valueSuffix={"s"}
+              min={5}
+              max={300}
+              step={5}
+              defaultValue={settings.defaultCustomPhaseTemplate.m_MaximumDuration}
+              enableTextField={true}
+              textFieldRegExp={"^\\d{0,4}$"}
+            />
+            <MainPanelRange
+              onChange={(value) => {
+                trigger("TrafficLightManager", "CallUpdateCustomPhaseData", JSON.stringify({ key: "TargetDurationMultiplier", value: value, index: props.itemIndex }));
+              }}
+              label={t("CustomPhaseEditor.Adjustments.TargetDurationMultiplier")}
+              value={data.targetDurationMultiplier}
+              valuePrefix={""}
+              valueSuffix={t("CustomPedestrianDurationMultiplierSuffix")}
+              min={0.1}
+              max={10}
+              step={0.1}
+              defaultValue={settings.defaultCustomPhaseTemplate.m_TargetDurationMultiplier}
+              enableTextField={true}
+              textFieldRegExp={"^\\d{0,4}(\\.\\d{0,2})?$"}
+            />
+            <MainPanelRange
+              onChange={(value) => {
+                trigger("TrafficLightManager", "CallUpdateCustomPhaseData", JSON.stringify({ key: "LaneOccupiedMultiplier", value: value, index: props.itemIndex }));
+              }}
+              label={t("CustomPhaseEditor.Adjustments.LaneOccupiedMultiplier")}
+              value={data.laneOccupiedMultiplier}
+              valuePrefix={""}
+              valueSuffix={t("CustomPedestrianDurationMultiplierSuffix")}
+              min={0.1}
+              max={10}
+              step={0.1}
+              defaultValue={settings.defaultCustomPhaseTemplate.m_LaneOccupiedMultiplier}
+              enableTextField={true}
+              textFieldRegExp={"^\\d{0,4}(\\.\\d{0,2})?$"}
+              tooltip={<TooltipContainer>{t("CustomPhaseEditor.Adjustments.LaneOccupiedMultiplier.Tooltip")}</TooltipContainer>}
+            />
+            <MainPanelRange
+              onChange={(value) => {
+                trigger("TrafficLightManager", "CallUpdateCustomPhaseData", JSON.stringify({ key: "IntervalExponent", value: value, index: props.itemIndex }));
+              }}
+              label={t("CustomPhaseEditor.Adjustments.IntervalExponent")}
+              value={data.intervalExponent}
+              valuePrefix={""}
+              valueSuffix={""}
+              min={0.1}
+              max={10}
+              step={0.1}
+              defaultValue={settings.defaultCustomPhaseTemplate.m_IntervalExponent}
+              enableTextField={true}
+              textFieldRegExp={"^\\d{0,4}(\\.\\d{0,2})?$"}
+              tooltip={<TooltipContainer>{t("CustomPhaseEditor.Adjustments.IntervalExponent.Tooltip")}</TooltipContainer>}
+            />
+          </PanelFoldout>
           <Divider />
         </>
       }
@@ -243,6 +277,6 @@ export default function SubPanel(props: { data: CustomPhaseItem | null, itemInde
         dim={true}
       />
       {props.trafficLightGroup.manualPhaseIndex < 0 && props.trafficLightGroup.currentPhaseIndex == props.itemIndex && <EndPhaseButton index={props.itemIndex} disabled={data.endPhasePrematurely} />}
-    </>
+    </div>
   );
 }

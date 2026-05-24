@@ -112,6 +112,16 @@ public class LocalisationUtils
         dictionary.Add(Mod.m_Settings.GetOptionDescLocaleID("m_DefaultAlwaysGreenKerbsideTurn"), this.GetString("DefaultAlwaysGreenKerbsideTurnDesc"));
         dictionary.Add(Mod.m_Settings.GetOptionLabelLocaleID("m_DefaultExclusivePedestrian"), this.GetString("DefaultExclusivePedestrianLabel"));
         dictionary.Add(Mod.m_Settings.GetOptionDescLocaleID("m_DefaultExclusivePedestrian"), this.GetString("DefaultExclusivePedestrianDesc"));
+        dictionary.Add(Mod.m_Settings.GetOptionLabelLocaleID("m_DefaultCustomPhaseTemplateOption"), this.GetString("Settings.Default.DefaultCustomPhaseTemplate.Label"));
+        dictionary.Add(Mod.m_Settings.GetOptionDescLocaleID("m_DefaultCustomPhaseTemplateOption"), this.GetString("Settings.Default.DefaultCustomPhaseTemplate.Desc"));
+        dictionary.Add(
+            Mod.m_Settings.GetOptionLabelLocaleID("m_DisplayTrafficLightGroupNameWhenToolDisabled"),
+            this.GetString("Settings.Default.DisplayTrafficLightGroupNameWhenToolDisabled.Label")
+        );
+        dictionary.Add(
+            Mod.m_Settings.GetOptionDescLocaleID("m_DisplayTrafficLightGroupNameWhenToolDisabled"),
+            this.GetString("Settings.Default.DisplayTrafficLightGroupNameWhenToolDisabled.Desc")
+        );
         dictionary.Add(Mod.m_Settings.GetOptionLabelLocaleID("m_ForceNodeUpdate"), this.GetString("ForceAllNodesUpdateLabel"));
         dictionary.Add(Mod.m_Settings.GetOptionDescLocaleID("m_ForceNodeUpdate"), this.GetString("ForceAllNodesUpdateDesc"));
         dictionary.Add(Mod.m_Settings.GetOptionWarningLocaleID("m_ForceNodeUpdate"), this.GetString("ForceAllNodesUpdateWarning"));

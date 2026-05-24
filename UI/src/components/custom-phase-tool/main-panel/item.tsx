@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import styled from "styled-components";
 
-import { call } from "cs2/api";
+import { call, trigger } from "cs2/api";
 
 import Check from "@/components/common/icons/check";
 import ChevronDown from "@/components/common/icons/chevron-down";
@@ -13,11 +13,13 @@ import VisibilityOff from "@/components/common/icons/visibility-off";
 import Row from "@/components/main-panel/items/row";
 
 import ItemDivider from "./item-divider";
-import { useTranslate } from "@/localisations";
 import Copy from "@/components/common/icons/copy";
+import TextField from "@/components/common/text-field";
 
 const Label = styled.div<{ dim?: boolean }>`
   color: ${props => props.dim ? "var(--textColorDim)" : "var(--textColor)"};
+  width: 6em;
+  max-width: 6em;
   flex-grow: 1;
   flex-shrink: 1;
   flex-basis: auto;
@@ -75,7 +77,6 @@ export default function Item(
     updateCurrentIndex: (index: number) => void,
   }
 ) {
-  const { t } = useTranslate();
   const [isActiveLabel, setIsActiveLabel] = useState(false);
   const swapItem = (index1: number, index2: number) => {
     call("TrafficLightManager", "CallSwapCustomPhase", JSON.stringify({ index1, index2 }))
@@ -99,7 +100,12 @@ export default function Item(
     <>
       <Row style={{ padding: "0.25em" }}>
         <Label dim={!isActiveLabel}>
-          {t("Phase") + " #" + (props.itemIndex + 1)}{props.trafficLightGroup.currentPhaseIndex === props.itemIndex && <ActiveDot />}
+          <TextField
+            onChange={(value) => trigger("TrafficLightManager", "CallUpdateCustomPhaseData", JSON.stringify({ index: props.itemIndex, key: "Name", value: value }))}
+            value={props.data.name}
+            displayWhenEmpty={"Phase #" + (props.itemIndex + 1)}
+          />
+          {props.trafficLightGroup.currentPhaseIndex === props.itemIndex && <ActiveDot />}
         </Label>
         <IconBarContainer>
           {props.itemState != ItemState.Editing && <>
@@ -134,10 +140,16 @@ export default function Item(
               <Check style={IconStyle} onClick={() => props.updateItemState(props.itemIndex, ItemState.None)} />
             </IconContainer>
             <IconContainer>
-              {(props.itemIndex - 1) >= 0 && <ChevronUp style={{ ...IconStyle, ...IconStyleDisabled }} onClick={() => swapItem(props.itemIndex, props.itemIndex - 1)} />}
+              <ChevronUp
+                style={{ ...IconStyle, ...(props.itemIndex - 1) >= 0 ? {} : IconStyleDisabled }}
+                onClick={() => (props.itemIndex - 1) >= 0 && swapItem(props.itemIndex, props.itemIndex - 1)}
+              />
             </IconContainer>
             <IconContainer>
-              {(props.itemIndex + 1) < props.itemCount && <ChevronDown style={{ ...IconStyle, ...IconStyleDisabled }} onClick={() => swapItem(props.itemIndex, props.itemIndex + 1)} />}
+              <ChevronDown
+                style={{ ...IconStyle, ...(props.itemIndex + 1) < props.itemCount ? {} : IconStyleDisabled }}
+                onClick={() => (props.itemIndex + 1) < props.itemCount && swapItem(props.itemIndex, props.itemIndex + 1)}
+              />
             </IconContainer>
           </>}
         </IconBarContainer>

@@ -197,7 +197,6 @@ public partial class PatchedTrafficLightSystem : GameSystemBase
                 if (trafficLightGroupEntity != Entity.Null)
                 {
                     trafficLightGroup = m_TrafficLightGroupData[trafficLightGroupEntity];
-                    m_EntityCommandBuffer.AddComponent<Sync>(unfilteredChunkIndex, trafficLightGroupEntity);
                 }
 
                 DynamicBuffer<CustomPhaseData>? customPhaseDataBuffer = null;
