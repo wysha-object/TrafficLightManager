@@ -56,7 +56,8 @@ Wherever you report an issue, please make sure to describe it clearly.
     <Dependency Id="" />
     <!--Change log for new version. Single line or multi line. Supports minimal markdown subset-->
     <ChangeLog>
-- Update Tooltip
+- Custom name
+- Phase template
     </ChangeLog>
     <!--External link. supported types are discord, github, youtube, twitch, x, paypal, patreon-->
     <ExternalLink Type="github" Url="https://github.com/wysha-object/TrafficLightManager" />
