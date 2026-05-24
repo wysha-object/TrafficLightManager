@@ -234,6 +234,10 @@ public class Settings : ModSetting
             return;
         }
         m_CustomPhaseTemplates.RemoveAt(index);
+        if (name == m_DefaultCustomPhaseTemplate.m_Name)
+        {
+            m_DefaultCustomPhaseTemplate = CustomPhaseTemplate.Default;
+        }
         Apply();
     }
 }
