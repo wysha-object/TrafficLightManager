@@ -36,6 +36,8 @@ public partial class UISystem : UISystemBase
 
     private GetterValueBinding<string> m_TrafficLightManagerGroupNameBinding;
 
+    private GetterValueBinding<string> m_SystemDefaultTemplateBinding;
+
     private ValueBinding<UITypes.ToolTooltipMessage[]> m_ToolTooltipMessageBinding;
 
     private ValueBinding<int> m_ToolStateBinding;
@@ -235,6 +237,16 @@ public partial class UISystem : UISystemBase
                 }
             )
         );
+        AddBinding(
+            m_SystemDefaultTemplateBinding = new GetterValueBinding<string>(
+                "TrafficLightManager",
+                "GetSystemDefaultTemplate",
+                () =>
+                {
+                    return JsonConvert.SerializeObject(CustomPhaseTemplate.Default);
+                }
+            )
+        );
 
         AddBinding(
             new CallBinding<string, string>(
@@ -249,7 +261,7 @@ public partial class UISystem : UISystemBase
                         {
                             customPhaseDataBuffer = EntityManager.AddBuffer<CustomPhaseData>(m_SelectedTrafficLightGroupEntity);
                         }
-                        customPhaseDataBuffer.Add(new CustomPhaseData());
+                        customPhaseDataBuffer.Add(new CustomPhaseData(Mod.m_Settings.m_DefaultCustomPhaseTemplate));
                         ForEachTrafficLight(UpdateEdgeInfo);
                         AddUpdate();
                     }

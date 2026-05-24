@@ -13,7 +13,6 @@ import ManualControlPanel from "./manual-control-panel";
 import SubPanel from "./sub-panel";
 import { useTranslate } from "@/localisations";
 import { ToolState } from "@/constants";
-import Tooltip from "@/components/common/tooltip";
 import TextField from "@/components/common/text-field";
 
 const Container = styled.div`
@@ -132,12 +131,10 @@ export default function MainPanel() {
   return (
     <Container>
       <TrafficLightsMembersContainer>
-        <Tooltip position="bottom-start" tooltip={t("CustomPhaseEditor.TrafficLightGroupName")}>
-          <TextField
-            onChange={(value) => trigger("TrafficLightManager", "SetTrafficLightGroupName", value)}
-            value={trafficLightGroupName}
-            displayWhenEmpty={"Traffic Light Group"} />
-          </Tooltip>
+        <TextField
+          onChange={(value) => trigger("TrafficLightManager", "SetTrafficLightGroupName", value)}
+          value={trafficLightGroupName}
+          displayWhenEmpty={"Traffic Light Group"} />
         <Row>{t("CustomPhaseEditor.TrafficLightsMembers")}</Row>
         <Scrollable contentStyle={ItemContainerStyle}>
           {

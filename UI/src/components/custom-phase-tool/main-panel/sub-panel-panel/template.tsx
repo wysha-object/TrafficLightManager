@@ -32,6 +32,7 @@ export default function Template(props: { item: CustomPhaseItem, itemIndex: numb
   let [inputName, setInputName] = useState("");
 
   const settings = JSON.parse(useValue(bindValue("TrafficLightManager", "GetSettings", "{}"))) as Settings;
+  const systemDefaultTemplate = JSON.parse(useValue(bindValue("TrafficLightManager", "GetSystemDefaultTemplate", "{}"))) as CustomPhaseTemplate;
   settings.customPhaseTemplates.findIndex(
     (template) => template.m_Name === selectTemplate
   ) < 0 && setSelectTemplate(settings.defaultCustomPhaseTemplate.m_Name);
@@ -100,7 +101,7 @@ export default function Template(props: { item: CustomPhaseItem, itemIndex: numb
                   }}
                 >
                   <span style={{ flex: 1 }}>{template.m_Name}</span>
-                  {template.m_Name !== settings.defaultCustomPhaseTemplate.m_Name &&
+                  {template.m_Name !== systemDefaultTemplate.m_Name &&
                     <IconContainer>
                       <Delete style={IconStyle} onClick={() => trigger("TrafficLightManager", "RemoveTemplate", template.m_Name)}></Delete>
                     </IconContainer>
@@ -141,7 +142,7 @@ export default function Template(props: { item: CustomPhaseItem, itemIndex: numb
           </Row>
           <Row>
             <div style={{ flex: "1", margin: "0 0.1em 0 0" }}>
-              <Button disabled={inputName === settings.defaultCustomPhaseTemplate.m_Name || inputName === ""} label="CustomPhaseEditor.Template.Save" onClick={() => {
+              <Button disabled={inputName === systemDefaultTemplate.m_Name || inputName === ""} label="CustomPhaseEditor.Template.Save" onClick={() => {
                 trigger("TrafficLightManager", "UpdateTemplate", JSON.stringify({
                   m_Name: inputName,
                   m_IsPrioritiseTrack: props.item.prioritiseTrack,
@@ -156,7 +157,7 @@ export default function Template(props: { item: CustomPhaseItem, itemIndex: numb
               }} />
             </div>
             <div style={{ flex: "1", margin: "0 0 0 0.1em" }}>
-              <Button disabled={inputName === settings.defaultCustomPhaseTemplate.m_Name || inputName === ""} label="CustomPhaseEditor.Template.SaveAndBind" onClick={() => {
+              <Button disabled={inputName === systemDefaultTemplate.m_Name || inputName === ""} label="CustomPhaseEditor.Template.SaveAndBind" onClick={() => {
                 trigger("TrafficLightManager", "UpdateTemplate", JSON.stringify({
                   m_Name: inputName,
                   m_IsPrioritiseTrack: props.item.prioritiseTrack,
