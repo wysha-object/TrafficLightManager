@@ -59,7 +59,7 @@ public class Settings : ModSetting
     }
     public string m_Locale { get; private set; }
 
-    public static DropdownItem<string>[] GetLanguageValues()
+    public DropdownItem<string>[] GetLanguageValues()
     {
         DropdownItem<string>[] list =
         [
@@ -114,16 +114,13 @@ public class Settings : ModSetting
 
     public CustomPhaseTemplate m_DefaultCustomPhaseTemplate { get; private set; }
 
-    public static DropdownItem<string>[] GetCustomPhaseTemplateValues()
+    public DropdownItem<string>[] GetCustomPhaseTemplateValues()
     {
         List<DropdownItem<string>> list = new List<DropdownItem<string>>();
-        var templates = Mod.m_Settings?.GetCustomPhaseTemplates();
-        if (templates != null)
+        var templates = GetCustomPhaseTemplates();
+        foreach (CustomPhaseTemplate template in templates)
         {
-            foreach (CustomPhaseTemplate template in templates)
-            {
-                list.Add(new DropdownItem<string> { value = template.m_Name, displayName = template.m_Name });
-            }
+            list.Add(new DropdownItem<string> { value = template.m_Name, displayName = template.m_Name });
         }
         return list.ToArray();
     }
@@ -168,9 +165,9 @@ public class Settings : ModSetting
         : base(mod)
     {
         SetDefaults();
+        AssetDatabase.global.LoadSettings(nameof(Settings), this);
         RegisterInOptionsUI();
         RegisterKeyBindings();
-        AssetDatabase.global.LoadSettings(nameof(Settings), this);
     }
 
     public override void SetDefaults()
@@ -193,6 +190,8 @@ public class Settings : ModSetting
         base.Apply();
         var uiSystem = Mod.m_World.GetOrCreateSystemManaged<Systems.UI.UISystem>();
         uiSystem.SettingUpdate();
+        RegisterInOptionsUI();
+        RegisterKeyBindings();
     }
 
     public bool IsNotInGame()
