@@ -43,7 +43,9 @@ Wherever you report an issue, please make sure to describe it clearly.
     <!--Thumbnail-->
     <Thumbnail Value="Properties/Thumbnail.png" />
     <!--Screenshot, can be set multiple times-->
-    <Screenshot Value="" />
+    <Screenshot Value="Properties/Screenshots/Screenshot1.png" />
+    <Screenshot Value="Properties/Screenshots/Screenshot2.png" />
+    <Screenshot Value="Properties/Screenshots/Screenshot3.png" />
     <!--Tag, can be set multiple times-->
     <Tag Value="" />
     <!--Link to the forum post where the mod can be discussed-->
