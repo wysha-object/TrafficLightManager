@@ -43,22 +43,22 @@ Wherever you report an issue, please make sure to describe it clearly.
     <!--Thumbnail-->
     <Thumbnail Value="Properties/Thumbnail.png" />
     <!--Screenshot, can be set multiple times-->
-    <Screenshot Value="Properties/Screenshots/Screenshot1.png" />
-    <Screenshot Value="Properties/Screenshots/Screenshot2.png" />
-    <Screenshot Value="Properties/Screenshots/Screenshot3.png" />
+    <Screenshot Value="Properties/Screenshots/Screenshot1.jpg" />
+    <Screenshot Value="Properties/Screenshots/Screenshot2.jpg" />
+    <Screenshot Value="Properties/Screenshots/Screenshot3.jpg" />
     <!--Tag, can be set multiple times-->
     <Tag Value="" />
     <!--Link to the forum post where the mod can be discussed-->
     <ForumLink Value="https://forum.paradoxplaza.com/forum/threads/traffic-light-manager-discussion-thread.1920173/" />
     <!--Version of the mod-->
-    <ModVersion Value="1.4.4" />
+    <ModVersion Value="1.4.5" />
     <!--Recommended version of the base game to use the mod-->
     <GameVersion Value="1.5.*" />
     <!--Dependency for the mod, can be set multiple times-->
     <Dependency Id="" />
     <!--Change log for new version. Single line or multi line. Supports minimal markdown subset-->
     <ChangeLog>
-- Fix some bugs
+- Temporary hotfix: Removed hotkey-related logic to ensure the mod works properly.
     </ChangeLog>
     <!--External link. supported types are discord, github, youtube, twitch, x, paypal, patreon-->
     <ExternalLink Type="github" Url="https://github.com/wysha-object/TrafficLightManager" />
