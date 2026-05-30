@@ -16,6 +16,11 @@ public partial class UISystem : UISystemBase
             return;
         }
         m_MainPanelToggleKeyboardBinding = Mod.m_Settings.GetAction(Settings.kKeyboardBindingMainPanelToggle);
+        if (m_MainPanelToggleKeyboardBinding == null)
+        {
+            Mod.m_Log.Error($"Failed to get action for {Settings.kKeyboardBindingMainPanelToggle}, key bindings will not work.");
+            return;
+        }
         m_MainPanelToggleKeyboardBinding.shouldBeEnabled = true;
         m_MainPanelToggleKeyboardBinding.onInteraction += ToggleToolState;
     }

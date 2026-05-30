@@ -84,7 +84,7 @@ public partial class UISystem : UISystemBase
         m_NameSystem = World.GetOrCreateSystemManaged<NameSystem>();
 
         AddUIBindings();
-        //SetupKeyBindings();
+        SetupKeyBindings();
         UpdateLocale();
 
         GameManager.instance.localizationManager.onActiveDictionaryChanged += UpdateLocale;
