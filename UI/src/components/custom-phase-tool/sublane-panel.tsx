@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef } from 'react';
+import { useCallback, useContext, useEffect, useRef } from 'react';
 import styled from 'styled-components';
 
 import { call } from 'cs2/api';
@@ -7,6 +7,9 @@ import { EdgeGroupMaskOptions } from "@/constants";
 
 import Lane from './lane';
 import LinkVariant from '@/components/common/icons/link-variant';
+import { SubLaneGroupMaskContextClipboard } from '@/context';
+import Copy from '../common/icons/copy';
+import Paste from '../common/icons/paste';
 
 const Container = styled.div<{ translateY: string }>`
   position: fixed;
@@ -23,6 +26,9 @@ const Content = styled.div`
   flex: 1;
   position: relative;
   padding: 6rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 `;
 
 const LaneContainer = styled.div`
@@ -49,7 +55,7 @@ const Divider = styled.div`
 
 const HorizontalDivider = styled.div`
   height: 2px;
-  width: auto;
+  width: 100%;
   border: 2px solid rgba(255, 255, 255, 0.1);
   margin: 6rem -6rem;
 `;
@@ -60,11 +66,18 @@ const IconContainer = styled.div`
   }
 `;
 
-const IconStyle = {
+const BigIconStyle = {
   color: "var(--textColorDim)",
-  width: "24rem",
-  height: "24rem",
+  width: "30rem",
+  height: "30rem",
   margin: "3rem"
+};
+
+const SmallIconStyle = {
+  color: "var(--textColorDim)",
+  width: "20rem",
+  height: "20rem",
+  margin: "2rem"
 };
 
 function GetCustomPhaseLane(subLane: SubLaneInfo, index: number, type: CustomPhaseLaneType): CustomPhaseLane {
@@ -113,6 +126,7 @@ function SetBit(input: number, index: number, value: number) {
 }
 
 export default function SubLanePanel(props: { edge: EdgeInfo, subLane: SubLaneInfo, index: number, position: ScreenPoint }) {
+  const { data: clipboardData, setData: setClipboardData } = useContext(SubLaneGroupMaskContextClipboard.context);
   const clickHandler = useCallback((index: number, type: CustomPhaseLaneType, direction: CustomPhaseLaneDirection, currentSignal: CustomPhaseSignalState) => {
     let newSignal = currentSignal == "stop" ? "go" : (currentSignal == "go" ? "yield" : "stop");
     const newGroupMask: SubLaneGroupMask = JSON.parse(JSON.stringify(props.subLane.m_SubLaneGroupMask));
@@ -221,7 +235,31 @@ export default function SubLanePanel(props: { edge: EdgeInfo, subLane: SubLaneIn
           </>}
         </LaneContainer>
         <HorizontalDivider />
-        <IconContainer><LinkVariant style={IconStyle} onClick={linkHandler} /></IconContainer>
+        <IconContainer><LinkVariant style={BigIconStyle} onClick={linkHandler} /></IconContainer>
+        <div style={{ display: "flex", flexDirection: "row", justifyContent: "center", alignItems: "center" }}>
+          <IconContainer>
+            <Copy
+              style={SmallIconStyle}
+              onClick={() => {
+                setClipboardData(props.subLane.m_SubLaneGroupMask);
+              }}
+            />
+          </IconContainer>
+          <IconContainer>
+            <Paste
+              style={{ ...SmallIconStyle, "opacity": clipboardData !== undefined ? 1 : 0.5 }}
+              onClick={() => {
+                if (clipboardData !== undefined) {
+                  const newGroupMask: SubLaneGroupMask = JSON.parse(JSON.stringify(props.subLane.m_SubLaneGroupMask));
+                  newGroupMask.m_Car = clipboardData.m_Car;
+                  newGroupMask.m_Track = clipboardData.m_Track;
+                  newGroupMask.m_Pedestrian = clipboardData.m_Pedestrian;
+                  call("TrafficLightManager", "CallUpdateEdgeGroupMask", JSON.stringify({ groupMaskArray: [newGroupMask], entity: props.edge.m_TrafficLightsEntity }));
+                }
+              }}
+            />
+          </IconContainer>
+        </div>
       </Content>
     </Container>
   );

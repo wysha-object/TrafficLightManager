@@ -1,6 +1,6 @@
 import { bindValue, useValue } from "cs2/api";
 
-import { CityConfigurationContext, defaultCityConfiguration, LocalisationContext } from "./context";
+import { CityConfigurationContext, defaultCityConfiguration, EdgeGroupMaskContextClipboard, LocalisationContext, SubLaneGroupMaskContextClipboard } from "./context";
 
 import MainPanel from "./components/main-panel";
 import CustomPhaseTool from "./components/custom-phase-tool";
@@ -14,8 +14,12 @@ export default function App() {
   return (
     <CityConfigurationContext.Provider value={cityConfiguration}>
       <LocalisationContext.Provider value={localisation}>
-        <MainPanel />
-        <CustomPhaseTool />
+        <EdgeGroupMaskContextClipboard.Provider>
+          <SubLaneGroupMaskContextClipboard.Provider>
+            <MainPanel />
+            <CustomPhaseTool />
+          </SubLaneGroupMaskContextClipboard.Provider>
+        </EdgeGroupMaskContextClipboard.Provider>
       </LocalisationContext.Provider>
     </CityConfigurationContext.Provider>
   );
