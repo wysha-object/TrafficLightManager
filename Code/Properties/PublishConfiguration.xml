@@ -53,7 +53,7 @@ Wherever you report an issue, please make sure to describe it clearly.
     <!--Version of the mod-->
     <ModVersion Value="1.4.7" />
     <!--Recommended version of the base game to use the mod-->
-    <GameVersion Value="1.5.*" />
+    <GameVersion Value="1.*" />
     <!--Dependency for the mod, can be set multiple times-->
     <Dependency Id="" />
     <!--Change log for new version. Single line or multi line. Supports minimal markdown subset-->
