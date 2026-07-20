@@ -5,6 +5,8 @@ using Colossal.Entities;
 using Colossal.UI.Binding;
 using Game.Buildings;
 using Game.Net;
+using Game.Rendering;
+using Game.Tools;
 using Game.UI;
 using Newtonsoft.Json;
 using TrafficLightManager.Code.Components;
@@ -190,7 +192,15 @@ public partial class UISystem : UISystemBase
                     {
                         foreach (var trafficLight in trafficLightsMembers)
                         {
-                            members.Add(new { entityIndex = trafficLight.m_Entity.Index });
+                            object? entityPosition = EntityManager.TryGetComponent<Node>(trafficLight.m_Entity, out var node)
+                                ? new
+                                {
+                                    x = node.m_Position.x,
+                                    y = node.m_Position.y,
+                                    z = node.m_Position.z,
+                                }
+                                : null;
+                            members.Add(new { entityIndex = trafficLight.m_Entity.Index, position = entityPosition });
                         }
                     }
                     return JsonConvert.SerializeObject(members);
@@ -530,6 +540,30 @@ public partial class UISystem : UISystemBase
                         return destIndex;
                     }
                     return -1;
+                }
+            )
+        );
+        AddBinding(
+            new CallBinding<string, string>(
+                "TrafficLightManager",
+                "CallLookAt",
+                (input) =>
+                {
+                    var definition = new
+                    {
+                        x = 0f,
+                        y = 0f,
+                        z = 0f,
+                        distance = 0f,
+                    };
+                    var value = JsonConvert.DeserializeAnonymousType(input, definition);
+                    var pivot = new float3(value.x, value.y, value.z);
+                    var zoom = value.distance;
+
+                    var cameraUpdateSystem = World.GetOrCreateSystemManaged<CameraUpdateSystem>();
+                    cameraUpdateSystem.activeCameraController.pivot = pivot;
+                    cameraUpdateSystem.activeCameraController.zoom = zoom;
+                    return "";
                 }
             )
         );

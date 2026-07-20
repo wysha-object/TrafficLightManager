@@ -47,7 +47,7 @@ const EndPhaseButton = (props: { index: number, disabled?: boolean }) => {
   };
   const { t } = useTranslate();
   return (
-    <Row hoverEffect={!props.disabled}>
+    <Row>
       <Button
         label={props.disabled ? t("CustomPhaseEditor.PhaseEndRequested") : t("CustomPhaseEditor.EndPhasePrematurely")}
         disabled={props.disabled}

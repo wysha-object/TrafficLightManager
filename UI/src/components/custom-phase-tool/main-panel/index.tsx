@@ -72,7 +72,7 @@ const AddButton = () => {
 
 const ManualControlButton = (props: { onClick: () => void }) => {
   return (
-    <Row hoverEffect={true}>
+    <Row>
       <Button label="CustomPhaseEditor.ManualControl" onClick={props.onClick} />
     </Row>
   );
@@ -139,7 +139,13 @@ export default function MainPanel() {
         <Scrollable contentStyle={ItemContainerStyle}>
           {
             trafficLightsMembers.map(
-              (item, _) => <Row key={item.entityIndex}>#{item.entityIndex}</Row>
+              (item, _) => <Row
+                key={item.entityIndex}
+                onClick={() => item.position && call("TrafficLightManager", "CallLookAt", JSON.stringify({ x: item.position.x, y: item.position.y, z: item.position.z, distance: 200 }))}
+                hoverEffect={true}
+              >
+                #{item.entityIndex}
+              </Row>
             )
           }
         </Scrollable>
