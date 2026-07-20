@@ -1,6 +1,10 @@
 {
     "AllowTurningOnRed": "容許於紅燈時轉彎",
     "CanaryBuildWarning": "請注意, 你正在使用 Canary 版. 此版本僅供測試, 很可能導致遊戲崩潰或存檔損壞. 請勿用於一般遊玩",
+    "ClipboardPanel.DisplayPhaseCountTooltip": "控制每条保存的相位配置显示几个相位的状态",
+    "ClipboardPanel.EdgeHistory": "边",
+    "ClipboardPanel.SubLaneHistory": "车道",
+    "ClipboardPanel.Title": "剪贴板",
     "Close": "關閉",
     "CustomPedestrianDurationMultiplier": "行人通行時段長短",
     "CustomPedestrianDurationMultiplierSuffix": "倍",

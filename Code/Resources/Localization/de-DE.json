@@ -1,6 +1,10 @@
 {
     "AllowTurningOnRed": "Abbiegen bei Rot erlauben",
     "CanaryBuildWarning": "Bitte beachte, dass du eine Canary-Version verwendest. Diese Version ist nur zum Testen gedacht und kann eher zu Spielabstuerzen oder beschaedigten Spielstaenden fuehren. Bitte verwende sie nicht fuer normales Spielen",
+    "ClipboardPanel.DisplayPhaseCountTooltip": "Controls how many phases are displayed for each saved phase configuration",
+    "ClipboardPanel.EdgeHistory": "Edge",
+    "ClipboardPanel.SubLaneHistory": "SubLane",
+    "ClipboardPanel.Title": "Clipboard",
     "Close": "Schliessen",
     "CustomPedestrianDurationMultiplier": "Dauer der Fussgaengerphase",
     "CustomPedestrianDurationMultiplierSuffix": "x",

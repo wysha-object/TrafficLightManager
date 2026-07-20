@@ -1,6 +1,10 @@
 {
     "AllowTurningOnRed": "Consenti svolta con rosso",
     "CanaryBuildWarning": "Nota: stai usando una build Canary. Questa versione e solo per test e puo causare crash del gioco o salvataggi danneggiati. Non usarla per il gioco normale",
+    "ClipboardPanel.DisplayPhaseCountTooltip": "Controls how many phases are displayed for each saved phase configuration",
+    "ClipboardPanel.EdgeHistory": "Edge",
+    "ClipboardPanel.SubLaneHistory": "SubLane",
+    "ClipboardPanel.Title": "Clipboard",
     "Close": "Chiudi",
     "CustomPedestrianDurationMultiplier": "Durata fase pedonale",
     "CustomPedestrianDurationMultiplierSuffix": "x",

@@ -7,7 +7,7 @@ const Container = styled.div`
   color: var(--accentColorNormal);
   font-size: 14rem;
   padding: 6rem 10rem;
-  min-height: 36rem;
+  height: 2em;
   display: flex;
   flex-direction: row;
   align-items: center;

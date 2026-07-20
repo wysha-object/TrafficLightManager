@@ -5,11 +5,11 @@ import { call } from 'cs2/api';
 
 import { EdgeGroupMaskOptions } from "@/constants";
 
-import Lane from './lane';
 import LinkVariant from '@/components/common/icons/link-variant';
 import { SubLaneGroupMaskContextClipboard } from '@/context';
 import Copy from '../common/icons/copy';
 import Paste from '../common/icons/paste';
+import SublaneViewer from '../common/sublane-viewer';
 
 const Container = styled.div<{ translateY: string }>`
   position: fixed;
@@ -29,28 +29,6 @@ const Content = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-`;
-
-const LaneContainer = styled.div`
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
-  align-items: flex-start;
-  align-content: center;
-  margin: 0 0 6rem 0;
-`;
-
-const Column = styled.div`
-  padding: 0rem;
-  display: flex;
-  flex: 0 1 auto;
-`;
-
-const Divider = styled.div`
-  height: 100%;
-  width: 0rem;
-  border: 1rem solid rgba(255, 255, 255, 0.1);
-  margin: 0 6rem;
 `;
 
 const HorizontalDivider = styled.div`
@@ -80,104 +58,8 @@ const SmallIconStyle = {
   margin: "2rem"
 };
 
-function GetCustomPhaseLane(subLane: SubLaneInfo, index: number, type: CustomPhaseLaneType): CustomPhaseLane {
-  const result: CustomPhaseLane = {
-    type: type,
-    left: "stop",
-    straight: "stop",
-    right: "stop",
-    uTurn: "stop",
-    all: "stop"
-  }
-  if (type == "carLane") {
-    result.left = (subLane.m_SubLaneGroupMask.m_Car.m_Left.m_GoGroupMask & (1 << index)) != 0 ? "go" : result.left;
-    result.straight = (subLane.m_SubLaneGroupMask.m_Car.m_Straight.m_GoGroupMask & (1 << index)) != 0 ? "go" : result.straight;
-    result.right = (subLane.m_SubLaneGroupMask.m_Car.m_Right.m_GoGroupMask & (1 << index)) != 0 ? "go" : result.right;
-    result.uTurn = (subLane.m_SubLaneGroupMask.m_Car.m_UTurn.m_GoGroupMask & (1 << index)) != 0 ? "go" : result.uTurn;
-    result.left = (subLane.m_SubLaneGroupMask.m_Car.m_Left.m_YieldGroupMask & (1 << index)) != 0 ? "yield" : result.left;
-    result.straight = (subLane.m_SubLaneGroupMask.m_Car.m_Straight.m_YieldGroupMask & (1 << index)) != 0 ? "yield" : result.straight;
-    result.right = (subLane.m_SubLaneGroupMask.m_Car.m_Right.m_YieldGroupMask & (1 << index)) != 0 ? "yield" : result.right;
-    result.uTurn = (subLane.m_SubLaneGroupMask.m_Car.m_UTurn.m_YieldGroupMask & (1 << index)) != 0 ? "yield" : result.uTurn;
-    result.left = subLane.m_CarLaneLeftCount + subLane.m_TrackLaneLeftCount <= 0 ? "none" : result.left;
-    result.straight = subLane.m_CarLaneStraightCount + subLane.m_TrackLaneStraightCount <= 0 ? "none" : result.straight;
-    result.right = subLane.m_CarLaneRightCount + subLane.m_TrackLaneRightCount <= 0 ? "none" : result.right;
-    result.uTurn = subLane.m_CarLaneUTurnCount <= 0 ? "none" : result.uTurn;
-  }
-  if (type == "trackLane") {
-    result.left = (subLane.m_SubLaneGroupMask.m_Track.m_Left.m_GoGroupMask & (1 << index)) != 0 ? "go" : result.left;
-    result.straight = (subLane.m_SubLaneGroupMask.m_Track.m_Straight.m_GoGroupMask & (1 << index)) != 0 ? "go" : result.straight;
-    result.right = (subLane.m_SubLaneGroupMask.m_Track.m_Right.m_GoGroupMask & (1 << index)) != 0 ? "go" : result.right;
-    result.left = (subLane.m_SubLaneGroupMask.m_Track.m_Left.m_YieldGroupMask & (1 << index)) != 0 ? "yield" : result.left;
-    result.straight = (subLane.m_SubLaneGroupMask.m_Track.m_Straight.m_YieldGroupMask & (1 << index)) != 0 ? "yield" : result.straight;
-    result.right = (subLane.m_SubLaneGroupMask.m_Track.m_Right.m_YieldGroupMask & (1 << index)) != 0 ? "yield" : result.right;
-    result.left = subLane.m_TrackLaneLeftCount <= 0 ? "none" : result.left;
-    result.straight = subLane.m_TrackLaneStraightCount <= 0 ? "none" : result.straight;
-    result.right = subLane.m_TrackLaneRightCount <= 0 ? "none" : result.right;
-    result.uTurn = "none";
-  }
-  if (type == "pedestrianLaneStopLine") {
-    result.all = (subLane.m_SubLaneGroupMask.m_Pedestrian.m_GoGroupMask & (1 << index)) != 0 ? "go" : result.all;
-  }
-  return result;
-}
-
-function SetBit(input: number, index: number, value: number) {
-  return ((input & (~(1 << index))) | (value << index));
-}
-
 export default function SubLanePanel(props: { edge: EdgeInfo, subLane: SubLaneInfo, index: number, position: ScreenPoint }) {
-  const { data: clipboardData, setData: setClipboardData } = useContext(SubLaneGroupMaskContextClipboard.context);
-  const clickHandler = useCallback((index: number, type: CustomPhaseLaneType, direction: CustomPhaseLaneDirection, currentSignal: CustomPhaseSignalState) => {
-    let newSignal = currentSignal == "stop" ? "go" : (currentSignal == "go" ? "yield" : "stop");
-    const newGroupMask: SubLaneGroupMask = JSON.parse(JSON.stringify(props.subLane.m_SubLaneGroupMask));
-    if (type == "carLane") {
-      if (direction == "left") {
-        if (props.subLane.m_CarLaneLeftCount == 0) {
-          newSignal = currentSignal == "stop" ? "go" : "stop";
-        }
-        newGroupMask.m_Car.m_Left.m_GoGroupMask = SetBit(newGroupMask.m_Car.m_Left.m_GoGroupMask, index, newSignal != "stop" ? 1 : 0);
-        newGroupMask.m_Car.m_Left.m_YieldGroupMask = SetBit(newGroupMask.m_Car.m_Left.m_YieldGroupMask, index, newSignal == "yield" ? 1 : 0);
-      }
-      if (direction == "straight") {
-        if (props.subLane.m_CarLaneStraightCount == 0) {
-          newSignal = currentSignal == "stop" ? "go" : "stop";
-        }
-        newGroupMask.m_Car.m_Straight.m_GoGroupMask = SetBit(newGroupMask.m_Car.m_Straight.m_GoGroupMask, index, newSignal != "stop" ? 1 : 0);
-        newGroupMask.m_Car.m_Straight.m_YieldGroupMask = SetBit(newGroupMask.m_Car.m_Straight.m_YieldGroupMask, index, newSignal == "yield" ? 1 : 0);
-      }
-      if (direction == "right") {
-        if (props.subLane.m_CarLaneRightCount == 0) {
-          newSignal = currentSignal == "stop" ? "go" : "stop";
-        }
-        newGroupMask.m_Car.m_Right.m_GoGroupMask = SetBit(newGroupMask.m_Car.m_Right.m_GoGroupMask, index, newSignal != "stop" ? 1 : 0);
-        newGroupMask.m_Car.m_Right.m_YieldGroupMask = SetBit(newGroupMask.m_Car.m_Right.m_YieldGroupMask, index, newSignal == "yield" ? 1 : 0);
-      }
-      if (direction == "uTurn") {
-        newGroupMask.m_Car.m_UTurn.m_GoGroupMask = SetBit(newGroupMask.m_Car.m_UTurn.m_GoGroupMask, index, newSignal != "stop" ? 1 : 0);
-        newGroupMask.m_Car.m_UTurn.m_YieldGroupMask = SetBit(newGroupMask.m_Car.m_UTurn.m_YieldGroupMask, index, newSignal == "yield" ? 1 : 0);
-      }
-    }
-    if (type == "trackLane") {
-      newSignal = currentSignal == "stop" ? "go" : "stop";
-      if (direction == "left") {
-        newGroupMask.m_Track.m_Left.m_GoGroupMask = SetBit(newGroupMask.m_Track.m_Left.m_GoGroupMask, index, newSignal != "stop" ? 1 : 0);
-        newGroupMask.m_Track.m_Left.m_YieldGroupMask = SetBit(newGroupMask.m_Track.m_Left.m_YieldGroupMask, index, newSignal == "yield" ? 1 : 0);
-      }
-      if (direction == "straight") {
-        newGroupMask.m_Track.m_Straight.m_GoGroupMask = SetBit(newGroupMask.m_Track.m_Straight.m_GoGroupMask, index, newSignal != "stop" ? 1 : 0);
-        newGroupMask.m_Track.m_Straight.m_YieldGroupMask = SetBit(newGroupMask.m_Track.m_Straight.m_YieldGroupMask, index, newSignal == "yield" ? 1 : 0);
-      }
-      if (direction == "right") {
-        newGroupMask.m_Track.m_Right.m_GoGroupMask = SetBit(newGroupMask.m_Track.m_Right.m_GoGroupMask, index, newSignal != "stop" ? 1 : 0);
-        newGroupMask.m_Track.m_Right.m_YieldGroupMask = SetBit(newGroupMask.m_Track.m_Right.m_YieldGroupMask, index, newSignal == "yield" ? 1 : 0);
-      }
-    }
-    if (type == "pedestrianLaneStopLine") {
-      newSignal = currentSignal == "stop" ? "go" : "stop";
-      newGroupMask.m_Pedestrian.m_GoGroupMask = SetBit(newGroupMask.m_Pedestrian.m_GoGroupMask, index, newSignal != "stop" ? 1 : 0);
-    }
-    call("TrafficLightManager", "CallUpdateSubLaneGroupMask", JSON.stringify({ groupMaskArray: [newGroupMask], entity: props.edge.m_TrafficLightsEntity }));
-  }, [props.subLane]);
+  const clipboard = useContext(SubLaneGroupMaskContextClipboard.context);
 
   const linkHandler = useCallback(() => {
     const newGroupMask: EdgeGroupMask = JSON.parse(JSON.stringify(props.edge.m_EdgeGroupMask));
@@ -201,39 +83,27 @@ export default function SubLanePanel(props: { edge: EdgeInfo, subLane: SubLaneIn
   return (
     <Container ref={containerRef} translateY={carLaneCount + trackLaneCount > 0 ? "0" : "-100%"}>
       <Content>
-        <LaneContainer>
-          {carLaneCount > 0 && <>
-            <Column>
-              <Lane
-                data={GetCustomPhaseLane(props.subLane, props.index, "carLane")}
-                index={props.index}
-                showIcon={true}
-                onClick={clickHandler}
-              />
-            </Column>
-            {trackLaneCount > 0 && <Divider />}
-          </>}
-          {trackLaneCount > 0 && <>
-            <Column>
-              <Lane
-                data={GetCustomPhaseLane(props.subLane, props.index, "trackLane")}
-                index={props.index}
-                showIcon={true}
-                onClick={clickHandler}
-              />
-            </Column>
-          </>}
-          {props.subLane.m_PedestrianLaneCount > 0 && <>
-            <Column>
-              <Lane
-                data={GetCustomPhaseLane(props.subLane, props.index, "pedestrianLaneStopLine")}
-                index={props.index}
-                showIcon={false}
-                onClick={clickHandler}
-              />
-            </Column>
-          </>}
-        </LaneContainer>
+        <SublaneViewer
+          subLane={props.subLane.m_SubLaneGroupMask}
+          displayOptions={{
+            carLane: {
+              left: props.subLane.m_CarLaneLeftCount > 0,
+              straight: props.subLane.m_CarLaneStraightCount > 0,
+              right: props.subLane.m_CarLaneRightCount > 0,
+              uTurn: props.subLane.m_CarLaneUTurnCount > 0,
+            },
+            trackLane: {
+              left: props.subLane.m_TrackLaneLeftCount > 0,
+              straight: props.subLane.m_TrackLaneStraightCount > 0,
+              right: props.subLane.m_TrackLaneRightCount > 0
+            },
+            pedestrianLaneStopLine: props.subLane.m_PedestrianLaneCount > 0
+          }}
+          index={props.index}
+          subLaneUpdateHandler={
+            (newGroupMask) => call("TrafficLightManager", "CallUpdateSubLaneGroupMask", JSON.stringify({ groupMaskArray: [newGroupMask], entity: props.edge.m_TrafficLightsEntity }))
+          }
+        />
         <HorizontalDivider />
         <IconContainer><LinkVariant style={BigIconStyle} onClick={linkHandler} /></IconContainer>
         <div style={{ display: "flex", flexDirection: "row", justifyContent: "center", alignItems: "center" }}>
@@ -241,19 +111,20 @@ export default function SubLanePanel(props: { edge: EdgeInfo, subLane: SubLaneIn
             <Copy
               style={SmallIconStyle}
               onClick={() => {
-                setClipboardData(props.subLane.m_SubLaneGroupMask);
+                clipboard.save(props.subLane.m_SubLaneGroupMask);
               }}
             />
           </IconContainer>
           <IconContainer>
             <Paste
-              style={{ ...SmallIconStyle, "opacity": clipboardData !== undefined ? 1 : 0.5 }}
+              style={{ ...SmallIconStyle, "opacity": clipboard.selectedIndex >= 0 ? 1 : 0.5 }}
               onClick={() => {
-                if (clipboardData !== undefined) {
+                if (clipboard.selectedIndex >= 0) {
+                  const selectedData = clipboard.history[clipboard.selectedIndex];
                   const newGroupMask: SubLaneGroupMask = JSON.parse(JSON.stringify(props.subLane.m_SubLaneGroupMask));
-                  newGroupMask.m_Car = clipboardData.m_Car;
-                  newGroupMask.m_Track = clipboardData.m_Track;
-                  newGroupMask.m_Pedestrian = clipboardData.m_Pedestrian;
+                  newGroupMask.m_Car = selectedData.m_Car;
+                  newGroupMask.m_Track = selectedData.m_Track;
+                  newGroupMask.m_Pedestrian = selectedData.m_Pedestrian;
                   call("TrafficLightManager", "CallUpdateEdgeGroupMask", JSON.stringify({ groupMaskArray: [newGroupMask], entity: props.edge.m_TrafficLightsEntity }));
                 }
               }}

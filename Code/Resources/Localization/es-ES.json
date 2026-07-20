@@ -1,6 +1,10 @@
 {
     "AllowTurningOnRed": "Permitir giro en rojo",
     "CanaryBuildWarning": "Ten en cuenta que estas usando una version Canary. Esta version es solo para pruebas y puede provocar fallos del juego o corrupcion de partidas guardadas. No uses esta version para juego normal",
+    "ClipboardPanel.DisplayPhaseCountTooltip": "Controls how many phases are displayed for each saved phase configuration",
+    "ClipboardPanel.EdgeHistory": "Edge",
+    "ClipboardPanel.SubLaneHistory": "SubLane",
+    "ClipboardPanel.Title": "Clipboard",
     "Close": "Cerrar",
     "CustomPedestrianDurationMultiplier": "Duracion de la fase peatonal",
     "CustomPedestrianDurationMultiplierSuffix": "x",

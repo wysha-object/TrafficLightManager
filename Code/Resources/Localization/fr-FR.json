@@ -1,6 +1,10 @@
 {
     "AllowTurningOnRed": "Autoriser le virage au rouge",
     "CanaryBuildWarning": "Veuillez noter que vous utilisez une version Canary. Cette version est reservee aux tests et peut provoquer des plantages du jeu ou des sauvegardes corrompues. N utilisez pas cette version pour jouer normalement",
+    "ClipboardPanel.DisplayPhaseCountTooltip": "Controls how many phases are displayed for each saved phase configuration",
+    "ClipboardPanel.EdgeHistory": "Edge",
+    "ClipboardPanel.SubLaneHistory": "SubLane",
+    "ClipboardPanel.Title": "Clipboard",
     "Close": "Fermer",
     "CustomPedestrianDurationMultiplier": "Duree de la phase pietonne",
     "CustomPedestrianDurationMultiplierSuffix": "x",

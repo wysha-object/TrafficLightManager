@@ -1,6 +1,10 @@
 {
     "AllowTurningOnRed": "적신호 시 회전 허용",
     "CanaryBuildWarning": "현재 Canary 빌드를 사용 중입니다. 이 버전은 테스트 전용이며 게임 충돌이나 저장 파일 손상을 일으킬 수 있습니다. 일반 플레이에는 사용하지 마십시오",
+    "ClipboardPanel.DisplayPhaseCountTooltip": "Controls how many phases are displayed for each saved phase configuration",
+    "ClipboardPanel.EdgeHistory": "Edge",
+    "ClipboardPanel.SubLaneHistory": "SubLane",
+    "ClipboardPanel.Title": "Clipboard",
     "Close": "닫기",
     "CustomPedestrianDurationMultiplier": "보행자 단계 지속 시간",
     "CustomPedestrianDurationMultiplierSuffix": "배",

@@ -1,6 +1,10 @@
 {
     "AllowTurningOnRed": "Allow Turning on Red",
     "CanaryBuildWarning": "Please note that you are using a canary build, which is more likely to contain game-breaking or save-breaking bugs and is strictly for playtesting only. DO NOT use this build for normal gameplay",
+    "ClipboardPanel.DisplayPhaseCountTooltip": "Controls how many phases are displayed for each saved phase configuration",
+    "ClipboardPanel.EdgeHistory": "Edge",
+    "ClipboardPanel.SubLaneHistory": "SubLane",
+    "ClipboardPanel.Title": "Clipboard",
     "Close": "Close",
     "CustomPedestrianDurationMultiplier": "Pedestrian Phase Duration",
     "CustomPedestrianDurationMultiplierSuffix": "x",

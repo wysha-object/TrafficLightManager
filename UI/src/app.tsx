@@ -4,6 +4,7 @@ import { CityConfigurationContext, defaultCityConfiguration, EdgeGroupMaskContex
 
 import MainPanel from "./components/main-panel";
 import CustomPhaseTool from "./components/custom-phase-tool";
+import ClipboardPanel from "./components/custom-phase-tool/clipboard-panel";
 
 export default function App() {
   let localisation = JSON.parse(useValue(bindValue("TrafficLightManager", "GetLocalisation")));
@@ -18,6 +19,7 @@ export default function App() {
           <SubLaneGroupMaskContextClipboard.Provider>
             <MainPanel />
             <CustomPhaseTool />
+            <ClipboardPanel />
           </SubLaneGroupMaskContextClipboard.Provider>
         </EdgeGroupMaskContextClipboard.Provider>
       </LocalisationContext.Provider>

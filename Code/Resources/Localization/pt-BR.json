@@ -1,6 +1,10 @@
 {
     "AllowTurningOnRed": "Permitir conversao no vermelho",
     "CanaryBuildWarning": "Atencao: voce esta usando uma versao Canary. Esta versao e apenas para testes e pode causar travamentos do jogo ou corrupcao de salvamentos. Nao use esta versao para jogar normalmente",
+    "ClipboardPanel.DisplayPhaseCountTooltip": "Controls how many phases are displayed for each saved phase configuration",
+    "ClipboardPanel.EdgeHistory": "Edge",
+    "ClipboardPanel.SubLaneHistory": "SubLane",
+    "ClipboardPanel.Title": "Clipboard",
     "Close": "Fechar",
     "CustomPedestrianDurationMultiplier": "Duracao da fase de pedestres",
     "CustomPedestrianDurationMultiplierSuffix": "x",

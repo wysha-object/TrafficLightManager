@@ -1,6 +1,10 @@
 {
     "AllowTurningOnRed": "Разрешить поворот на красный",
     "CanaryBuildWarning": "Обратите внимание: вы используете Canary-сборку. Эта версия предназначена только для тестирования и может вызывать сбои игры или повреждение сохранений. Не используйте ее для обычной игры",
+    "ClipboardPanel.DisplayPhaseCountTooltip": "Controls how many phases are displayed for each saved phase configuration",
+    "ClipboardPanel.EdgeHistory": "Edge",
+    "ClipboardPanel.SubLaneHistory": "SubLane",
+    "ClipboardPanel.Title": "Clipboard",
     "Close": "Закрыть",
     "CustomPedestrianDurationMultiplier": "Длительность пешеходной фазы",
     "CustomPedestrianDurationMultiplierSuffix": "x",

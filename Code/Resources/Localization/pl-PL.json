@@ -1,6 +1,10 @@
 {
     "AllowTurningOnRed": "Zezwalaj na skret na czerwonym",
     "CanaryBuildWarning": "Uwaga: uzywasz wersji Canary. Ta wersja sluzy tylko do testow i moze powodowac awarie gry lub uszkodzenie zapisu. Nie uzywaj jej do normalnej rozgrywki",
+    "ClipboardPanel.DisplayPhaseCountTooltip": "Controls how many phases are displayed for each saved phase configuration",
+    "ClipboardPanel.EdgeHistory": "Edge",
+    "ClipboardPanel.SubLaneHistory": "SubLane",
+    "ClipboardPanel.Title": "Clipboard",
     "Close": "Zamknij",
     "CustomPedestrianDurationMultiplier": "Czas trwania fazy pieszych",
     "CustomPedestrianDurationMultiplierSuffix": "x",

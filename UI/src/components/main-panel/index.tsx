@@ -21,6 +21,8 @@ const HeaderContainer = styled.div`
   overflow: hidden;
   margin: -10rem 0 0 -10rem;
   padding: 10rem 10rem 6rem 10rem;
+  z-index: 1000;
+  border-radius: 4rem;
 `;
 
 const Container = styled.div`
@@ -45,8 +47,8 @@ const BackButton = () => {
 export default function MainPanel() {
   const [showPanel, setShowPanel] = useState(false);
 
-  const [top, setTop] = useState(-999999);
-  const [left, setLeft] = useState(-999999);
+  const [top, setTop] = useState(-1000);
+  const [left, setLeft] = useState(-1000);
   const [dragging, setDragging] = useState(false);
   const [recalc, setRecalc] = useState({});
 
@@ -113,7 +115,7 @@ export default function MainPanel() {
     if (container && toolSideColumn) {
       const containerRect = container.getBoundingClientRect();
       const toolSideColumnRect = toolSideColumn.getBoundingClientRect();
-      if (top > -999999 && left > -999999) {
+      if (top > -1000 && left > -1000) {
         result.top = Math.min(top, toolSideColumnRect.top - 200);
         result.left = Math.min(left, document.body.clientWidth - containerRect.width);
         result.top = Math.max(result.top, 0);

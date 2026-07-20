@@ -317,13 +317,17 @@ public partial class UISystem : UISystemBase
         switch (toolState)
         {
             case ToolState.Disabled:
-                m_ToolSystem.Disable();
                 m_SelectedTrafficLightGroupEntity = Entity.Null;
+                m_EditingPhaseIndexBinding.Update(-1);
+                m_ToolSystem.Disable();
                 break;
             case ToolState.ChooseGroup:
             case ToolState.AddTrafficLights:
             case ToolState.RemoveTrafficLights:
             case ToolState.Choosed:
+                m_EditingPhaseIndexBinding.Update(-1);
+                m_ToolSystem.Enable();
+                break;
             case ToolState.Editing:
                 m_ToolSystem.Enable();
                 break;
