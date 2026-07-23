@@ -41,7 +41,7 @@ public partial class UISystem : UISystemBase
 
     private Tool.ToolSystem m_ToolSystem;
 
-    private Update.ModificationUpdateSystem m_ModificationUpdateSystem;
+    private ModificationUpdateSystem m_ModificationUpdateSystem;
 
     private SimulationUpdateSystem m_SimulationUpdateSystem;
 
@@ -142,9 +142,10 @@ public partial class UISystem : UISystemBase
         localisationsHelper.AddToDictionary(GameManager.instance.localizationManager.activeDictionary);
         localisationsHelper.UpdateActiveDictionary();
 
-        if (m_LocalisationBinding != null)
+        UISystem uiSystem = Mod.m_World.GetOrCreateSystemManaged<UISystem>();
+        if (uiSystem.m_LocalisationBinding != null)
         {
-            m_LocalisationBinding.Update();
+            uiSystem.m_LocalisationBinding.Update();
         }
     }
 
@@ -318,16 +319,12 @@ public partial class UISystem : UISystemBase
         {
             case ToolState.Disabled:
                 m_SelectedTrafficLightGroupEntity = Entity.Null;
-                m_EditingPhaseIndexBinding.Update(-1);
                 m_ToolSystem.Disable();
                 break;
             case ToolState.ChooseGroup:
             case ToolState.AddTrafficLights:
             case ToolState.RemoveTrafficLights:
             case ToolState.Choosed:
-                m_EditingPhaseIndexBinding.Update(-1);
-                m_ToolSystem.Enable();
-                break;
             case ToolState.Editing:
                 m_ToolSystem.Enable();
                 break;

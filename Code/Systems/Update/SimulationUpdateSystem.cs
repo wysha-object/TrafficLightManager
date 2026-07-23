@@ -7,15 +7,15 @@ namespace TrafficLightManager.Code.Systems.Update;
 
 public partial class SimulationUpdateSystem : GameSystemBase
 {
-    private Game.Simulation.SimulationSystem m_SimulationSystem;
+    private SimulationSystem m_SimulationSystem;
 
-    private TrafficLightManager.Code.Systems.UI.UISystem m_UISystem;
+    private UI.UISystem m_UISystem;
 
     protected override void OnCreate()
     {
         base.OnCreate();
-        m_SimulationSystem = World.GetOrCreateSystemManaged<Game.Simulation.SimulationSystem>();
-        m_UISystem = World.GetOrCreateSystemManaged<TrafficLightManager.Code.Systems.UI.UISystem>();
+        m_SimulationSystem = World.GetOrCreateSystemManaged<SimulationSystem>();
+        m_UISystem = World.GetOrCreateSystemManaged<UI.UISystem>();
     }
 
     protected override void OnUpdate()

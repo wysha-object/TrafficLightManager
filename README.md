@@ -16,10 +16,10 @@
 </p>
 
 ## Features
- 
-* Set traffic lights to various predefined signal modes
 
-* Create fully customized signal phases
+- Set traffic lights to various predefined signal modes
+
+- Create fully customized signal phases
 
 ## Support
 

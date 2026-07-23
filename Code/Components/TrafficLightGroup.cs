@@ -1,6 +1,5 @@
 ﻿using Colossal.Serialization.Entities;
 using Game.Net;
-using Unity.Collections;
 using Unity.Entities;
 
 namespace TrafficLightManager.Code.Components
@@ -21,9 +20,6 @@ namespace TrafficLightManager.Code.Components
 
         public byte m_Status;
 
-        // Schema 3
-        public FixedString64Bytes m_Name;
-
         public void Deserialize<TReader>(TReader reader)
             where TReader : IReader
         {
@@ -43,10 +39,9 @@ namespace TrafficLightManager.Code.Components
                 reader.Read(out m_TargetDuration);
             }
 
-            if (schemaVersion >= 3)
+            if (schemaVersion == 3)
             {
-                reader.Read(out string name);
-                m_Name = name;
+                reader.Read(out string _);
             }
         }
 
@@ -61,7 +56,6 @@ namespace TrafficLightManager.Code.Components
             writer.Write(m_NextSignalGroup);
             writer.Write(m_Timer);
             writer.Write(m_TargetDuration);
-            writer.Write(m_Name.ToString());
         }
     }
 }

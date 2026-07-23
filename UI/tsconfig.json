@@ -1,12 +1,13 @@
 {
   "compilerOptions": {
     "ignoreDeprecations": "6.0",
-    "jsx":"react-jsx",
+    "jsx": "react-jsx",
     "target": "ESNext",
     "module": "ESNext",
     "moduleResolution": "Node",
     "isolatedModules": true,
     "strict": true,
+    "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true,
     "esModuleInterop": true,
@@ -16,8 +17,7 @@
     "typeRoots": ["types"],
     "resolveJsonModule": true,
     "paths": {
-      "@/*": ["*"],
       "mod.json": ["../mod.json"]
     }
-  },
-} 
+  }
+}

@@ -1,12 +1,9 @@
-using System;
 using System.Collections.Generic;
 using cohtml.Net;
 using Colossal.Entities;
 using Colossal.UI.Binding;
-using Game.Buildings;
 using Game.Net;
 using Game.Rendering;
-using Game.Tools;
 using Game.UI;
 using Newtonsoft.Json;
 using TrafficLightManager.Code.Components;
@@ -15,12 +12,17 @@ using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 namespace TrafficLightManager.Code.Systems.UI;
 
 public partial class UISystem : UISystemBase
 {
-    private static GetterValueBinding<string> m_LocalisationBinding;
+    private ValueBinding<int> m_ToolStateBinding;
+
+    private ValueBinding<int> m_DisplayPhaseIndexBinding;
+
+    private GetterValueBinding<string> m_LocalisationBinding;
 
     private GetterValueBinding<string> m_CityConfigurationBinding;
 
@@ -40,16 +42,11 @@ public partial class UISystem : UISystemBase
 
     private GetterValueBinding<string> m_SystemDefaultTemplateBinding;
 
-    private ValueBinding<UITypes.ToolTooltipMessage[]> m_ToolTooltipMessageBinding;
-
-    private ValueBinding<int> m_ToolStateBinding;
-
-    private ValueBinding<int> m_DisplayPhaseIndexBinding;
-
-    private ValueBinding<int> m_EditingPhaseIndexBinding;
-
     private void AddUIBindings()
     {
+        AddBinding(m_ToolStateBinding = new ValueBinding<int>("TrafficLightManager", "GetToolState", (int)ToolState.Disabled));
+        AddBinding(m_DisplayPhaseIndexBinding = new ValueBinding<int>("TrafficLightManager", "GetDisplayPhaseIndex", -1));
+
         AddBinding(
             m_LocalisationBinding = new GetterValueBinding<string>(
                 "TrafficLightManager",
@@ -207,18 +204,6 @@ public partial class UISystem : UISystemBase
                 }
             )
         );
-
-        AddBinding(
-            m_ToolTooltipMessageBinding = new ValueBinding<UITypes.ToolTooltipMessage[]>(
-                "TrafficLightManager",
-                "GetToolTooltipMessage",
-                [],
-                new ListWriter<UITypes.ToolTooltipMessage>(new ValueWriter<UITypes.ToolTooltipMessage>())
-            )
-        );
-        AddBinding(m_ToolStateBinding = new ValueBinding<int>("TrafficLightManager", "GetToolState", (int)ToolState.Disabled));
-        AddBinding(m_DisplayPhaseIndexBinding = new ValueBinding<int>("TrafficLightManager", "GetDisplayPhaseIndex", -1));
-        AddBinding(m_EditingPhaseIndexBinding = new ValueBinding<int>("TrafficLightManager", "GetEditingPhaseIndex", -1));
         AddBinding(
             m_SettingsBinding = new GetterValueBinding<string>(
                 "TrafficLightManager",
@@ -259,9 +244,254 @@ public partial class UISystem : UISystemBase
         );
 
         AddBinding(
+            new CallBinding<int, string>(
+                "TrafficLightManager",
+                "SetToolState",
+                (inputValue) =>
+                {
+                    SetToolState((ToolState)inputValue);
+                    return "";
+                }
+            )
+        );
+        AddBinding(
+            new CallBinding<int, string>(
+                "TrafficLightManager",
+                "SetDisplayPhaseIndex",
+                (index) =>
+                {
+                    m_DisplayPhaseIndexBinding.Update(index);
+                    return "";
+                }
+            )
+        );
+        AddBinding(new TriggerBinding<int>("TrafficLightManager", "SetManualPhaseIndex", UpdateManualPhaseIndex));
+        AddBinding(
             new CallBinding<string, string>(
                 "TrafficLightManager",
-                "CallAddCustomPhase",
+                "SetCustomPhaseData",
+                (inputJsonString) =>
+                {
+                    var inputValue = JsonConvert.DeserializeObject<UITypes.UpdateCustomPhaseData>(inputJsonString);
+                    if (!m_SelectedTrafficLightGroupEntity.Equals(Entity.Null))
+                    {
+                        DynamicBuffer<CustomPhaseData> customPhaseDataBuffer;
+                        if (!EntityManager.TryGetBuffer(m_SelectedTrafficLightGroupEntity, false, out customPhaseDataBuffer))
+                        {
+                            customPhaseDataBuffer = EntityManager.AddBuffer<CustomPhaseData>(m_SelectedTrafficLightGroupEntity);
+                        }
+
+                        int index = inputValue.index;
+                        if (index < 0 || index >= customPhaseDataBuffer.Length)
+                        {
+                            return "";
+                        }
+                        var newValue = customPhaseDataBuffer[index];
+
+                        if (inputValue.key == "MinimumDuration")
+                        {
+                            newValue.m_MinimumDuration = ushort.Parse(inputValue.value);
+                            if (newValue.m_MinimumDuration > newValue.m_MaximumDuration)
+                            {
+                                newValue.m_MaximumDuration = newValue.m_MinimumDuration;
+                            }
+                        }
+                        else if (inputValue.key == "MaximumDuration")
+                        {
+                            newValue.m_MaximumDuration = ushort.Parse(inputValue.value);
+                            if (newValue.m_MinimumDuration > newValue.m_MaximumDuration)
+                            {
+                                newValue.m_MinimumDuration = newValue.m_MaximumDuration;
+                            }
+                        }
+                        else if (inputValue.key == "TargetDurationMultiplier")
+                        {
+                            newValue.m_TargetDurationMultiplier = float.Parse(inputValue.value);
+                        }
+                        else if (inputValue.key == "LaneOccupiedMultiplier")
+                        {
+                            newValue.m_LaneOccupiedMultiplier = float.Parse(inputValue.value);
+                        }
+                        else if (inputValue.key == "IntervalExponent")
+                        {
+                            newValue.m_IntervalExponent = float.Parse(inputValue.value);
+                        }
+                        else if (inputValue.key == "PrioritiseTrack")
+                        {
+                            if (bool.Parse(inputValue.value))
+                            {
+                                newValue.m_Options |= CustomPhaseData.Options.PrioritiseTrack;
+                            }
+                            else
+                            {
+                                newValue.m_Options &= ~CustomPhaseData.Options.PrioritiseTrack;
+                            }
+                        }
+                        else if (inputValue.key == "PrioritisePublicCar")
+                        {
+                            if (bool.Parse(inputValue.value))
+                            {
+                                newValue.m_Options |= CustomPhaseData.Options.PrioritisePublicCar;
+                            }
+                            else
+                            {
+                                newValue.m_Options &= ~CustomPhaseData.Options.PrioritisePublicCar;
+                            }
+                        }
+                        else if (inputValue.key == "PrioritisePedestrian")
+                        {
+                            if (bool.Parse(inputValue.value))
+                            {
+                                newValue.m_Options |= CustomPhaseData.Options.PrioritisePedestrian;
+                            }
+                            else
+                            {
+                                newValue.m_Options &= ~CustomPhaseData.Options.PrioritisePedestrian;
+                            }
+                        }
+                        else if (inputValue.key == "LinkedWithNextPhase")
+                        {
+                            if (bool.Parse(inputValue.value))
+                            {
+                                newValue.m_Options |= CustomPhaseData.Options.LinkedWithNextPhase;
+                            }
+                            else
+                            {
+                                newValue.m_Options &= ~CustomPhaseData.Options.LinkedWithNextPhase;
+                            }
+                        }
+                        else if (inputValue.key == "EndPhasePrematurely")
+                        {
+                            newValue.m_Options |= CustomPhaseData.Options.EndPhasePrematurely;
+                        }
+                        else if (inputValue.key == "Name")
+                        {
+                            newValue.m_Name = new FixedString64Bytes(inputValue.value);
+                        }
+                        else if (inputValue.key == "BindWithTemplate")
+                        {
+                            var definition = new { bindWithTemplate = false, templateName = "" };
+                            var value = JsonConvert.DeserializeAnonymousType(inputValue.value, definition);
+
+                            if (value.bindWithTemplate)
+                            {
+                                newValue.m_Options |= CustomPhaseData.Options.BindWithTemplate;
+                                newValue.m_BindTemplate = new FixedString64Bytes(value.templateName);
+                            }
+                            else
+                            {
+                                newValue.m_Options &= ~CustomPhaseData.Options.BindWithTemplate;
+                                newValue.m_BindTemplate = new FixedString64Bytes();
+                            }
+                        }
+                        else if (inputValue.key == "ApplyTemplate")
+                        {
+                            var templates = Mod.m_Settings.GetCustomPhaseTemplates();
+                            var templateIndex = templates.FindIndex(t => t.m_Name == inputValue.value);
+                            if (templateIndex >= 0)
+                            {
+                                newValue.m_MinimumDuration = templates[templateIndex].m_MinimumDuration;
+                                newValue.m_MaximumDuration = templates[templateIndex].m_MaximumDuration;
+                                newValue.m_TargetDurationMultiplier = templates[templateIndex].m_TargetDurationMultiplier;
+                                newValue.m_LaneOccupiedMultiplier = templates[templateIndex].m_LaneOccupiedMultiplier;
+                                newValue.m_IntervalExponent = templates[templateIndex].m_IntervalExponent;
+                                if (templates[templateIndex].m_IsPrioritiseTrack)
+                                {
+                                    newValue.m_Options |= CustomPhaseData.Options.PrioritiseTrack;
+                                }
+                                else
+                                {
+                                    newValue.m_Options &= ~CustomPhaseData.Options.PrioritiseTrack;
+                                }
+                                if (templates[templateIndex].m_IsPrioritisePublicCar)
+                                {
+                                    newValue.m_Options |= CustomPhaseData.Options.PrioritisePublicCar;
+                                }
+                                else
+                                {
+                                    newValue.m_Options &= ~CustomPhaseData.Options.PrioritisePublicCar;
+                                }
+                                if (templates[templateIndex].m_IsPrioritisePedestrian)
+                                {
+                                    newValue.m_Options |= CustomPhaseData.Options.PrioritisePedestrian;
+                                }
+                                else
+                                {
+                                    newValue.m_Options &= ~CustomPhaseData.Options.PrioritisePedestrian;
+                                }
+                            }
+                        }
+                        customPhaseDataBuffer[index] = newValue;
+
+                        if (
+                            (newValue.m_Options & CustomPhaseData.Options.BindWithTemplate) != 0
+                            && Mod.m_Settings.GetCustomPhaseTemplates().FindIndex(t => t.m_Name == newValue.m_BindTemplate) >= 0
+                        )
+                        {
+                            Mod.m_Settings.UpdateCustomPhaseTemplate(
+                                new CustomPhaseTemplate
+                                {
+                                    m_Name = newValue.m_BindTemplate.ToString(),
+                                    m_MinimumDuration = newValue.m_MinimumDuration,
+                                    m_MaximumDuration = newValue.m_MaximumDuration,
+                                    m_TargetDurationMultiplier = newValue.m_TargetDurationMultiplier,
+                                    m_LaneOccupiedMultiplier = newValue.m_LaneOccupiedMultiplier,
+                                    m_IntervalExponent = newValue.m_IntervalExponent,
+                                    m_IsPrioritiseTrack = (newValue.m_Options & CustomPhaseData.Options.PrioritiseTrack) != 0,
+                                    m_IsPrioritisePublicCar = (newValue.m_Options & CustomPhaseData.Options.PrioritisePublicCar) != 0,
+                                    m_IsPrioritisePedestrian = (newValue.m_Options & CustomPhaseData.Options.PrioritisePedestrian) != 0,
+                                }
+                            );
+                        }
+
+                        ForEachTrafficLight(UpdateEdgeInfo);
+                    }
+                    return "";
+                }
+            )
+        );
+        AddBinding(
+            new CallBinding<string, string>(
+                "TrafficLightManager",
+                "SetTemplate",
+                (inputValue) =>
+                {
+                    var template = JsonConvert.DeserializeObject<CustomPhaseTemplate>(inputValue);
+                    Mod.m_Settings.UpdateCustomPhaseTemplate(template);
+                    return "";
+                }
+            )
+        );
+        AddBinding(
+            new CallBinding<string, string>(
+                "TrafficLightManager",
+                "RemoveTemplate",
+                (templeteName) =>
+                {
+                    Mod.m_Settings.RemoveCustomPhaseTemplate(templeteName);
+                    return "";
+                }
+            )
+        );
+        AddBinding(
+            new CallBinding<string, string>(
+                "TrafficLightManager",
+                "SetTrafficLightGroupName",
+                (name) =>
+                {
+                    if (m_SelectedTrafficLightGroupEntity != Entity.Null)
+                    {
+                        m_NameSystem.SetCustomName(m_SelectedTrafficLightGroupEntity, name);
+                        m_TrafficLightManagerGroupNameBinding.Update();
+                    }
+                    return "";
+                }
+            )
+        );
+        AddBinding(
+            new CallBinding<string, string>(
+                "TrafficLightManager",
+                "AddCustomPhase",
                 (_) =>
                 {
                     if (!m_SelectedTrafficLightGroupEntity.Equals(Entity.Null))
@@ -280,13 +510,11 @@ public partial class UISystem : UISystemBase
             )
         );
         AddBinding(
-            new CallBinding<string, string>(
+            new CallBinding<int, string>(
                 "TrafficLightManager",
-                "CallRemoveCustomPhase",
-                (input) =>
+                "RemoveCustomPhase",
+                (inputValue) =>
                 {
-                    var definition = new { index = 0 };
-                    var value = JsonConvert.DeserializeAnonymousType(input, definition);
                     if (!m_SelectedTrafficLightGroupEntity.Equals(Entity.Null))
                     {
                         DynamicBuffer<CustomPhaseData> customPhaseDataBuffer;
@@ -294,7 +522,7 @@ public partial class UISystem : UISystemBase
                         {
                             customPhaseDataBuffer = EntityManager.AddBuffer<CustomPhaseData>(m_SelectedTrafficLightGroupEntity);
                         }
-                        customPhaseDataBuffer.RemoveAt(value.index);
+                        customPhaseDataBuffer.RemoveAt(inputValue);
 
                         ForEachTrafficLight(
                             (e) =>
@@ -310,7 +538,7 @@ public partial class UISystem : UISystemBase
                                     subLaneGroupMaskBuffer = EntityManager.AddBuffer<SubLaneGroupMask>(e);
                                 }
 
-                                for (int i = value.index; i < 16; i++)
+                                for (int i = inputValue; i < 16; i++)
                                 {
                                     CustomPhaseUtils.SwapBit(subLaneGroupMaskBuffer, i, i + 1);
                                     CustomPhaseUtils.SwapBit(edgeGroupMaskBuffer, i, i + 1);
@@ -328,11 +556,11 @@ public partial class UISystem : UISystemBase
         AddBinding(
             new CallBinding<string, string>(
                 "TrafficLightManager",
-                "CallSwapCustomPhase",
-                (input) =>
+                "SwapCustomPhase",
+                (inputJsonString) =>
                 {
-                    var definition = new { index1 = 0, index2 = 0 };
-                    var value = JsonConvert.DeserializeAnonymousType(input, definition);
+                    var inputDefinition = new { index1 = 0, index2 = 0 };
+                    var inputValue = JsonConvert.DeserializeAnonymousType(inputJsonString, inputDefinition);
                     if (!m_SelectedTrafficLightGroupEntity.Equals(Entity.Null))
                     {
                         DynamicBuffer<CustomPhaseData> customPhaseDataBuffer;
@@ -340,7 +568,10 @@ public partial class UISystem : UISystemBase
                         {
                             customPhaseDataBuffer = EntityManager.AddBuffer<CustomPhaseData>(m_SelectedTrafficLightGroupEntity);
                         }
-                        (customPhaseDataBuffer[value.index2], customPhaseDataBuffer[value.index1]) = (customPhaseDataBuffer[value.index1], customPhaseDataBuffer[value.index2]);
+                        (customPhaseDataBuffer[inputValue.index2], customPhaseDataBuffer[inputValue.index1]) = (
+                            customPhaseDataBuffer[inputValue.index1],
+                            customPhaseDataBuffer[inputValue.index2]
+                        );
 
                         ForEachTrafficLight(
                             (e) =>
@@ -356,8 +587,8 @@ public partial class UISystem : UISystemBase
                                     subLaneGroupMaskBuffer = EntityManager.AddBuffer<SubLaneGroupMask>(e);
                                 }
 
-                                CustomPhaseUtils.SwapBit(edgeGroupMaskBuffer, value.index1, value.index2);
-                                CustomPhaseUtils.SwapBit(subLaneGroupMaskBuffer, value.index1, value.index2);
+                                CustomPhaseUtils.SwapBit(edgeGroupMaskBuffer, inputValue.index1, inputValue.index2);
+                                CustomPhaseUtils.SwapBit(subLaneGroupMaskBuffer, inputValue.index1, inputValue.index2);
                                 UpdateEdgeInfo(e);
                             }
                         );
@@ -370,18 +601,18 @@ public partial class UISystem : UISystemBase
         AddBinding(
             new CallBinding<string, string>(
                 "TrafficLightManager",
-                "CallUpdateEdgeGroupMask",
-                (input) =>
+                "UpdateEdgeGroupMask",
+                (inputJsonString) =>
                 {
                     if (m_SelectedTrafficLightGroupEntity.Equals(Entity.Null))
                     {
                         return "";
                     }
 
-                    var definition = new { groupMaskArray = new EdgeGroupMask[0], entity = Entity.Null };
-                    var value = JsonConvert.DeserializeAnonymousType(input, definition);
-                    EdgeGroupMask[] groupMaskArray = value.groupMaskArray;
-                    Entity entity = value.entity;
+                    var inputDefinition = new { groupMaskArray = new EdgeGroupMask[0], entity = Entity.Null };
+                    var inputValue = JsonConvert.DeserializeAnonymousType(inputJsonString, inputDefinition);
+                    EdgeGroupMask[] groupMaskArray = inputValue.groupMaskArray;
+                    Entity entity = inputValue.entity;
 
                     ForEachTrafficLight(
                         (e) =>
@@ -414,7 +645,6 @@ public partial class UISystem : UISystemBase
                         }
                     );
                     AddUpdate();
-
                     return "";
                 }
             )
@@ -422,18 +652,18 @@ public partial class UISystem : UISystemBase
         AddBinding(
             new CallBinding<string, string>(
                 "TrafficLightManager",
-                "CallUpdateSubLaneGroupMask",
-                (input) =>
+                "UpdateSubLaneGroupMask",
+                (inputJsonString) =>
                 {
                     if (m_SelectedTrafficLightGroupEntity.Equals(Entity.Null))
                     {
                         return "";
                     }
 
-                    var definition = new { groupMaskArray = new SubLaneGroupMask[0], entity = Entity.Null };
-                    var value = JsonConvert.DeserializeAnonymousType(input, definition);
-                    SubLaneGroupMask[] groupMaskArray = value.groupMaskArray;
-                    Entity entity = value.entity;
+                    var inputDefinition = new { groupMaskArray = new SubLaneGroupMask[0], entity = Entity.Null };
+                    var inputValue = JsonConvert.DeserializeAnonymousType(inputJsonString, inputDefinition);
+                    SubLaneGroupMask[] groupMaskArray = inputValue.groupMaskArray;
+                    Entity entity = inputValue.entity;
 
                     ForEachTrafficLight(
                         (e) =>
@@ -466,7 +696,6 @@ public partial class UISystem : UISystemBase
                         }
                     );
                     AddUpdate();
-
                     return "";
                 }
             )
@@ -474,7 +703,7 @@ public partial class UISystem : UISystemBase
         AddBinding(
             new CallBinding<string, string>(
                 "TrafficLightManager",
-                "CallAddWorldPosition",
+                "AddWorldPosition",
                 (input) =>
                 {
                     UITypes.WorldPosition[] posArray = JsonConvert.DeserializeObject<UITypes.WorldPosition[]>(input);
@@ -490,7 +719,7 @@ public partial class UISystem : UISystemBase
         AddBinding(
             new CallBinding<string, string>(
                 "TrafficLightManager",
-                "CallRemoveWorldPosition",
+                "RemoveWorldPosition",
                 (input) =>
                 {
                     UITypes.WorldPosition[] posArray = JsonConvert.DeserializeObject<UITypes.WorldPosition[]>(input);
@@ -504,9 +733,34 @@ public partial class UISystem : UISystemBase
             )
         );
         AddBinding(
+            new CallBinding<string, string>(
+                "TrafficLightManager",
+                "LookAt",
+                (inputJsonString) =>
+                {
+                    var inputDefinition = new
+                    {
+                        x = 0f,
+                        y = 0f,
+                        z = 0f,
+                        distance = 0f,
+                    };
+                    var inputValue = JsonConvert.DeserializeAnonymousType(inputJsonString, inputDefinition);
+                    var pivot = new float3(inputValue.x, inputValue.y, inputValue.z);
+                    var zoom = inputValue.distance;
+
+                    var cameraUpdateSystem = World.GetOrCreateSystemManaged<CameraUpdateSystem>();
+                    cameraUpdateSystem.activeCameraController.pivot = pivot;
+                    cameraUpdateSystem.activeCameraController.zoom = zoom;
+                    return "";
+                }
+            )
+        );
+
+        AddBinding(
             new CallBinding<int, int>(
                 "TrafficLightManager",
-                "CallCopyPhase",
+                "CopyPhase",
                 (sourceIndex) =>
                 {
                     if (EntityManager.TryGetBuffer(m_SelectedTrafficLightGroupEntity, false, out DynamicBuffer<CustomPhaseData> customPhaseDataBuffer))
@@ -540,301 +794,6 @@ public partial class UISystem : UISystemBase
                         return destIndex;
                     }
                     return -1;
-                }
-            )
-        );
-        AddBinding(
-            new CallBinding<string, string>(
-                "TrafficLightManager",
-                "CallLookAt",
-                (input) =>
-                {
-                    var definition = new
-                    {
-                        x = 0f,
-                        y = 0f,
-                        z = 0f,
-                        distance = 0f,
-                    };
-                    var value = JsonConvert.DeserializeAnonymousType(input, definition);
-                    var pivot = new float3(value.x, value.y, value.z);
-                    var zoom = value.distance;
-
-                    var cameraUpdateSystem = World.GetOrCreateSystemManaged<CameraUpdateSystem>();
-                    cameraUpdateSystem.activeCameraController.pivot = pivot;
-                    cameraUpdateSystem.activeCameraController.zoom = zoom;
-                    return "";
-                }
-            )
-        );
-
-        AddBinding(
-            new TriggerBinding<int>(
-                "TrafficLightManager",
-                "SetToolState",
-                (state) =>
-                {
-                    SetToolState((ToolState)state);
-                }
-            )
-        );
-        AddBinding(new TriggerBinding<int>("TrafficLightManager", "SetToolState", (index) => SetToolState((ToolState)index)));
-        AddBinding(
-            new TriggerBinding<int>(
-                "TrafficLightManager",
-                "SetDisplayPhaseIndex",
-                (index) =>
-                {
-                    m_DisplayPhaseIndexBinding.Update(index);
-                }
-            )
-        );
-        AddBinding(new TriggerBinding<int>("TrafficLightManager", "SetEditingPhaseIndex", (index) => m_EditingPhaseIndexBinding.Update(index)));
-        AddBinding(new TriggerBinding<int>("TrafficLightManager", "SetManualPhaseIndex", UpdateManualPhaseIndex));
-        AddBinding(
-            new TriggerBinding<string>(
-                "TrafficLightManager",
-                "CallUpdateCustomPhaseData",
-                (jsonString) =>
-                {
-                    var input = JsonConvert.DeserializeObject<UITypes.UpdateCustomPhaseData>(jsonString);
-                    if (!m_SelectedTrafficLightGroupEntity.Equals(Entity.Null))
-                    {
-                        DynamicBuffer<CustomPhaseData> customPhaseDataBuffer;
-                        if (!EntityManager.TryGetBuffer(m_SelectedTrafficLightGroupEntity, false, out customPhaseDataBuffer))
-                        {
-                            customPhaseDataBuffer = EntityManager.AddBuffer<CustomPhaseData>(m_SelectedTrafficLightGroupEntity);
-                        }
-
-                        int index = input.index;
-                        if (index < 0 || index >= customPhaseDataBuffer.Length)
-                        {
-                            return;
-                        }
-                        var newValue = customPhaseDataBuffer[index];
-
-                        if (input.key == "MinimumDuration")
-                        {
-                            newValue.m_MinimumDuration = ushort.Parse(input.value);
-                            if (newValue.m_MinimumDuration > newValue.m_MaximumDuration)
-                            {
-                                newValue.m_MaximumDuration = newValue.m_MinimumDuration;
-                            }
-                        }
-                        else if (input.key == "MaximumDuration")
-                        {
-                            newValue.m_MaximumDuration = ushort.Parse(input.value);
-                            if (newValue.m_MinimumDuration > newValue.m_MaximumDuration)
-                            {
-                                newValue.m_MinimumDuration = newValue.m_MaximumDuration;
-                            }
-                        }
-                        else if (input.key == "TargetDurationMultiplier")
-                        {
-                            newValue.m_TargetDurationMultiplier = float.Parse(input.value);
-                        }
-                        else if (input.key == "LaneOccupiedMultiplier")
-                        {
-                            newValue.m_LaneOccupiedMultiplier = float.Parse(input.value);
-                        }
-                        else if (input.key == "IntervalExponent")
-                        {
-                            newValue.m_IntervalExponent = float.Parse(input.value);
-                        }
-                        else if (input.key == "PrioritiseTrack")
-                        {
-                            if (bool.Parse(input.value))
-                            {
-                                newValue.m_Options |= CustomPhaseData.Options.PrioritiseTrack;
-                            }
-                            else
-                            {
-                                newValue.m_Options &= ~CustomPhaseData.Options.PrioritiseTrack;
-                            }
-                        }
-                        else if (input.key == "PrioritisePublicCar")
-                        {
-                            if (bool.Parse(input.value))
-                            {
-                                newValue.m_Options |= CustomPhaseData.Options.PrioritisePublicCar;
-                            }
-                            else
-                            {
-                                newValue.m_Options &= ~CustomPhaseData.Options.PrioritisePublicCar;
-                            }
-                        }
-                        else if (input.key == "PrioritisePedestrian")
-                        {
-                            if (bool.Parse(input.value))
-                            {
-                                newValue.m_Options |= CustomPhaseData.Options.PrioritisePedestrian;
-                            }
-                            else
-                            {
-                                newValue.m_Options &= ~CustomPhaseData.Options.PrioritisePedestrian;
-                            }
-                        }
-                        else if (input.key == "LinkedWithNextPhase")
-                        {
-                            if (bool.Parse(input.value))
-                            {
-                                newValue.m_Options |= CustomPhaseData.Options.LinkedWithNextPhase;
-                            }
-                            else
-                            {
-                                newValue.m_Options &= ~CustomPhaseData.Options.LinkedWithNextPhase;
-                            }
-                        }
-                        else if (input.key == "EndPhasePrematurely")
-                        {
-                            newValue.m_Options |= CustomPhaseData.Options.EndPhasePrematurely;
-                        }
-                        else if (input.key == "Name")
-                        {
-                            newValue.m_Name = new FixedString64Bytes(input.value);
-                        }
-                        customPhaseDataBuffer[index] = newValue;
-
-                        if (
-                            (newValue.m_Options & CustomPhaseData.Options.BindWithTemplate) != 0
-                            && Mod.m_Settings.GetCustomPhaseTemplates().FindIndex(t => t.m_Name == newValue.m_BindTemplate) >= 0
-                        )
-                        {
-                            Mod.m_Settings.UpdateCustomPhaseTemplate(
-                                new CustomPhaseTemplate
-                                {
-                                    m_Name = newValue.m_BindTemplate.ToString(),
-                                    m_MinimumDuration = newValue.m_MinimumDuration,
-                                    m_MaximumDuration = newValue.m_MaximumDuration,
-                                    m_TargetDurationMultiplier = newValue.m_TargetDurationMultiplier,
-                                    m_LaneOccupiedMultiplier = newValue.m_LaneOccupiedMultiplier,
-                                    m_IntervalExponent = newValue.m_IntervalExponent,
-                                    m_IsPrioritiseTrack = (newValue.m_Options & CustomPhaseData.Options.PrioritiseTrack) != 0,
-                                    m_IsPrioritisePublicCar = (newValue.m_Options & CustomPhaseData.Options.PrioritisePublicCar) != 0,
-                                    m_IsPrioritisePedestrian = (newValue.m_Options & CustomPhaseData.Options.PrioritisePedestrian) != 0,
-                                }
-                            );
-                        }
-
-                        ForEachTrafficLight(UpdateEdgeInfo);
-                    }
-                    return;
-                }
-            )
-        );
-        AddBinding(
-            new TriggerBinding<string>(
-                "TrafficLightManager",
-                "UpdatePhaseTemplateBind",
-                (input) =>
-                {
-                    var definition = new
-                    {
-                        index = 0,
-                        bindWithTemplate = false,
-                        templateName = "",
-                    };
-                    var value = JsonConvert.DeserializeAnonymousType(input, definition);
-                    if (!m_SelectedTrafficLightGroupEntity.Equals(Entity.Null))
-                    {
-                        if (EntityManager.TryGetBuffer(m_SelectedTrafficLightGroupEntity, false, out DynamicBuffer<CustomPhaseData> customPhaseDataBuffer))
-                        {
-                            var phase = customPhaseDataBuffer[value.index];
-                            if (value.bindWithTemplate)
-                            {
-                                phase.m_Options |= CustomPhaseData.Options.BindWithTemplate;
-                                phase.m_BindTemplate = new FixedString64Bytes(value.templateName);
-                            }
-                            else
-                            {
-                                phase.m_Options &= ~CustomPhaseData.Options.BindWithTemplate;
-                                phase.m_BindTemplate = new FixedString64Bytes();
-                            }
-                            customPhaseDataBuffer[value.index] = phase;
-                        }
-                    }
-                }
-            )
-        );
-        AddBinding(
-            new TriggerBinding<string>(
-                "TrafficLightManager",
-                "ApplyTemplate",
-                (input) =>
-                {
-                    var definition = new { index = 0, templateName = "" };
-                    var value = JsonConvert.DeserializeAnonymousType(input, definition);
-
-                    if (!m_SelectedTrafficLightGroupEntity.Equals(Entity.Null))
-                    {
-                        if (EntityManager.TryGetBuffer(m_SelectedTrafficLightGroupEntity, false, out DynamicBuffer<CustomPhaseData> customPhaseDataBuffer))
-                        {
-                            var phase = customPhaseDataBuffer[value.index];
-
-                            var templates = Mod.m_Settings.GetCustomPhaseTemplates();
-                            var index = templates.FindIndex(t => t.m_Name == value.templateName);
-                            if (index >= 0)
-                            {
-                                phase.m_MinimumDuration = templates[index].m_MinimumDuration;
-                                phase.m_MaximumDuration = templates[index].m_MaximumDuration;
-                                phase.m_TargetDurationMultiplier = templates[index].m_TargetDurationMultiplier;
-                                phase.m_LaneOccupiedMultiplier = templates[index].m_LaneOccupiedMultiplier;
-                                phase.m_IntervalExponent = templates[index].m_IntervalExponent;
-                                if (templates[index].m_IsPrioritiseTrack)
-                                {
-                                    phase.m_Options |= CustomPhaseData.Options.PrioritiseTrack;
-                                }
-                                else
-                                {
-                                    phase.m_Options &= ~CustomPhaseData.Options.PrioritiseTrack;
-                                }
-                                if (templates[index].m_IsPrioritisePublicCar)
-                                {
-                                    phase.m_Options |= CustomPhaseData.Options.PrioritisePublicCar;
-                                }
-                                else
-                                {
-                                    phase.m_Options &= ~CustomPhaseData.Options.PrioritisePublicCar;
-                                }
-                                if (templates[index].m_IsPrioritisePedestrian)
-                                {
-                                    phase.m_Options |= CustomPhaseData.Options.PrioritisePedestrian;
-                                }
-                                else
-                                {
-                                    phase.m_Options &= ~CustomPhaseData.Options.PrioritisePedestrian;
-                                }
-
-                                customPhaseDataBuffer[value.index] = phase;
-                            }
-                        }
-                    }
-                }
-            )
-        );
-        AddBinding(
-            new TriggerBinding<string>(
-                "TrafficLightManager",
-                "UpdateTemplate",
-                (input) =>
-                {
-                    var template = JsonConvert.DeserializeObject<CustomPhaseTemplate>(input);
-                    Mod.m_Settings.UpdateCustomPhaseTemplate(template);
-                }
-            )
-        );
-        AddBinding(new TriggerBinding<string>("TrafficLightManager", "RemoveTemplate", (templeteName) => Mod.m_Settings.RemoveCustomPhaseTemplate(templeteName)));
-        AddBinding(
-            new TriggerBinding<string>(
-                "TrafficLightManager",
-                "SetTrafficLightGroupName",
-                (name) =>
-                {
-                    if (m_SelectedTrafficLightGroupEntity != Entity.Null)
-                    {
-                        m_NameSystem.SetCustomName(m_SelectedTrafficLightGroupEntity, name);
-                        m_TrafficLightManagerGroupNameBinding.Update();
-                    }
                 }
             )
         );

@@ -3,7 +3,7 @@ using TrafficLightManager.Code.Components;
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
-using static TrafficLightManager.Code.Systems.TrafficLightSystems.Initialisation.PatchedTrafficLightInitializationSystem;
+using static TrafficLightManager.Code.Systems.Initialization.PatchedTrafficLightInitializationSystem;
 
 namespace TrafficLightManager.Code.Utils;
 

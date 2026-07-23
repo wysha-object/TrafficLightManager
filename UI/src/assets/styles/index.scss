@@ -1,0 +1,94 @@
+*[disabled] {
+  opacity: 0.3;
+}
+
+Button[variant='flat'] {
+  border-radius: 3rem;
+  background-color: var(--toolbarFieldColor);
+  &:hover {
+    background-color: var(--toolbarFieldColor-hover);
+  }
+  &:active {
+    background-color: var(--toolbarFieldColor-active);
+  }
+  &[disabled] {
+    background-color: var(--toolbarFieldColor);
+  }
+
+  &.top-option-button {
+    margin-bottom: 0;
+    border-radius: 5rem 5rem 0 0;
+    &.selected {
+      background-color: var(--toolbarFieldColor-hover);
+    }
+  }
+
+  border: none !important;
+  background-image: none !important;
+}
+
+Button[variant='round'] {
+  padding: 5rem;
+  &[disabled] {
+    background-color: transparent;
+  }
+}
+
+svg {
+  fill: var(--textColor);
+}
+
+.horizontal-divider {
+  height: 0;
+  width: 100%;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+}
+
+.horizontal-divider-with-gap {
+  @extend .horizontal-divider;
+  margin: 5rem 0;
+}
+
+.vertical-divider {
+  height: 100%;
+  width: 0;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  margin: 0 5rem;
+}
+
+.vertical-divider-with-gap {
+  @extend .vertical-divider;
+  margin: 0 5rem;
+}
+
+.row {
+  width: 100%;
+  padding: 0.2em 0.5em;
+  border-radius: 3rem;
+  display: flex;
+  align-items: center;
+}
+
+.row-with-hover-effect {
+  @extend .row;
+  &:hover {
+    background-color: rgba(0, 0, 0, 0.1);
+  }
+}
+
+.horizontal-gap {
+  height: 6rem;
+}
+
+.vertical-gap {
+  width: 6rem;
+}
+
+.big-icon {
+  width: 1.2em;
+  height: 1.2em;
+}
+
+.dim {
+  color: var(--textColorDim);
+}

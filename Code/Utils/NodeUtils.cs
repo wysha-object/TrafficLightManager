@@ -3,7 +3,7 @@ using TrafficLightManager.Code.Components;
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
-using static TrafficLightManager.Code.Systems.TrafficLightSystems.Initialisation.PatchedTrafficLightInitializationSystem;
+using static TrafficLightManager.Code.Systems.Initialization.PatchedTrafficLightInitializationSystem;
 
 namespace TrafficLightManager.Code.Utils;
 
@@ -215,17 +215,17 @@ public partial struct NodeUtils
             connectedEdgeBuffer,
             edgeGroupMaskBuffer,
             subLaneGroupMaskBuffer,
-            job.m_ExtraTypeHandle.m_SubLane,
-            job.m_Overlaps,
-            job.m_ExtraTypeHandle.m_Edge,
-            job.m_ExtraTypeHandle.m_EdgeGeometry,
-            job.m_ExtraTypeHandle.m_Lane,
-            job.m_ExtraTypeHandle.m_PedestrianLane,
+            job.m_SubLaneLookup,
+            job.m_LaneOverlapLookup,
+            job.m_EdgeData,
+            job.m_EdgeGeometryData,
+            job.m_LaneLookup,
+            job.m_PedestrianLaneData,
             job.m_MasterLaneData,
-            job.m_ExtraTypeHandle.m_TrackLane,
+            job.m_TrackLaneData,
             job.m_CarLaneData,
             job.m_CurveData,
-            job.m_ExtraTypeHandle.m_TrainTrack
+            job.m_TrainTrackData
         );
     }
 
@@ -328,7 +328,7 @@ public partial struct NodeUtils
 
     public static float3 GetEdgePosition(ref InitializeTrafficLightsJob job, Entity nodeEntity, Entity edgeEntity)
     {
-        return GetEdgePosition(nodeEntity, edgeEntity, job.m_ExtraTypeHandle.m_Edge, job.m_ExtraTypeHandle.m_EdgeGeometry);
+        return GetEdgePosition(nodeEntity, edgeEntity, job.m_EdgeData, job.m_EdgeGeometryData);
     }
 
     public static float3 GetSubLanePosition(Entity subLane, ComponentLookup<Curve> curveLookup)
@@ -435,7 +435,7 @@ public partial struct NodeUtils
 
     public static bool IsCrossingStopLine(ref InitializeTrafficLightsJob job, Entity nodeSubLaneEntity, Entity edgeEntity)
     {
-        return IsCrossingStopLine(nodeSubLaneEntity, edgeEntity, job.m_ExtraTypeHandle.m_Lane, job.m_Overlaps, job.m_ExtraTypeHandle.m_SubLane);
+        return IsCrossingStopLine(nodeSubLaneEntity, edgeEntity, job.m_LaneLookup, job.m_LaneOverlapLookup, job.m_SubLaneLookup);
     }
 
     public static bool HasTrainTrack(NativeArray<EdgeInfo> edgeInfoArray)

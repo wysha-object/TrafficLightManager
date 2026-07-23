@@ -3,6 +3,7 @@ using Colossal.Logging;
 using Game;
 using Game.Modding;
 using Game.SceneFlow;
+using TrafficLightManager.Code.Systems.Update;
 using Unity.Collections;
 using Unity.Entities;
 
@@ -26,11 +27,11 @@ public class Mod : IMod
 
     private static Game.Simulation.TrafficLightSystem m_TrafficLightSystem;
 
-    private static TrafficLightManager.Code.Systems.TrafficLightSystems.Initialisation.PatchedTrafficLightInitializationSystem m_PatchedTrafficLightInitializationSystem;
+    private static Systems.Initialization.PatchedTrafficLightInitializationSystem m_PatchedTrafficLightInitializationSystem;
 
-    private static TrafficLightManager.Code.Systems.TrafficLightSystems.Simulation.PatchedTrafficLightSystem m_PatchedTrafficLightSystem;
+    private static Systems.Simulation.PatchedTrafficLightSystem m_PatchedTrafficLightSystem;
 
-    private static Systems.TrafficLightSystems.Simulation.TrafficLightGroupSystem m_TrafficLightGroupSystem;
+    private static Systems.Update.TrafficLightGroupUpdateSystem m_TrafficLightGroupSystem;
 
     public void OnLoad(UpdateSystem updateSystem)
     {
@@ -45,10 +46,9 @@ public class Mod : IMod
 
         m_TrafficLightInitializationSystem = m_World.GetOrCreateSystemManaged<Game.Net.TrafficLightInitializationSystem>();
         m_TrafficLightSystem = m_World.GetOrCreateSystemManaged<Game.Simulation.TrafficLightSystem>();
-        m_PatchedTrafficLightInitializationSystem =
-            m_World.GetOrCreateSystemManaged<TrafficLightManager.Code.Systems.TrafficLightSystems.Initialisation.PatchedTrafficLightInitializationSystem>();
-        m_PatchedTrafficLightSystem = m_World.GetOrCreateSystemManaged<TrafficLightManager.Code.Systems.TrafficLightSystems.Simulation.PatchedTrafficLightSystem>();
-        m_TrafficLightGroupSystem = m_World.GetOrCreateSystemManaged<TrafficLightManager.Code.Systems.TrafficLightSystems.Simulation.TrafficLightGroupSystem>();
+        m_PatchedTrafficLightInitializationSystem = m_World.GetOrCreateSystemManaged<Systems.Initialization.PatchedTrafficLightInitializationSystem>();
+        m_PatchedTrafficLightSystem = m_World.GetOrCreateSystemManaged<Systems.Simulation.PatchedTrafficLightSystem>();
+        m_TrafficLightGroupSystem = m_World.GetOrCreateSystemManaged<Systems.Update.TrafficLightGroupUpdateSystem>();
         m_Settings = new Settings(this);
 
         SystemSetup(updateSystem);
@@ -72,19 +72,14 @@ public class Mod : IMod
         Utils.EntityQueryUtils.UpdateEntityQuery(m_TrafficLightInitializationSystem, "m_TrafficLightsQuery", noneList);
         Utils.EntityQueryUtils.UpdateEntityQuery(m_TrafficLightSystem, "m_TrafficLightQuery", noneList);
 
-        updateSystem.UpdateBefore<
-            TrafficLightManager.Code.Systems.TrafficLightSystems.Initialisation.PatchedTrafficLightInitializationSystem,
-            Game.Net.TrafficLightInitializationSystem
-        >(SystemUpdatePhase.Modification4B);
-        updateSystem.UpdateBefore<TrafficLightManager.Code.Systems.TrafficLightSystems.Simulation.PatchedTrafficLightSystem, Game.Simulation.TrafficLightSystem>(
-            SystemUpdatePhase.GameSimulation
-        );
-        updateSystem.UpdateAt<TrafficLightManager.Code.Systems.UI.TooltipSystem>(SystemUpdatePhase.UITooltip);
-        updateSystem.UpdateAt<TrafficLightManager.Code.Systems.UI.UISystem>(SystemUpdatePhase.UIUpdate);
-        updateSystem.UpdateAt<TrafficLightManager.Code.Systems.Tool.ToolSystem>(SystemUpdatePhase.ToolUpdate);
-        updateSystem.UpdateAt<TrafficLightManager.Code.Systems.Update.ModificationUpdateSystem>(SystemUpdatePhase.ModificationEnd);
-        updateSystem.UpdateAt<TrafficLightManager.Code.Systems.TrafficLightSystems.Simulation.TrafficLightGroupSystem>(SystemUpdatePhase.ModificationEnd);
-        updateSystem.UpdateAfter<TrafficLightManager.Code.Systems.Update.SimulationUpdateSystem>(SystemUpdatePhase.GameSimulation);
+        updateSystem.UpdateBefore<Systems.Initialization.PatchedTrafficLightInitializationSystem, Game.Net.TrafficLightInitializationSystem>(SystemUpdatePhase.Modification4B);
+        updateSystem.UpdateBefore<Systems.Simulation.PatchedTrafficLightSystem, Game.Simulation.TrafficLightSystem>(SystemUpdatePhase.GameSimulation);
+        updateSystem.UpdateAt<Systems.UI.TooltipSystem>(SystemUpdatePhase.UITooltip);
+        updateSystem.UpdateAt<Systems.UI.UISystem>(SystemUpdatePhase.UIUpdate);
+        updateSystem.UpdateAt<Systems.Tool.ToolSystem>(SystemUpdatePhase.ToolUpdate);
+        updateSystem.UpdateAt<ModificationUpdateSystem>(SystemUpdatePhase.ModificationEnd);
+        updateSystem.UpdateAt<Systems.Update.TrafficLightGroupUpdateSystem>(SystemUpdatePhase.ModificationEnd);
+        updateSystem.UpdateAfter<SimulationUpdateSystem>(SystemUpdatePhase.GameSimulation);
 
         m_TrafficLightInitializationSystem.Enabled = false;
         m_TrafficLightSystem.Enabled = false;
