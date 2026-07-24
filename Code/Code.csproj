@@ -7,7 +7,7 @@
 
     <AssemblyName>TrafficLightManager.Code</AssemblyName>
     <RootNamespace>TrafficLightManager.Code</RootNamespace>
-    <Version>1.4.7</Version>
+    <Version>1.5.0</Version>
 
     <!--The file where mod information which is required for publishing mod on PDX mods are stored-->
     <PublishConfigurationPath>Properties\PublishConfiguration.xml</PublishConfigurationPath>
@@ -15,7 +15,10 @@
 
   <!--Imports must be after PropertyGroup block-->
   <Import Project="$([System.Environment]::GetEnvironmentVariable('CSII_TOOLPATH', 'EnvironmentVariableTarget.User'))\Mod.props" />
-  <Import Project="$([System.Environment]::GetEnvironmentVariable('CSII_TOOLPATH', 'EnvironmentVariableTarget.User'))\Mod.targets" Condition="'$(DisablePostProcessors)' != 'true'" />
+  <Import
+    Project="$([System.Environment]::GetEnvironmentVariable('CSII_TOOLPATH', 'EnvironmentVariableTarget.User'))\Mod.targets"
+    Condition="'$(DisablePostProcessors)' != 'true'"
+  />
 
   <PropertyGroup>
     <LangVersion>12.0</LangVersion>
