@@ -1,5 +1,7 @@
 import DeleteSvg from 'assets/images/delete.svg'
-import { ClipboardContext, ClipboardHistoryItem } from 'hooks/clipboard'
+import OutlinedCircleSvg from 'assets/images/outlined-circle.svg'
+import SolidCircleSvg from 'assets/images/solid-circle.svg'
+import { ClipboardContext } from 'hooks/clipboard'
 import { useTranslate } from 'hooks/translate'
 import {
   useCallback,
@@ -28,8 +30,8 @@ import TipArea from '../components/base/tip-area'
 import { EdgeGroupMask, SubLaneGroupMask, ToolState } from 'types'
 import classNames from 'classnames'
 import BasePage from 'components/base/base-page'
-import styled from 'styled-components'
 import { useGetCustomPhaseItemsCmd, useGetToolStateCmd } from 'hooks/cmds'
+import TextInput from 'components/base/text-input'
 
 export default function ClipboardPanel() {
   const { t } = useTranslate()
@@ -81,7 +83,6 @@ export default function ClipboardPanel() {
   const mouseMoveHandler = useCallback(
     (event: MouseEvent) => {
       setTop((prev) => {
-        console.log(prev, event.movementY)
         return prev + event.movementY
       })
       setRight((prev) => prev - event.movementX)
@@ -101,7 +102,7 @@ export default function ClipboardPanel() {
 
   const style: React.CSSProperties = useMemo(() => {
     const result: React.CSSProperties = {
-      display: showPanel ? 'block' : 'none',
+      display: showPanel ? 'flex' : 'none',
     }
     const toolSideColumn = document.querySelector('.tool-side-column_l9i')
     if (containerRef.current && toolSideColumn) {
@@ -127,13 +128,13 @@ export default function ClipboardPanel() {
         maxWidth: '16em',
         width: '16em',
         right: '4em',
+        flexDirection: 'column',
         ...style,
       }}
       header={
         <div
           style={{
             display: 'flex',
-            flexDirection: 'row',
             justifyContent: 'space-between',
             alignItems: 'center',
           }}
@@ -197,6 +198,9 @@ function ClipboardViewer(props: { displayPhaseCount: number }) {
     <div
       style={{
         backgroundColor: 'var(--panelColorNormal)',
+        flex: '1',
+        display: 'flex',
+        flexDirection: 'column',
       }}
     >
       <div className='row' style={{ paddingBottom: '0' }}>
@@ -228,7 +232,7 @@ function ClipboardViewer(props: { displayPhaseCount: number }) {
         </Button>
       </div>
       <div className='horizontal-divider' />
-      <Scrollable>
+      <Scrollable className='backdrop-blur' trackVisibility='always' style={{ flex: '1' }}>
         <ClipboardList
           clipboard={clipboard}
           displayPhaseCount={props.displayPhaseCount}
@@ -238,48 +242,68 @@ function ClipboardViewer(props: { displayPhaseCount: number }) {
   )
 }
 
-const ClipboardListContainer = styled.div`
-  backdrop-filter: var(--panelBlur);
-`
-
 function ClipboardList(props: {
-  clipboard:
-    ClipboardContext<EdgeGroupMask> | ClipboardContext<SubLaneGroupMask>
+  clipboard: ClipboardContext<EdgeGroupMask> | ClipboardContext<SubLaneGroupMask>
   displayPhaseCount: number
 }) {
   return (
-    <ClipboardListContainer>
+    <div>
       {props.clipboard.history.map((item, index) => (
         <ClipboardItem
-          key={index}
-          item={item}
+          key={`${index}${item.name}`}
+          clipboard={props.clipboard}
           index={index}
-          deleteHandler={() => props.clipboard.deleteAt(index)}
-          selectHandler={() => props.clipboard.selectAt(index)}
           displayPhaseCount={props.displayPhaseCount}
         />
       ))}
-    </ClipboardListContainer>
+    </div>
   )
 }
 
 function ClipboardItem(props: {
-  item:
-    ClipboardHistoryItem<EdgeGroupMask> | ClipboardHistoryItem<SubLaneGroupMask>
+  clipboard: ClipboardContext<EdgeGroupMask> | ClipboardContext<SubLaneGroupMask>
   index: number
-  deleteHandler: () => void
-  selectHandler: () => void
   displayPhaseCount: number
 }) {
+  const item = useMemo(() => {
+    return props.clipboard.history[props.index]
+  }, [props.clipboard.history, props.index])
   return (
-    <div onClick={props.selectHandler} style={{ flexDirection: 'column' }}>
+    <div style={{ flexDirection: 'column' }}>
+      <div className='row'>
+        <TextInput
+          style={{ flex: '1' }}
+          onChange={(newName) => props.clipboard.updateAt(props.index, { name: newName })}
+          value={item.name ?? ''}
+          displayWhenEmpty={`#${props.index}`}
+        />
+        <Button variant='round' onClick={() => props.clipboard.deleteAt(props.index)}>
+          <DeleteSvg />
+        </Button>
+      </div>
       <PanelFoldout
         header={
-          <div className='row' style={{ justifyContent: 'space-between' }}>
-            {`#${props.index}`}
-            <Button variant='round' onClick={props.deleteHandler}>
-              <DeleteSvg />
-            </Button>
+          <div className='row' style={{ color: props.clipboard.selectedIndex === props.index ? 'lightgreen' : undefined }}>
+            <div style={{ flex: '1' }}>{`#${props.index}`}</div>
+            {
+              props.clipboard.selectedIndex === props.index ?
+                <Button
+                  variant='round'
+                  onClick={() => {
+                    props.clipboard.selectAt(-1)
+                  }}
+                >
+                  <SolidCircleSvg fill='lightgreen' />
+                </Button> :
+                <Button
+                  variant='round'
+                  onClick={() => {
+                    props.clipboard.selectAt(props.index)
+                  }}
+                >
+                  <OutlinedCircleSvg />
+                </Button>
+            }
           </div>
         }
       >
@@ -291,9 +315,10 @@ function ClipboardItem(props: {
                 className='row'
                 style={{ flexDirection: 'column', alignItems: 'flex-start' }}
               >
-                {'m_Edge' in props.item.value ? (
+                {'m_Edge' in item.value ? (
                   <EdgeViewer
-                    data={props.item.value as EdgeGroupMask}
+                    key={`${item.name}${phaseIndex}`}
+                    data={item.value as EdgeGroupMask}
                     displayOptions={{
                       carLane: {
                         left: true,
@@ -319,7 +344,8 @@ function ClipboardItem(props: {
                   />
                 ) : (
                   <SublaneViewer
-                    subLane={props.item.value as SubLaneGroupMask}
+                    key={`${item.name}${phaseIndex}`}
+                    subLane={item.value as SubLaneGroupMask}
                     displayOptions={{
                       carLane: {
                         left: true,

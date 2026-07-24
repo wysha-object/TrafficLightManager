@@ -310,6 +310,10 @@ public partial class UISystem : UISystemBase
 
     public void SetToolState(ToolState toolState)
     {
+        if (toolState == GetToolState())
+        {
+            return;
+        }
         UpdateManualPhaseIndex(-1);
         if (!new[] { ToolState.Disabled, ToolState.ChooseGroup }.Contains(toolState) && m_SelectedTrafficLightGroupEntity == Entity.Null)
         {
@@ -331,10 +335,27 @@ public partial class UISystem : UISystemBase
         }
         m_ToolStateBinding.Update((int)toolState);
 
+        SetDisplayPhaseIndex(-1);
+
         ClearEdgeInfo();
         ForEachTrafficLight(UpdateEdgeInfo);
+    }
 
-        m_DisplayPhaseIndexBinding.Update(-1);
+    public int GetDisplayPhaseIndex()
+    {
+        return m_DisplayPhaseIndexBinding.value;
+    }
+
+    public void SetDisplayPhaseIndex(int index)
+    {
+        if (new[] { ToolState.Choosed, ToolState.Editing }.Contains(GetToolState()))
+        {
+            m_DisplayPhaseIndexBinding.Update(index);
+        }
+        else if (m_DisplayPhaseIndexBinding.value != -1)
+        {
+            m_DisplayPhaseIndexBinding.Update(-1);
+        }
     }
 
     public void AddUpdate()

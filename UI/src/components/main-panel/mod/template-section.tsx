@@ -36,40 +36,40 @@ export default function TemplateSection(props: {
             <span style={{ flex: '1' }}>
               {t('CustomPhaseEditor.Template.BoundWith')}
             </span>
-            <span style={{ color: '#77FF00' }}>{props.item.bindTemplate}</span>
+            <span style={{ color: 'lightgreen' }}>{props.item.bindTemplate}</span>
           </div>
           {settings.customPhaseTemplates.findIndex(
             (template) => template.m_Name === props.item.bindTemplate,
           ) < 0 && (
-            <>
-              <div className='row'>
-                {t('CustomPhaseEditor.Template.InvalidBind')}
-              </div>
-              <div className='row'>
-                <Button
-                  style={{ width: '100%' }}
-                  variant='flat'
-                  onClick={() => {
-                    setTemplateCmd({
-                      m_Name: props.item.bindTemplate,
-                      m_IsPrioritiseTrack: props.item.prioritiseTrack,
-                      m_IsPrioritisePublicCar: props.item.prioritisePublicCar,
-                      m_IsPrioritisePedestrian: props.item.prioritisePedestrian,
-                      m_MinimumDuration: props.item.minimumDuration,
-                      m_MaximumDuration: props.item.maximumDuration,
-                      m_TargetDurationMultiplier:
-                        props.item.targetDurationMultiplier,
-                      m_LaneOccupiedMultiplier:
-                        props.item.laneOccupiedMultiplier,
-                      m_IntervalExponent: props.item.intervalExponent,
-                    })
-                  }}
-                >
-                  {t('CustomPhaseEditor.Template.SaveAndBind')}
-                </Button>
-              </div>
-            </>
-          )}
+              <>
+                <div className='row'>
+                  {t('CustomPhaseEditor.Template.InvalidBind')}
+                </div>
+                <div className='row'>
+                  <Button
+                    style={{ width: '100%' }}
+                    variant='flat'
+                    onClick={() => {
+                      setTemplateCmd({
+                        m_Name: props.item.bindTemplate,
+                        m_IsPrioritiseTrack: props.item.prioritiseTrack,
+                        m_IsPrioritisePublicCar: props.item.prioritisePublicCar,
+                        m_IsPrioritisePedestrian: props.item.prioritisePedestrian,
+                        m_MinimumDuration: props.item.minimumDuration,
+                        m_MaximumDuration: props.item.maximumDuration,
+                        m_TargetDurationMultiplier:
+                          props.item.targetDurationMultiplier,
+                        m_LaneOccupiedMultiplier:
+                          props.item.laneOccupiedMultiplier,
+                        m_IntervalExponent: props.item.intervalExponent,
+                      })
+                    }}
+                  >
+                    {t('CustomPhaseEditor.Template.SaveAndBind')}
+                  </Button>
+                </div>
+              </>
+            )}
           {props.item.bindWithTemplate && (
             <div className='row'>
               <Button
@@ -97,23 +97,27 @@ export default function TemplateSection(props: {
               'classes',
             )}
             content={settings.customPhaseTemplates.map((template) => (
-              <DropdownItem
-                key={template.m_Name}
-                value={template.m_Name}
-                onChange={(value) => {
-                  setSelectTemplate(value)
-                }}
-              >
-                <span style={{ flex: 1 }}>{template.m_Name}</span>
+              <div key={template.m_Name} style={{ display: 'flex' }}>
+                <div style={{ flex: '1' }}>
+                  <DropdownItem
+                    value={template.m_Name}
+                    onChange={(value) => {
+                      setSelectTemplate(value)
+                    }}
+                  >
+                    {template.m_Name}
+                  </DropdownItem>
+                </div>
                 {template.m_Name !== systemDefaultTemplate.m_Name && (
                   <Button
+                    style={{ display: 'flex', alignItems: 'center', padding: '0 10rem', borderRadius: '0' }}
                     variant='round'
                     onClick={() => removeTemplateCmd(template.m_Name)}
                   >
                     <DeleteSvg />
                   </Button>
                 )}
-              </DropdownItem>
+              </div>
             ))}
           >
             <div className='row'>
@@ -169,7 +173,7 @@ export default function TemplateSection(props: {
             ></Input>
           </div>
           <div className='row'>
-            <div style={{ flex: '1 1 0' }}>
+            <div style={{ flex: '1' }}>
               <Button
                 variant='flat'
                 disabled={
@@ -194,7 +198,7 @@ export default function TemplateSection(props: {
               </Button>
             </div>
             <div className='vertical-gap' />
-            <div style={{ flex: '1 1 0' }}>
+            <div style={{ flex: '1' }}>
               <Button
                 variant='flat'
                 disabled={

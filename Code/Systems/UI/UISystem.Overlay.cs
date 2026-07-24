@@ -122,7 +122,7 @@ public partial class UISystem : UISystemBase
                     int displayIndex = trafficLights.m_CurrentSignalGroup - 1;
                     if (
                         customTrafficLights.m_TrafficLightGroupEntity == m_SelectedTrafficLightGroupEntity
-                        && (m_DisplayPhaseIndexBinding.value < 0 || m_DisplayPhaseIndexBinding.value == displayIndex)
+                        && (GetDisplayPhaseIndex() < 0 || GetDisplayPhaseIndex() == displayIndex)
                     )
                     {
                         continue;
@@ -176,9 +176,9 @@ public partial class UISystem : UISystemBase
                     {
                         displayIndex = trafficLightGroup.m_ManualSignalGroup - 1;
                     }
-                    else if (m_DisplayPhaseIndexBinding.value >= 0)
+                    else if (GetDisplayPhaseIndex() >= 0)
                     {
-                        displayIndex = m_DisplayPhaseIndexBinding.value;
+                        displayIndex = GetDisplayPhaseIndex();
                     }
                     else if (EntityManager.TryGetComponent<TrafficLights>(e, out var trafficLights))
                     {
@@ -212,7 +212,7 @@ public partial class UISystem : UISystemBase
                             }
                             if ((laneSignal.m_GroupMask & 1 << displayIndex) != 0)
                             {
-                                overlayBuffer.DrawCurve(color, curve.m_Bezier, 0.25f);
+                                overlayBuffer.DrawCurve(color, curve.m_Bezier, 0.3f);
                             }
                         }
                     }

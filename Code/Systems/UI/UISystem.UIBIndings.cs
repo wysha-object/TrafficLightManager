@@ -260,12 +260,22 @@ public partial class UISystem : UISystemBase
                 "SetDisplayPhaseIndex",
                 (index) =>
                 {
-                    m_DisplayPhaseIndexBinding.Update(index);
+                    SetDisplayPhaseIndex(index);
                     return "";
                 }
             )
         );
-        AddBinding(new TriggerBinding<int>("TrafficLightManager", "SetManualPhaseIndex", UpdateManualPhaseIndex));
+        AddBinding(
+            new CallBinding<int, string>(
+                "TrafficLightManager",
+                "SetManualPhaseIndex",
+                (inputValue) =>
+                {
+                    UpdateManualPhaseIndex(inputValue);
+                    return "";
+                }
+            )
+        );
         AddBinding(
             new CallBinding<string, string>(
                 "TrafficLightManager",
@@ -756,7 +766,6 @@ public partial class UISystem : UISystemBase
                 }
             )
         );
-
         AddBinding(
             new CallBinding<int, int>(
                 "TrafficLightManager",
@@ -794,6 +803,20 @@ public partial class UISystem : UISystemBase
                         return destIndex;
                     }
                     return -1;
+                }
+            )
+        );
+        AddBinding(new CallBinding<string, string>("TrafficLightManager", "GetStorage", (inputValue) => Mod.m_Settings.GetStorage(inputValue)));
+        AddBinding(
+            new CallBinding<string, string>(
+                "TrafficLightManager",
+                "UpdateStorage",
+                (inputJsonString) =>
+                {
+                    var inputDefinition = new { key = "", value = "" };
+                    var inputValue = JsonConvert.DeserializeAnonymousType(inputJsonString, inputDefinition);
+                    Mod.m_Settings.UpdateStorage(inputValue.key, inputValue.value);
+                    return "";
                 }
             )
         );

@@ -86,13 +86,13 @@ export function useGetSystemDefaultTemplateCmd() {
   ) as CustomPhaseTemplate
 }
 
-export async function setToolStateCmd(inputValue: ToolState) {
+export async function setToolStateCmd(inputValue: ToolState): Promise<void> {
   return await call('TrafficLightManager', 'SetToolState', inputValue)
 }
-export async function setDisplayPhaseIndexCmd(inputValue: number) {
+export async function setDisplayPhaseIndexCmd(inputValue: number): Promise<void> {
   return await call('TrafficLightManager', 'SetDisplayPhaseIndex', inputValue)
 }
-export async function setManualPhaseIndexCmd(inputValue: number) {
+export async function setManualPhaseIndexCmd(inputValue: number): Promise<void> {
   return await call('TrafficLightManager', 'SetManualPhaseIndex', inputValue)
 }
 export async function setCustomPhaseDataCmd(
@@ -121,37 +121,44 @@ export async function setCustomPhaseDataCmd(
       }
     | { key: 'ApplyTemplate'; value: string }
   ),
-) {
+): Promise<void> {
+  let value: any = inputValue
+  if (inputValue.key === 'BindWithTemplate') {
+    value = {
+      ...inputValue,
+      value: JSON.stringify(inputValue.value),
+    }
+  }
   return await call(
     'TrafficLightManager',
     'SetCustomPhaseData',
-    JSON.stringify(inputValue),
+    JSON.stringify(value),
   )
 }
-export async function setTemplateCmd(inputValue: CustomPhaseTemplate) {
+export async function setTemplateCmd(inputValue: CustomPhaseTemplate): Promise<void> {
   return await call(
     'TrafficLightManager',
     'SetTemplate',
     JSON.stringify(inputValue),
   )
 }
-export async function removeTemplateCmd(inputValue: string) {
+export async function removeTemplateCmd(inputValue: string): Promise<void> {
   return await call('TrafficLightManager', 'RemoveTemplate', inputValue)
 }
-export async function setTrafficLightGroupNameCmd(inputValue: string) {
+export async function setTrafficLightGroupNameCmd(inputValue: string): Promise<void> {
   return await call(
     'TrafficLightManager',
     'SetTrafficLightGroupName',
     inputValue,
   )
 }
-export async function addCustomPhaseCmd() {
+export async function addCustomPhaseCmd(): Promise<void> {
   return await call('TrafficLightManager', 'AddCustomPhase', '')
 }
-export async function removeCustomPhaseCmd(inputValue: number) {
+export async function removeCustomPhaseCmd(inputValue: number): Promise<void> {
   return await call('TrafficLightManager', 'RemoveCustomPhase', inputValue)
 }
-export async function swapCustomPhaseCmd(index1: number, index2: number) {
+export async function swapCustomPhaseCmd(index1: number, index2: number): Promise<void> {
   return await call(
     'TrafficLightManager',
     'SwapCustomPhase',
@@ -161,7 +168,7 @@ export async function swapCustomPhaseCmd(index1: number, index2: number) {
 export async function updateEdgeGroupMaskCmd(
   groupMaskArray: EdgeGroupMask[],
   entity: Entity,
-) {
+): Promise<void> {
   return await call(
     'TrafficLightManager',
     'UpdateEdgeGroupMask',
@@ -171,21 +178,21 @@ export async function updateEdgeGroupMaskCmd(
 export async function updateSubLaneGroupMaskCmd(
   groupMaskArray: SubLaneGroupMask[],
   entity: Entity,
-) {
+): Promise<void> {
   return await call(
     'TrafficLightManager',
     'UpdateSubLaneGroupMask',
     JSON.stringify({ groupMaskArray, entity }),
   )
 }
-export async function addWorldPosition(inputValue: WorldPosition[]) {
+export async function addWorldPosition(inputValue: WorldPosition[]): Promise<void> {
   return await call(
     'TrafficLightManager',
     'AddWorldPosition',
     JSON.stringify(inputValue),
   )
 }
-export async function removeWorldPosition(inputValue: WorldPosition[]) {
+export async function removeWorldPosition(inputValue: WorldPosition[]): Promise<void> {
   return await call(
     'TrafficLightManager',
     'RemoveWorldPosition',
@@ -197,13 +204,27 @@ export async function lookAt(
   y: number,
   z: number,
   distance: number,
-) {
+): Promise<void> {
   return await call(
     'TrafficLightManager',
     'LookAt',
     JSON.stringify({ x, y, z, distance }),
   )
 }
-export async function copyPhaseCmd(index: number) {
+export async function copyPhaseCmd(index: number): Promise<number> {
   return (await call('TrafficLightManager', 'CopyPhase', index)) as number
+}
+export async function getStorage(key: string): Promise<object | null> {
+  const jsonString = await call('TrafficLightManager', 'GetStorage', key) as string
+  if (!jsonString) {
+    return null
+  }
+  return JSON.parse(jsonString) as object
+}
+export async function updateStorage(key: string, value: object): Promise<void> {
+  return await call(
+    'TrafficLightManager',
+    'UpdateStorage',
+    JSON.stringify({ key, value:  JSON.stringify(value) }),
+  )
 }

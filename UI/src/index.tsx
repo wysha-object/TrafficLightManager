@@ -7,11 +7,10 @@ import {
   SubLaneGroupMaskContextClipboard,
   CurrentFocusPhaseIndexContext,
 } from 'context'
-import { useGetCityConfigurationCmd } from 'hooks/cmds'
+import { useGetCityConfigurationCmd, useGetDisplayPhaseIndexCmd } from 'hooks/cmds'
 import ClipboardPanel from 'pages/clipboard-panel'
 import CustomPhaseTool from 'pages/custom-phase-tool'
 import MainPanel from 'pages/main-panel'
-import { useEffect, useState } from 'react'
 import { setDisplayPhaseIndexCmd, useGetLocalisationCmd } from 'hooks/cmds'
 
 const register: ModRegistrar = (moduleRegistry) => {
@@ -19,12 +18,7 @@ const register: ModRegistrar = (moduleRegistry) => {
 }
 
 function App() {
-  const [currentPhaseIndex, setCurrentPhaseIndex] = useState(-1)
-
-  useEffect(() => {
-    setDisplayPhaseIndexCmd(currentPhaseIndex)
-  }, [currentPhaseIndex])
-
+  const displayPhaseIndex = useGetDisplayPhaseIndexCmd()
   let localisation = useGetLocalisationCmd()
   const cityConfiguration = useGetCityConfigurationCmd()
 
@@ -34,7 +28,7 @@ function App() {
         <EdgeGroupMaskContextClipboard.Provider>
           <SubLaneGroupMaskContextClipboard.Provider>
             <CurrentFocusPhaseIndexContext.Provider
-              value={[currentPhaseIndex, setCurrentPhaseIndex]}
+              value={[displayPhaseIndex, setDisplayPhaseIndexCmd]}
             >
               <MainPanel />
               <CustomPhaseTool />

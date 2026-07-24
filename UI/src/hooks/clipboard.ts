@@ -3,25 +3,29 @@ import {
   createElement,
   ProviderProps,
   useCallback,
-  useMemo,
+  useEffect,
   useState,
 } from 'react'
+import { getStorage, updateStorage } from './cmds'
 
-export interface ClipboardContext<T> {
+export interface Clipboard<T> {
   history: ClipboardHistoryItem<T>[]
   selectedIndex: number
-  save: (t: T, name?: string) => void
-  updateAt: (index: number, name: string) => void
-  deleteAt: (index: number) => void
-  selectAt: (index: number) => void
 }
 
 export interface ClipboardHistoryItem<T> {
   value: T
-  name?: string
+  name: string
 }
 
-export function createClipboard<T>() {
+export interface ClipboardContext<T> extends Clipboard<T> {
+  save: (t: T, name?: string) => void
+  updateAt: (index: number, value: Partial<ClipboardHistoryItem<T>>) => void
+  deleteAt: (index: number) => void
+  selectAt: (index: number) => void
+}
+
+export function createClipboard<T>(key: string) {
   const context = createContext<ClipboardContext<T>>({
     history: [],
     selectedIndex: -1,
@@ -34,56 +38,86 @@ export function createClipboard<T>() {
   return {
     context,
     Provider: (props: Omit<ProviderProps<ClipboardContext<T>>, 'value'>) => {
-      const [history, setHistory] = useState<ClipboardHistoryItem<T>[]>([])
-      const [index, setIndex] = useState<number>(-1)
+      const [clipboard, setClipboard] = useState<Clipboard<T>>({
+        history: [],
+        selectedIndex: -1,
+      })
+      const [initialized, setInitialized] = useState(false)
 
       const save = useCallback(
         (t: T, name?: string) => {
           if (t) {
-            setHistory((value) => {
-              if (value.length >= 10) {
-                value = value.slice(0, 9)
+            setClipboard((prev) => {
+              let newHistory = prev.history
+              if (newHistory.length >= 10) {
+                newHistory = newHistory.slice(0, 9)
               }
-              value = [{ value: t, name: name }, ...value]
-              return value
+              let nameValue = name
+              if (!nameValue) {
+                const date = new Date()
+                nameValue = `Created on ${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}:${date.getSeconds().toString().padStart(2, '0')}`
+              }
+              newHistory = [{ value: t, name: nameValue }, ...newHistory]
+              return { history: newHistory, selectedIndex: 0 }
             })
-            setIndex(0)
           }
         },
-        [setHistory, setIndex],
+        [setClipboard],
       )
       const updateAt = useCallback(
-        (index: number, name: string) => {
-          setHistory((value) =>
-            value.map((item, i) => (i === index ? { ...item, name } : item)),
-          )
+        (index: number, value: Partial<ClipboardHistoryItem<T>>) => {
+          setClipboard((prev) => ({
+            ...prev,
+            history: prev.history.map((item, i) => (i === index ? { ...item, ...value } : item)),
+          }))
         },
-        [setHistory],
+        [setClipboard],
       )
       const deleteAt = useCallback(
         (index: number) => {
-          setHistory((value) => value.filter((_, i) => i !== index))
+          setClipboard((prev) => {
+            const newValue = {
+              ...prev,
+              history: prev.history.filter((_, i) => i !== index),
+            }
+            if (newValue.selectedIndex === index) {
+              newValue.selectedIndex = -1
+            } else if (newValue.selectedIndex > index) {
+              newValue.selectedIndex -= 1
+            }
+            return newValue
+          })
         },
-        [setHistory],
+        [setClipboard],
       )
-      const selectedIndex = useMemo(() => {
-        if (history.length === 0) {
-          return -1
-        }
-        if (index < 0 || index >= history.length) {
-          return 0
-        }
-        return index
-      }, [index, history.length])
       const selectAt = useCallback(
         (index: number) => {
-          setIndex(index)
+          setClipboard((prev) => ({
+            ...prev,
+            selectedIndex: index,
+          }))
         },
-        [setIndex],
+        [setClipboard],
       )
 
+      const loadClipboard = async () => {
+        const stored = await getStorage(key) as Clipboard<T>
+        if (!stored) {
+          setClipboard({ history: [], selectedIndex: -1 })
+        } else {
+          setClipboard(stored)
+        }
+      }
+      useEffect(() => {
+        loadClipboard().then(() => setInitialized(true))
+      }, [])
+      useEffect(() => {
+        if (!initialized) return
+        updateStorage(key, clipboard)
+      }, [JSON.stringify(clipboard)])
+
       return createElement(context.Provider, {
-        value: { history, selectedIndex, save, updateAt, deleteAt, selectAt },
+        value: { ...clipboard, save, updateAt, deleteAt, selectAt },
         ...props,
       })
     },

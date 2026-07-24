@@ -11,7 +11,7 @@ import LinkVariantSvg from 'assets/images/link-variant.svg'
 import LinkVariantOffSvg from 'assets/images/link-variant-off.svg'
 import { useCallback, useContext, useEffect, useMemo, useState } from 'react'
 import styled from 'styled-components'
-import InputField from 'components/base/text-input'
+import TextInput from 'components/base/text-input'
 import { Button } from 'cs2/ui'
 import { ToolState, TrafficLightGroup } from 'types'
 import {
@@ -136,7 +136,8 @@ export default function PhaseRow(props: {
             color: !isActiveLabel ? 'var(--textColorDim)' : 'var(--textColor)',
           }}
         >
-          <InputField
+          <TextInput
+            style={{ flex: '1' }}
             onChange={(value) =>
               setCustomPhaseDataCmd({
                 key: 'Name',
@@ -150,15 +151,15 @@ export default function PhaseRow(props: {
         </div>
         <IconBarContainer>
           {currentFocusPhaseIndex === props.itemIndex &&
-          toolState === ToolState.Editing ? (
+            toolState === ToolState.Editing ? (
             <>
               <Button
                 variant='round'
-                onClick={() => {
+                onClick={async () => {
                   removeCustomPhaseCmd(props.itemIndex)
                   if (currentFocusPhaseIndex === props.itemIndex) {
+                    await setToolStateCmd(ToolState.Choosed)
                     setCurrentFocusPhaseIndex(-1)
-                    setToolStateCmd(ToolState.Choosed)
                   }
                 }}
               >
@@ -166,9 +167,9 @@ export default function PhaseRow(props: {
               </Button>
               <Button
                 variant='round'
-                onClick={() => {
+                onClick={async () => {
+                  await setToolStateCmd(ToolState.Choosed)
                   setCurrentFocusPhaseIndex(-1)
-                  setToolStateCmd(ToolState.Choosed)
                 }}
               >
                 <CheckSvg />
@@ -199,9 +200,9 @@ export default function PhaseRow(props: {
               {currentFocusPhaseIndex === props.itemIndex ? (
                 <Button
                   variant='round'
-                  onClick={() => {
+                  onClick={async () => {
+                    await setToolStateCmd(ToolState.Choosed)
                     setCurrentFocusPhaseIndex(-1)
-                    setToolStateCmd(ToolState.Choosed)
                   }}
                 >
                   <VisibilityOffSvg />
@@ -209,9 +210,9 @@ export default function PhaseRow(props: {
               ) : (
                 <Button
                   variant='round'
-                  onClick={() => {
+                  onClick={async () => {
+                    await setToolStateCmd(ToolState.Choosed)
                     setCurrentFocusPhaseIndex(props.itemIndex)
-                    setToolStateCmd(ToolState.Choosed)
                   }}
                 >
                   <VisibilitySvg />
@@ -219,9 +220,9 @@ export default function PhaseRow(props: {
               )}
               <Button
                 variant='round'
-                onClick={() => {
+                onClick={async () => {
+                  await setToolStateCmd(ToolState.Editing)
                   setCurrentFocusPhaseIndex(props.itemIndex)
-                  setToolStateCmd(ToolState.Editing)
                 }}
               >
                 <TuneSvg />
@@ -230,8 +231,8 @@ export default function PhaseRow(props: {
                 variant='round'
                 onClick={async () => {
                   let newIndex: number = await copyPhaseCmd(props.itemIndex)
+                  await setToolStateCmd(ToolState.Choosed)
                   setCurrentFocusPhaseIndex(newIndex)
-                  setToolStateCmd(ToolState.Choosed)
                 }}
               >
                 <CopySvg />

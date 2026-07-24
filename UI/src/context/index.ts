@@ -10,11 +10,11 @@ const CityConfigurationContext = createContext<CityConfiguration>(
   DEFAULT_CITY_CONFIGURATION,
 )
 const LocalisationContext = createContext({})
-const EdgeGroupMaskContextClipboard = createClipboard<EdgeGroupMask>()
-const SubLaneGroupMaskContextClipboard = createClipboard<SubLaneGroupMask>()
+const EdgeGroupMaskContextClipboard = createClipboard<EdgeGroupMask>('EdgeGroupMaskClipboard')
+const SubLaneGroupMaskContextClipboard = createClipboard<SubLaneGroupMask>('SubLaneGroupMaskClipboard')
 const CurrentFocusPhaseIndexContext = createContext<
-  [number, (value: number) => void]
->([-1, () => {}])
+  [number, (value: number) => Promise<void>]
+>([-1, async () => {}])
 
 export {
   CityConfigurationContext,

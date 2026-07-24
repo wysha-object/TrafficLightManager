@@ -24,7 +24,8 @@ const PanelContainer = styled.div`
   backdrop-filter: var(--panelBlur);
   flex: 1;
   position: relative;
-  padding: 0.25em;
+  width: 17em;
+  max-width: 17em;
 `
 
 const TextItem = (props: {
@@ -123,13 +124,8 @@ export default function PhaseDetailsPanel() {
 
   return (
     <PanelContainer>
-      <Scrollable>
-        <div
-          style={{
-            width: '17em',
-            maxWidth: '17em',
-          }}
-        >
+      <Scrollable trackVisibility='always' style={{padding: '0.25em'}}>
+        <div>
           {!statisticsOnly && (
             <>
               <PanelFoldout
@@ -146,7 +142,7 @@ export default function PhaseDetailsPanel() {
                 <TemplateSection
                   item={customPhaseItem}
                   itemIndex={index}
-                ></TemplateSection>
+                />
               </PanelFoldout>
               <div className='horizontal-divider' />
               <PanelFoldout
@@ -352,12 +348,12 @@ export default function PhaseDetailsPanel() {
                 / 
                 ${(trafficLightGroup.currentPhaseIndex == index
                   ? Math.min(
-                      Math.max(
-                        trafficLightGroup.targetDuration,
-                        customPhaseItem.minimumDuration,
-                      ),
-                      customPhaseItem.maximumDuration,
-                    )
+                    Math.max(
+                      trafficLightGroup.targetDuration,
+                      customPhaseItem.minimumDuration,
+                    ),
+                    customPhaseItem.maximumDuration,
+                  )
                   : customPhaseItem.minimumDuration
                 ).toFixed(2)}s
               `}

@@ -1,7 +1,7 @@
 import styled from 'styled-components'
 
 const Box = styled.div`
-  border-width: 2px;
+  border-width: 2rem;
   border-style: solid;
   border-bottom-color: var(--textColorDimmer);
   border-left-color: var(--textColorDimmer);
@@ -11,7 +11,7 @@ const Box = styled.div`
   margin: 0 0.5em 0 0;
   width: 1em;
   height: 1em;
-  padding: 1px;
+  padding: 1rem;
 `
 
 const Checkmark = styled.div<{ isChecked: boolean }>`

@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
 using Colossal.IO.AssetDatabase;
 using Game.Input;
@@ -8,7 +7,6 @@ using Game.SceneFlow;
 using Game.Settings;
 using Game.UI.Widgets;
 using TrafficLightManager.Code.Utils;
-using Unity.Collections;
 using Unity.Entities;
 
 namespace TrafficLightManager.Code;
@@ -44,6 +42,9 @@ public class Settings : ModSetting
             m_DefaultExclusivePedestrian = settings.m_DefaultExclusivePedestrian;
         }
     }
+
+    [SettingsUIHidden]
+    public Dictionary<string, string> m_Storage;
 
     [SettingsUISection(kTabGeneral, kGroupGeneral)]
     [SettingsUIDropdown(typeof(Settings), "GetLanguageValues")]
@@ -172,6 +173,8 @@ public class Settings : ModSetting
 
     public override void SetDefaults()
     {
+        m_Storage = new Dictionary<string, string>();
+
         m_LocaleOption = "auto";
 
         m_DefaultSplitPhasing = false;
@@ -239,5 +242,19 @@ public class Settings : ModSetting
             m_DefaultCustomPhaseTemplate = CustomPhaseTemplate.Default;
         }
         Apply();
+    }
+
+    public string GetStorage(string key)
+    {
+        if (m_Storage.TryGetValue(key, out string value))
+        {
+            return value;
+        }
+        return null;
+    }
+
+    public void UpdateStorage(string key, string value)
+    {
+        m_Storage[key] = value;
     }
 }

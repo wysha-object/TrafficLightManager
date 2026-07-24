@@ -35,9 +35,9 @@ const Content = styled.div`
 `
 
 const HorizontalDivider = styled.div`
-  height: 2px;
+  height: 2rem;
   width: 100%;
-  border: 2px solid rgba(255, 255, 255, 0.1);
+  border: 2rem solid rgba(255, 255, 255, 0.1);
   margin: 6rem -6rem;
 `
 

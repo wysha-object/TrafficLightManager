@@ -1,7 +1,7 @@
 import styled from 'styled-components'
 
 const Circle = styled.div`
-  border-width: 2px;
+  border-width: 2rem;
   border-style: solid;
   border-bottom-color: var(--accentColorNormal);
   border-left-color: var(--accentColorNormal);
@@ -11,7 +11,7 @@ const Circle = styled.div`
   margin: 0 0.5em 0 0;
   width: 1em;
   height: 1em;
-  padding: 3px;
+  padding: 3rem;
 `
 
 const Bullet = styled.div<{ isChecked: boolean }>`

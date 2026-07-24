@@ -20,6 +20,8 @@ const BasePage = forwardRef<HTMLDivElement, BasePageProps>(
           borderRadius: '4rem',
           position: 'fixed',
           zIndex: '1000',
+          overflow: 'hidden',
+          color: 'var(--textColor)',
           ...props.style,
         }}
       >
@@ -29,7 +31,6 @@ const BasePage = forwardRef<HTMLDivElement, BasePageProps>(
             padding: '6rem 10rem',
             height: '2em',
             backgroundColor: 'var(--panelColorDark)',
-            backdropFilter: 'var(--panelBlur)',
             color: 'var(--accentColorNormal)',
           }}
         >

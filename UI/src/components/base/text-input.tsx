@@ -4,11 +4,11 @@ import Input from './input'
 import { ChangeEvent, KeyboardEvent, useEffect, useState } from 'react'
 import { Button } from 'cs2/ui'
 
-export default function InputField(props: {
+export default function TextInput(props: {
   style?: React.CSSProperties
-  onChange: (value: string) => void
   value: string
   displayWhenEmpty?: string
+  onChange: (value: string) => void
 }) {
   const [textFieldActive, setTextFieldActive] = useState(false)
   const [textFieldValue, setTextFieldValue] = useState('')
@@ -35,11 +35,10 @@ export default function InputField(props: {
       style={{
         display: 'flex',
         alignItems: 'center',
-        width: '100%',
         ...props.style,
       }}
     >
-      <div style={{ flex: 1 }}>
+      <div style={{ flexGrow: 1, flexBasis: 0 }}>
         {textFieldActive ? (
           <Input
             style={{ width: '100%' }}
@@ -58,15 +57,14 @@ export default function InputField(props: {
         )}
       </div>
       <div className='vertical-gap' />
-      {textFieldActive ? (
+      {textFieldActive ?
         <Button variant='round' onClick={submitTextField}>
           <CheckSvg />
-        </Button>
-      ) : (
+        </Button> :
         <Button variant='round' onClick={enableTextField}>
           <EditSvg />
         </Button>
-      )}
+      }
     </div>
   )
 }

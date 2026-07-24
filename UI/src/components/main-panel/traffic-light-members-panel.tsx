@@ -1,4 +1,4 @@
-import InputField from 'components/base/text-input'
+import TextInput from 'components/base/text-input'
 import { Button, Scrollable } from 'cs2/ui'
 import {
   useGetTrafficLightsMembersCmd,
@@ -29,7 +29,7 @@ export default function TrafficLightMembersPanel() {
 
   return (
     <PanelContainer>
-      <InputField
+      <TextInput
         style={{ margin: '2rem 2rem' }}
         onChange={(value) => setTrafficLightGroupNameCmd(value)}
         value={trafficLightGroupName}
