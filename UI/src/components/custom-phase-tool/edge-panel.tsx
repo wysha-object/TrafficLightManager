@@ -84,10 +84,10 @@ export default function EdgePanel(props: {
 
   if (
     carLaneCount +
-      publicCarLaneCount +
-      trackLaneCount +
-      data.m_PedestrianLaneStopLineCount +
-      data.m_PedestrianLaneNonStopLineCount <=
+    publicCarLaneCount +
+    trackLaneCount +
+    data.m_PedestrianLaneStopLineCount +
+    data.m_PedestrianLaneNonStopLineCount <=
     0
   ) {
     return <></>
@@ -128,49 +128,42 @@ export default function EdgePanel(props: {
           />
         </div>
         <HorizontalDivider />
-        <LinkVariantOffSvg className='big-icon' onClick={unlinkHandler} />
-        <div
-          style={{
-            display: 'flex',
-            flexDirection: 'row',
-            justifyContent: 'center',
-            alignItems: 'center',
+        <Button variant='round' onClick={unlinkHandler}>
+          <LinkVariantOffSvg className='big-icon' />
+        </Button>
+        <Button
+          variant='round'
+          onClick={() => {
+            clipboard.save(data.m_EdgeGroupMask)
           }}
         >
-          <Button
-            variant='round'
-            onClick={() => {
-              clipboard.save(data.m_EdgeGroupMask)
-            }}
-          >
-            <CopySvg />
-          </Button>
-          <Button
-            variant='round'
-            disabled={clipboard.selectedIndex < 0}
-            onClick={() => {
-              if (clipboard.selectedIndex >= 0) {
-                const selectedItem = clipboard.history[clipboard.selectedIndex]
-                const newGroupMask: EdgeGroupMask = JSON.parse(
-                  JSON.stringify(data.m_EdgeGroupMask),
-                )
-                newGroupMask.m_Car = selectedItem.value.m_Car
-                newGroupMask.m_PublicCar = selectedItem.value.m_PublicCar
-                newGroupMask.m_Track = selectedItem.value.m_Track
-                newGroupMask.m_PedestrianStopLine =
-                  selectedItem.value.m_PedestrianStopLine
-                newGroupMask.m_PedestrianNonStopLine =
-                  selectedItem.value.m_PedestrianNonStopLine
-                updateEdgeGroupMaskCmd(
-                  [newGroupMask],
-                  data.m_TrafficLightsEntity,
-                )
-              }
-            }}
-          >
-            <PasteSvg />
-          </Button>
-        </div>
+          <CopySvg className='big-icon' />
+        </Button>
+        <Button
+          variant='round'
+          disabled={clipboard.selectedIndex < 0}
+          onClick={() => {
+            if (clipboard.selectedIndex >= 0) {
+              const selectedItem = clipboard.history[clipboard.selectedIndex]
+              const newGroupMask: EdgeGroupMask = JSON.parse(
+                JSON.stringify(data.m_EdgeGroupMask),
+              )
+              newGroupMask.m_Car = selectedItem.value.m_Car
+              newGroupMask.m_PublicCar = selectedItem.value.m_PublicCar
+              newGroupMask.m_Track = selectedItem.value.m_Track
+              newGroupMask.m_PedestrianStopLine =
+                selectedItem.value.m_PedestrianStopLine
+              newGroupMask.m_PedestrianNonStopLine =
+                selectedItem.value.m_PedestrianNonStopLine
+              updateEdgeGroupMaskCmd(
+                [newGroupMask],
+                data.m_TrafficLightsEntity,
+              )
+            }
+          }}
+        >
+          <PasteSvg className='big-icon' />
+        </Button>
       </Content>
     </Container>
   )

@@ -119,44 +119,35 @@ export default function SubLanePanel(props: {
         <Button variant='round' onClick={linkHandler}>
           <LinkVariantSvg className='big-icon' />
         </Button>
-        <div
-          style={{
-            display: 'flex',
-            flexDirection: 'row',
-            justifyContent: 'center',
-            alignItems: 'center',
+        <Button
+          variant='round'
+          onClick={() => {
+            clipboard.save(props.subLane.m_SubLaneGroupMask)
           }}
         >
-          <Button
-            variant='round'
-            onClick={() => {
-              clipboard.save(props.subLane.m_SubLaneGroupMask)
-            }}
-          >
-            <CopySvg />
-          </Button>
-          <Button
-            variant='round'
-            disabled={clipboard.selectedIndex < 0}
-            onClick={() => {
-              if (clipboard.selectedIndex >= 0) {
-                const selectedItem = clipboard.history[clipboard.selectedIndex]
-                const newGroupMask: SubLaneGroupMask = JSON.parse(
-                  JSON.stringify(props.subLane.m_SubLaneGroupMask),
-                )
-                newGroupMask.m_Car = selectedItem.value.m_Car
-                newGroupMask.m_Track = selectedItem.value.m_Track
-                newGroupMask.m_Pedestrian = selectedItem.value.m_Pedestrian
-                updateSubLaneGroupMaskCmd(
-                  [newGroupMask],
-                  props.edge.m_TrafficLightsEntity,
-                )
-              }
-            }}
-          >
-            <PasteSvg />
-          </Button>
-        </div>
+          <CopySvg className='big-icon' />
+        </Button>
+        <Button
+          variant='round'
+          disabled={clipboard.selectedIndex < 0}
+          onClick={() => {
+            if (clipboard.selectedIndex >= 0) {
+              const selectedItem = clipboard.history[clipboard.selectedIndex]
+              const newGroupMask: SubLaneGroupMask = JSON.parse(
+                JSON.stringify(props.subLane.m_SubLaneGroupMask),
+              )
+              newGroupMask.m_Car = selectedItem.value.m_Car
+              newGroupMask.m_Track = selectedItem.value.m_Track
+              newGroupMask.m_Pedestrian = selectedItem.value.m_Pedestrian
+              updateSubLaneGroupMaskCmd(
+                [newGroupMask],
+                props.edge.m_TrafficLightsEntity,
+              )
+            }
+          }}
+        >
+          <PasteSvg className='big-icon' />
+        </Button>
       </Content>
     </Container>
   )
