@@ -48,7 +48,7 @@ namespace TrafficLightManager.Code.Components
         public void Serialize<TWriter>(TWriter writer)
             where TWriter : IWriter
         {
-            int schemaVersion = 3;
+            int schemaVersion = 4;
 
             writer.Write(schemaVersion);
             writer.Write((byte)m_State);
