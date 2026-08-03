@@ -15,12 +15,6 @@
   <img src="https://img.shields.io/badge/TypeScript-3178C6"/>
 </p>
 
-## 功能
-
-- 将信号灯设置为预定义的信号模式
-
-- 完全自定义信号灯相位
-
 ## 支持
 
 如果这个模组对你有帮助，不妨点个 Star 支持一下 ！

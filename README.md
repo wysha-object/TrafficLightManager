@@ -15,12 +15,6 @@
   <img src="https://img.shields.io/badge/TypeScript-3178C6"/>
 </p>
 
-## Features
-
-- Set traffic lights to various predefined signal modes
-
-- Create fully customized signal phases
-
 ## Support
 
 If you find this mod helpful, please consider giving it a star!

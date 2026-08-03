@@ -17,9 +17,25 @@ Mod-related information and usage tutorials can be found on 哔哩哔哩: https:
 
 ## Feature
 
-* Set traffic lights to various predefined signal modes
+Customize the traffic lights at any intersection to look and work exactly the way you want.
 
-* Create fully customized signal phases
+* Traffic Light Group: Combine multiple small intersections into one large intersection, allowing you to create complex intersection layouts.
+
+* Template System: Change all phases using the same template across all saves at once, and customize which template is used when creating new phases.
+
+* Clipboard System: Copy the signal configuration of any lane connection (Edge or SubLane) to the clipboard and paste it to other lane connections, allowing you to quickly edit multiple intersections.
+
+* Custom Name: Customize the names of intersections and phases, and optionally keep intersection names always visible on the world map.
+
+* Display Current Phase: Always show the current phase, allowing you to know the current state of an intersection at any time.
+
+* Sound Feedback: Provides sound feedback when hovering over buttons or pressing buttons.
+
+In addition to these features, this mod includes many other thoughtful designs:
+
+* When viewing an intersection, you can click another intersection to immediately switch the viewing target.
+
+* Only the most useful features are included, without a complicated UI interface.
 
 ## Support
 
@@ -48,6 +64,13 @@ Wherever you report an issue, please make sure to describe it clearly.
     <Screenshot Value="Properties/Screenshots/Screenshot1.jpg" />
     <Screenshot Value="Properties/Screenshots/Screenshot2.jpg" />
     <Screenshot Value="Properties/Screenshots/Screenshot3.jpg" />
+    <Screenshot Value="Properties/Screenshots/Screenshot4.jpg" />
+    <Screenshot Value="Properties/Screenshots/Screenshot5.jpg" />
+    <Screenshot Value="Properties/Screenshots/Screenshot6.jpg" />
+    <Screenshot Value="Properties/Screenshots/Screenshot7.jpg" />
+    <Screenshot Value="Properties/Screenshots/Screenshot8.jpg" />
+    <Screenshot Value="Properties/Screenshots/Screenshot9.jpg" />
+    <Screenshot Value="Properties/Screenshots/Screenshot10.jpg" />
     <!--Tag, can be set multiple times-->
     <Tag Value="" />
     <!--Link to the forum post where the mod can be discussed-->
