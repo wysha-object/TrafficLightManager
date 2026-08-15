@@ -3,12 +3,12 @@ import TrainSvg from 'assets/images/train.svg'
 import WalkSvg from 'assets/images/walk.svg'
 import WalkUnderlineSvg from 'assets/images/walk-underline.svg'
 import BusSideSvg from 'assets/images/bus-side.svg'
-import { useContext } from 'react'
+import { ReactNode, useContext } from 'react'
 import styled from 'styled-components'
 import { CityConfigurationContext } from 'context'
 import TrafficSignButton from 'components/custom-phase-tool/traffic-sign-button'
 import TipArea from 'components/base/tip-area'
-import TrafficSignTooltip from './traffic-sign'
+import TrafficSignTooltip from '../custom-phase-tool/traffic-sign'
 import {
   CustomPhaseSignalState,
   CustomPhaseLane,
@@ -30,19 +30,20 @@ const Filler = styled.div`
   flex: 1;
 `
 
+const BoxContainer = styled.div`
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-content: center;
+  flex-direction: column;
+  align-items: center;
+  margin: 0 0 6rem 0;
+`
+
 const Box = (props: {
   state?: CustomPhaseSignalState
-  children?: React.ReactNode
+  children?: ReactNode
 }) => {
-  const BoxContainer = styled.div`
-    flex: 1;
-    display: flex;
-    justify-content: center;
-    align-content: center;
-    flex-direction: column;
-    align-items: center;
-    margin: 0 0 6rem 0;
-  `
   if (props.state) {
     return (
       <TipArea
@@ -74,12 +75,12 @@ export default function LaneItem(props: {
         props.data.type,
       ) ? (
         <>
-          {props.data.type == 'pedestrianLaneStopLine' && props.showIcon && (
+          {props.data.type === 'pedestrianLaneStopLine' && props.showIcon && (
             <Box>
               <WalkSvg />
             </Box>
           )}
-          {props.data.type == 'pedestrianLaneNonStopLine' && props.showIcon && (
+          {props.data.type === 'pedestrianLaneNonStopLine' && props.showIcon && (
             <Box>
               <WalkUnderlineSvg />
             </Box>
@@ -104,22 +105,22 @@ export default function LaneItem(props: {
         </>
       ) : (
         <>
-          {props.data.type == 'carLane' && props.showIcon && (
+          {props.data.type === 'carLane' && props.showIcon && (
             <Box>
               <CarSvg />
             </Box>
           )}
-          {props.data.type == 'publicCarLane' && props.showIcon && (
+          {props.data.type === 'publicCarLane' && props.showIcon && (
             <Box>
               <BusSideSvg />
             </Box>
           )}
-          {props.data.type == 'trackLane' && props.showIcon && (
+          {props.data.type === 'trackLane' && props.showIcon && (
             <Box>
               <TrainSvg />
             </Box>
           )}
-          {props.data.left != 'none' && (
+          {props.data.left !== 'none' && (
             <>
               <Box state={props.data.left}>
                 <TrafficSignButton
@@ -139,7 +140,7 @@ export default function LaneItem(props: {
               </Box>
             </>
           )}
-          {props.data.straight != 'none' && (
+          {props.data.straight !== 'none' && (
             <>
               <Box state={props.data.straight}>
                 <TrafficSignButton
@@ -159,7 +160,7 @@ export default function LaneItem(props: {
               </Box>
             </>
           )}
-          {props.data.right != 'none' && (
+          {props.data.right !== 'none' && (
             <>
               <Box state={props.data.right}>
                 <TrafficSignButton
@@ -179,7 +180,7 @@ export default function LaneItem(props: {
               </Box>
             </>
           )}
-          {props.data.uTurn != 'none' && (
+          {props.data.uTurn !== 'none' && (
             <>
               <Box state={props.data.uTurn}>
                 <TrafficSignButton

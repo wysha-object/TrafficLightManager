@@ -1,7 +1,7 @@
 import LinkVariantOffSvg from 'assets/images/link-variant-off.svg'
 import CopySvg from 'assets/images/copy.svg'
 import PasteSvg from 'assets/images/paste.svg'
-import { useCallback, useContext, useEffect, useRef } from 'react'
+import React, { useCallback, useContext, useEffect, useRef, useState } from 'react'
 import styled from 'styled-components'
 import { EdgeGroupMaskContextClipboard } from 'context'
 import EdgeViewer from 'components/shared/edge-viewer'
@@ -34,13 +34,6 @@ const Content = styled.div`
   align-items: center;
 `
 
-const HorizontalDivider = styled.div`
-  height: 2rem;
-  width: 100%;
-  border: 2rem solid rgba(255, 255, 255, 0.1);
-  margin: 6rem -6rem;
-`
-
 export default function EdgePanel(props: {
   data: EdgeInfo
   index: number
@@ -48,6 +41,43 @@ export default function EdgePanel(props: {
 }) {
   const { data, index, position } = props
   const clipboard = useContext(EdgeGroupMaskContextClipboard.context)
+  const edgeViewerRef = useRef<HTMLDivElement>(null)
+
+  const [buttonAreaStyle, setButtonAreaStyle] = useState<React.CSSProperties>({})
+  const [clipboardButtonAreaStyle, setClipboardButtonAreaStyle] = useState<React.CSSProperties>({})
+
+  const prevWidthRef = useRef(0)
+  useEffect(() => {
+    const raf = requestAnimationFrame(() => {
+      if (!edgeViewerRef.current) return
+
+      const fontSize = parseFloat(getComputedStyle(edgeViewerRef.current).fontSize)
+      const rect = edgeViewerRef.current.getBoundingClientRect()
+      if (rect.width === prevWidthRef.current) return
+      prevWidthRef.current = rect.width
+      if (rect.width > 7 * fontSize) {
+        setButtonAreaStyle({
+          display: 'flex',
+          width: '100%',
+          justifyContent: 'space-between',
+        })
+        setClipboardButtonAreaStyle({
+          display: 'flex',
+        })
+        return
+      } else if (rect.width > 4 * fontSize) {
+        setButtonAreaStyle({})
+        setClipboardButtonAreaStyle({
+          display: 'flex',
+        })
+        return
+      }
+
+      setButtonAreaStyle({})
+      setClipboardButtonAreaStyle({})
+    })
+    return () => cancelAnimationFrame(raf)
+  })
 
   const unlinkHandler = useCallback(() => {
     const newGroupMask: EdgeGroupMask = JSON.parse(
@@ -96,7 +126,7 @@ export default function EdgePanel(props: {
   return (
     <Container ref={containerRef}>
       <Content>
-        <div>
+        <div ref={edgeViewerRef}>
           <EdgeViewer
             data={data.m_EdgeGroupMask}
             displayOptions={{
@@ -127,43 +157,47 @@ export default function EdgePanel(props: {
             }
           />
         </div>
-        <HorizontalDivider />
-        <Button variant='round' onClick={unlinkHandler}>
-          <LinkVariantOffSvg className='big-icon' />
-        </Button>
-        <Button
-          variant='round'
-          onClick={() => {
-            clipboard.save(data.m_EdgeGroupMask)
-          }}
-        >
-          <CopySvg className='big-icon' />
-        </Button>
-        <Button
-          variant='round'
-          disabled={clipboard.selectedIndex < 0}
-          onClick={() => {
-            if (clipboard.selectedIndex >= 0) {
-              const selectedItem = clipboard.history[clipboard.selectedIndex]
-              const newGroupMask: EdgeGroupMask = JSON.parse(
-                JSON.stringify(data.m_EdgeGroupMask),
-              )
-              newGroupMask.m_Car = selectedItem.value.m_Car
-              newGroupMask.m_PublicCar = selectedItem.value.m_PublicCar
-              newGroupMask.m_Track = selectedItem.value.m_Track
-              newGroupMask.m_PedestrianStopLine =
-                selectedItem.value.m_PedestrianStopLine
-              newGroupMask.m_PedestrianNonStopLine =
-                selectedItem.value.m_PedestrianNonStopLine
-              updateEdgeGroupMaskCmd(
-                [newGroupMask],
-                data.m_TrafficLightsEntity,
-              )
-            }
-          }}
-        >
-          <PasteSvg className='big-icon' />
-        </Button>
+        <div className='horizontal-divider-with-gap' />
+        <div style={buttonAreaStyle}>
+          <Button variant='round' onClick={unlinkHandler}>
+            <LinkVariantOffSvg className='big-icon' />
+          </Button>
+          <div style={clipboardButtonAreaStyle}>
+            <Button
+              variant='round'
+              onClick={() => {
+                clipboard.save(data.m_EdgeGroupMask)
+              }}
+            >
+              <CopySvg className='big-icon' />
+            </Button>
+            <Button
+              variant='round'
+              disabled={clipboard.selectedIndex < 0}
+              onClick={() => {
+                if (clipboard.selectedIndex >= 0) {
+                  const selectedItem = clipboard.history[clipboard.selectedIndex]
+                  const newGroupMask: EdgeGroupMask = JSON.parse(
+                    JSON.stringify(data.m_EdgeGroupMask),
+                  )
+                  newGroupMask.m_Car = selectedItem.value.m_Car
+                  newGroupMask.m_PublicCar = selectedItem.value.m_PublicCar
+                  newGroupMask.m_Track = selectedItem.value.m_Track
+                  newGroupMask.m_PedestrianStopLine =
+                    selectedItem.value.m_PedestrianStopLine
+                  newGroupMask.m_PedestrianNonStopLine =
+                    selectedItem.value.m_PedestrianNonStopLine
+                  updateEdgeGroupMaskCmd(
+                    [newGroupMask],
+                    data.m_TrafficLightsEntity,
+                  )
+                }
+              }}
+            >
+              <PasteSvg className='big-icon' />
+            </Button>
+          </div>
+        </div>
       </Content>
     </Container>
   )

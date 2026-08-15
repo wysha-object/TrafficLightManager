@@ -1,6 +1,6 @@
 import { DetailedHTMLProps, useCallback } from 'react'
 import styled from 'styled-components'
-import LaneItem from '../custom-phase-tool/lane-item'
+import LaneItem from './lane-item'
 import {
   SubLaneGroupMask,
   CustomPhaseLaneType,

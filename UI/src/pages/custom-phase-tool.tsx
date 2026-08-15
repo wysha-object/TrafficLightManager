@@ -59,6 +59,7 @@ export default function CustomPhaseTool() {
             )
             .map((edge) => (
               <EdgePanel
+                key={`${edge.m_Position.key}`}
                 data={edge}
                 index={currrentFocusPhaseIndex}
                 position={screenPointMap[edge.m_Position.key]}
@@ -75,6 +76,7 @@ export default function CustomPhaseTool() {
               edge.m_SubLaneInfoList
                 .map((subLane) => (
                   <SubLanePanel
+                    key={`${subLane.m_Position.key}`}
                     edge={edge}
                     subLane={subLane}
                     index={currrentFocusPhaseIndex}
