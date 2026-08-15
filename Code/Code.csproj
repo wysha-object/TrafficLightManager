@@ -7,7 +7,7 @@
 
     <AssemblyName>TrafficLightManager.Code</AssemblyName>
     <RootNamespace>TrafficLightManager.Code</RootNamespace>
-    <Version>1.5.0</Version>
+    <Version>1.5.3</Version>
 
     <!--The file where mod information which is required for publishing mod on PDX mods are stored-->
     <PublishConfigurationPath>Properties\PublishConfiguration.xml</PublishConfigurationPath>
