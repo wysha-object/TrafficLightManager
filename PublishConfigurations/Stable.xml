@@ -1,0 +1,107 @@
+<Publish>
+    <!--Id must be set in order to update existed mod. it is not required for publishing mod for the first time-->
+    <ModId Value="139487" />
+    
+    <!--Name of the mod to display to players-->
+    <DisplayName Value="Traffic Light Manager" />
+
+    <!--Short description of the mod-->
+    <ShortDescription Value="A traffic light management mod based on slyh/TLE" />
+    
+    <!--Long description of the mod. Single line or multi line. Supports minimal markdown subset-->
+    <!--LongDescription Value="This is a long description" /-->
+    <LongDescription>
+
+# Traffic Light Manager
+
+A traffic light management mod based on slyh/Cities2-TrafficLightsEnhancement
+
+Mod-related information and usage tutorials can be found on 
+
+哔哩哔哩: https://space.bilibili.com/3546726445091690
+QQ: 760057820
+
+## Feature
+
+Customize the traffic lights at any intersection to look and work exactly the way you want.
+
+* Traffic Light Group: Combine multiple small intersections into one large intersection, allowing you to create complex intersection layouts.
+
+* Template System: Change all phases using the same template across all saves at once, and customize which template is used when creating new phases.
+
+* Clipboard System: Copy the signal configuration of any lane connection (Edge or SubLane) to the clipboard and paste it to other lane connections, allowing you to quickly edit multiple intersections.
+
+* Custom Name: Customize the names of intersections and phases, and optionally keep intersection names always visible on the world map.
+
+* Display Current Phase: Always show the current phase, allowing you to know the current state of an intersection at any time.
+
+* Sound Feedback: Provides sound feedback when hovering over buttons or pressing buttons.
+
+In addition to these features, this mod includes many other thoughtful designs:
+
+* When viewing an intersection, you can click another intersection to immediately switch the viewing target.
+
+* Only the most useful features are included, without a complicated UI interface.
+
+## Support
+
+If you find this mod helpful, please consider giving it a star !
+
+## Contribution
+
+Please check on GitHub.
+
+## Comments
+
+It is recommended to report issues on Github first, followed by the Paradox Forum.
+
+Github &gt; Paradox Forum &gt; Other
+
+Wherever you report an issue, please make sure to describe it clearly.
+
+* When reporting a bug, please provide as much detailed text description / game save files / screenshots / logs, or any other relevant information that can help identify the issue.
+
+* When requesting a feature, please provide as much detailed text description / images, or anything else that can help clarify your request.
+
+    </LongDescription>
+
+    <!--Thumbnail-->
+    <Thumbnail Value="Properties/Thumbnail.png" />
+
+    <!--Screenshot, can be set multiple times-->
+    <Screenshot Value="Properties/Screenshots/Screenshot1.jpg" />
+    <Screenshot Value="Properties/Screenshots/Screenshot2.jpg" />
+    <Screenshot Value="Properties/Screenshots/Screenshot3.jpg" />
+    <Screenshot Value="Properties/Screenshots/Screenshot4.jpg" />
+    <Screenshot Value="Properties/Screenshots/Screenshot5.jpg" />
+    <Screenshot Value="Properties/Screenshots/Screenshot6.jpg" />
+    <Screenshot Value="Properties/Screenshots/Screenshot7.jpg" />
+    <Screenshot Value="Properties/Screenshots/Screenshot8.jpg" />
+    <Screenshot Value="Properties/Screenshots/Screenshot9.jpg" />
+    <Screenshot Value="Properties/Screenshots/Screenshot10.jpg" />
+
+    <!--Tag, can be set multiple times-->
+    <Tag Value="" />
+
+    <!--Link to the forum post where the mod can be discussed-->
+    <ForumLink Value="https://forum.paradoxplaza.com/forum/threads/traffic-light-manager-discussion-thread.1920173/" />
+
+    <!--Version of the mod-->
+    <ModVersion Value="1.5.4" />
+
+    <!--Recommended version of the base game to use the mod-->
+    <GameVersion Value="1.*" />
+
+    <!--Dependency for the mod, can be set multiple times-->
+    <Dependency Id="" />
+
+    <!--Change log for new version. Single line or multi line. Supports minimal markdown subset-->
+    <ChangeLog>
+- Enhance UI
+    </ChangeLog>
+
+    <!--External link. supported types are discord, github, youtube, twitch, x, paypal, patreon-->
+    <ExternalLink Type="discord" Url="https://discord.gg/TBPYuMtN2" />
+    <ExternalLink Type="github" Url="https://github.com/wysha-object/TrafficLightManager" />
+    <ExternalLink Type="paypal" Url="https://paypal.me/SSObject" />
+</Publish>

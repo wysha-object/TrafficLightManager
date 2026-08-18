@@ -25,7 +25,7 @@ If you find this mod helpful, please consider giving it a star!
 
 All localization files can be found in the [Code/Resources/Localization](/Code/Resources/Localization) directory.
 
-Use `node i18n-format` in the project root to quickly format localization files.
+Use `npm i18n:format` in the project root to quickly format localization files.
 
 Other localization files use `en-US` as the baseline.
 

@@ -1,0 +1,47 @@
+<Publish>
+    <ModId Value="155789" />
+
+    <DisplayName Value="Traffic Light Manager [Beta]" />
+
+    <ShortDescription Value="A traffic light management mod based on slyh/TLE" />
+
+    <LongDescription>
+
+# Traffic Light Manager [Beta]
+
+Beta version of Traffic Light Manager (https://mods.paradoxplaza.com/mods/139487/Windows)
+
+    </LongDescription>
+    
+    <Thumbnail Value="Properties/Thumbnail.png" />
+    
+    <Screenshot Value="Properties/Screenshots/Screenshot1.jpg" />
+    <Screenshot Value="Properties/Screenshots/Screenshot2.jpg" />
+    <Screenshot Value="Properties/Screenshots/Screenshot3.jpg" />
+    <Screenshot Value="Properties/Screenshots/Screenshot4.jpg" />
+    <Screenshot Value="Properties/Screenshots/Screenshot5.jpg" />
+    <Screenshot Value="Properties/Screenshots/Screenshot6.jpg" />
+    <Screenshot Value="Properties/Screenshots/Screenshot7.jpg" />
+    <Screenshot Value="Properties/Screenshots/Screenshot8.jpg" />
+    <Screenshot Value="Properties/Screenshots/Screenshot9.jpg" />
+    <Screenshot Value="Properties/Screenshots/Screenshot10.jpg" />
+    
+    <Tag Value="" />
+    
+    <ForumLink Value="https://forum.paradoxplaza.com/forum/threads/traffic-light-manager-discussion-thread.1920173/" />
+    
+    <ModVersion Value="1.5.4-beta" />
+    
+    <GameVersion Value="1.*" />
+    
+    <Dependency Id="" />
+    
+    <ChangeLog>
+- Fix UI
+- Improve performance
+    </ChangeLog>
+    
+    <ExternalLink Type="discord" Url="https://discord.gg/TBPYuMtN2" />
+    <ExternalLink Type="github" Url="https://github.com/wysha-object/TrafficLightManager" />
+    <ExternalLink Type="paypal" Url="https://paypal.me/SSObject" />
+</Publish>

@@ -474,3 +474,6 @@ $RECYCLE.BIN/
 *.lnk
 
 Managed/
+
+# 现在发布配置放在 PublishConfigurations, 发布新版本前使用 publish-configuration-manager.js 来应用发布配置
+./Code/Properties/PublishConfiguration.xml
