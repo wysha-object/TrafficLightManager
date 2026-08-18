@@ -33,12 +33,12 @@ if (args[0] === 'beta') {
 
   const now = new Date()
   const date =
-    now.getFullYear().toString() +
-    String(now.getMonth() + 1).padStart(2, '0') +
-    String(now.getDate()).padStart(2, '0') +
+    now.getUTCFullYear().toString() +
+    String(now.getUTCMonth() + 1).padStart(2, '0') +
+    String(now.getUTCDate()).padStart(2, '0') +
     'T' +
-    String(now.getHours()).padStart(2, '0') +
-    String(now.getMinutes()).padStart(2, '0')
+    String(now.getUTCHours()).padStart(2, '0') +
+    String(now.getUTCMinutes()).padStart(2, '0')
 
   const commitHash = execSync('git rev-parse HEAD').toString().trim().slice(0, 7)
 
