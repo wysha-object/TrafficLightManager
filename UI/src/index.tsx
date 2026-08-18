@@ -23,21 +23,23 @@ function App() {
   const cityConfiguration = useGetCityConfigurationCmd()
 
   return (
-    <CityConfigurationContext.Provider value={cityConfiguration}>
-      <LocalisationContext.Provider value={localisation}>
-        <EdgeGroupMaskContextClipboard.Provider>
-          <SubLaneGroupMaskContextClipboard.Provider>
-            <CurrentFocusPhaseIndexContext.Provider
-              value={[displayPhaseIndex, setDisplayPhaseIndexCmd]}
-            >
-              <MainPanel />
-              <CustomPhaseTool />
-              <ClipboardPanel />
-            </CurrentFocusPhaseIndexContext.Provider>
-          </SubLaneGroupMaskContextClipboard.Provider>
-        </EdgeGroupMaskContextClipboard.Provider>
-      </LocalisationContext.Provider>
-    </CityConfigurationContext.Provider>
+    <div id="traffic-light-manager-root">
+      <CityConfigurationContext.Provider value={cityConfiguration}>
+        <LocalisationContext.Provider value={localisation}>
+          <EdgeGroupMaskContextClipboard.Provider>
+            <SubLaneGroupMaskContextClipboard.Provider>
+              <CurrentFocusPhaseIndexContext.Provider
+                value={[displayPhaseIndex, setDisplayPhaseIndexCmd]}
+              >
+                <MainPanel />
+                <CustomPhaseTool />
+                <ClipboardPanel />
+              </CurrentFocusPhaseIndexContext.Provider>
+            </SubLaneGroupMaskContextClipboard.Provider>
+          </EdgeGroupMaskContextClipboard.Provider>
+        </LocalisationContext.Provider>
+      </CityConfigurationContext.Provider>
+    </div>
   )
 }
 
