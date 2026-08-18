@@ -31,7 +31,9 @@ public class Mod : IMod
 
     private static Systems.Simulation.PatchedTrafficLightSystem m_PatchedTrafficLightSystem;
 
-    private static Systems.Update.TrafficLightGroupUpdateSystem m_TrafficLightGroupSystem;
+    private static Systems.Simulation.TrafficLightGroupSystem m_TrafficLightGroupSystem;
+
+    private static Systems.Update.TrafficLightGroupUpdateSystem m_TrafficLightGroupUpdateSystem;
 
     public void OnLoad(UpdateSystem updateSystem)
     {
@@ -48,7 +50,8 @@ public class Mod : IMod
         m_TrafficLightSystem = m_World.GetOrCreateSystemManaged<Game.Simulation.TrafficLightSystem>();
         m_PatchedTrafficLightInitializationSystem = m_World.GetOrCreateSystemManaged<Systems.Initialization.PatchedTrafficLightInitializationSystem>();
         m_PatchedTrafficLightSystem = m_World.GetOrCreateSystemManaged<Systems.Simulation.PatchedTrafficLightSystem>();
-        m_TrafficLightGroupSystem = m_World.GetOrCreateSystemManaged<Systems.Update.TrafficLightGroupUpdateSystem>();
+        m_TrafficLightGroupSystem = m_World.GetOrCreateSystemManaged<Systems.Simulation.TrafficLightGroupSystem>();
+        m_TrafficLightGroupUpdateSystem = m_World.GetOrCreateSystemManaged<Systems.Update.TrafficLightGroupUpdateSystem>();
         m_Settings = new Settings(this);
 
         SystemSetup(updateSystem);
@@ -74,6 +77,7 @@ public class Mod : IMod
 
         updateSystem.UpdateBefore<Systems.Initialization.PatchedTrafficLightInitializationSystem, Game.Net.TrafficLightInitializationSystem>(SystemUpdatePhase.Modification4B);
         updateSystem.UpdateBefore<Systems.Simulation.PatchedTrafficLightSystem, Game.Simulation.TrafficLightSystem>(SystemUpdatePhase.GameSimulation);
+        updateSystem.UpdateAt<Systems.Simulation.TrafficLightGroupSystem>(SystemUpdatePhase.GameSimulation);
         updateSystem.UpdateAt<Systems.UI.TooltipSystem>(SystemUpdatePhase.UITooltip);
         updateSystem.UpdateAt<Systems.UI.UISystem>(SystemUpdatePhase.UIUpdate);
         updateSystem.UpdateAt<Systems.Tool.ToolSystem>(SystemUpdatePhase.ToolUpdate);
