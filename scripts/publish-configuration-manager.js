@@ -40,7 +40,7 @@ if (args[0] === 'beta') {
     String(now.getHours()).padStart(2, '0') +
     String(now.getMinutes()).padStart(2, '0')
 
-  const commitHash = execSync('git rev-parse HEAD').toString().trim()
+  const commitHash = execSync('git rev-parse HEAD').toString().trim().slice(0, 7)
 
   parsedPublishConfiguration['Publish']['ModVersion']['@_Value'] =
     parsedPublishConfiguration['Publish']['ModVersion']['@_Value'] +
