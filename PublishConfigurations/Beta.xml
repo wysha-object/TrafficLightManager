@@ -37,8 +37,9 @@ Beta version of Traffic Light Manager (https://mods.paradoxplaza.com/mods/139487
     <Dependency Id="" />
     
     <ChangeLog>
-- Fix UI
-- Improve performance
+
+See commit history for details
+
     </ChangeLog>
     
     <ExternalLink Type="discord" Url="https://discord.gg/TBPYuMtN2" />

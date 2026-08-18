@@ -97,7 +97,9 @@ Wherever you report an issue, please make sure to describe it clearly.
 
     <!--Change log for new version. Single line or multi line. Supports minimal markdown subset-->
     <ChangeLog>
-- Enhance UI
+
+See commit history for details
+
     </ChangeLog>
 
     <!--External link. supported types are discord, github, youtube, twitch, x, paypal, patreon-->
