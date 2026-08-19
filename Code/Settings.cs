@@ -155,7 +155,7 @@ public class Settings : ModSetting
     public string m_ReleaseChannel => Mod.ReleaseChannel();
 
     [SettingsUISection(kTabGeneral, kGroupVersion)]
-    public string m_Version => Mod.m_InformationalVersion.Substring(0, 20);
+    public string m_Version => Mod.m_InformationalVersion;
 
     [SettingsUIKeyboardBinding(BindingKeyboard.None, kKeyboardBindingMainPanelToggle)]
     [SettingsUISection(kTabKeyBindings, kGroupMainPanel)]
