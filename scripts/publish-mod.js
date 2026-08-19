@@ -23,16 +23,11 @@ let publishConfiguration =
     ? fs.readFileSync(STABLE_PUBLISH_CONFIGURATION_PATH, 'utf-8')
     : fs.readFileSync(BETA_PUBLISH_CONFIGURATION_PATH, 'utf-8')
 
-if (args[0] === 'BETA') {
-  const parser = new XMLParser({
-    ignoreAttributes: false,
-  })
-  const builder = new XMLBuilder({
-    ignoreAttributes: false,
-    format: true,
-  })
-  const parsedPublishConfiguration = parser.parse(publishConfiguration)
+const parsedPublishConfiguration = new XMLParser({
+  ignoreAttributes: false,
+}).parse(publishConfiguration)
 
+if (args[0] === 'BETA') {
   const now = new Date()
   const date =
     now.getUTCFullYear().toString() +
@@ -53,9 +48,14 @@ if (args[0] === 'BETA') {
     date +
     '+' +
     commitHash
-
-  publishConfiguration = builder.build(parsedPublishConfiguration)
 }
+
+const releaseVersion = parsedPublishConfiguration['Publish']['ModVersion']['@_Value']
+
+publishConfiguration = new XMLBuilder({
+  ignoreAttributes: false,
+  format: true,
+}).build(parsedPublishConfiguration)
 
 fs.writeFileSync(
   './Code/Properties/PublishConfiguration.xml',
@@ -64,9 +64,9 @@ fs.writeFileSync(
 )
 
 execSync(
-  `dotnet publish Code/Code.csproj -p:PublishProfile=PublishNewVersion -p:ReleaseChannel=${args[0]}`,
+  `dotnet publish Code/Code.csproj -p:PublishProfile=PublishNewVersion -p:RELEASE_CHANNEL=${args[0]} -p:RELEASE_VERSION=${releaseVersion}`,
   {
     shell: true,
-    stdio: 'inherit'
+    stdio: 'inherit',
   },
 )
