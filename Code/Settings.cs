@@ -21,6 +21,7 @@ public class Settings : ModSetting
     public const string kGroupGeneral = "GroupGeneral";
     public const string kGroupDefault = "GroupDefault";
     public const string kGroupDisplay = "GroupDisplay";
+    public const string kGroupVersion = "GroupVersion";
 
     public const string kTabKeyBindings = "TabKeyBindings";
     public const string kGroupMainPanel = "GroupMainPanel";
@@ -149,6 +150,12 @@ public class Settings : ModSetting
 
     [SettingsUISection(kTabGeneral, kGroupDisplay)]
     public bool m_DisplayTrafficLightGroupNameWhenToolDisabled { get; set; }
+
+    [SettingsUISection(kTabGeneral, kGroupVersion)]
+    public string m_ReleaseChannel => Mod.ReleaseChannel();
+
+    [SettingsUISection(kTabGeneral, kGroupVersion)]
+    public string m_Version => Mod.m_InformationalVersion.Substring(0, 20);
 
     [SettingsUIKeyboardBinding(BindingKeyboard.None, kKeyboardBindingMainPanelToggle)]
     [SettingsUISection(kTabKeyBindings, kGroupMainPanel)]

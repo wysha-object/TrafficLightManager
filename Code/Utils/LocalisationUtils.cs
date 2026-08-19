@@ -133,6 +133,11 @@ public class LocalisationUtils
             this.GetString("Settings.Display.DisplayCurrentPhaseWhenToolDisabled.Label")
         );
         dictionary.Add(Mod.m_Settings.GetOptionDescLocaleID("m_DisplayCurrentPhaseWhenToolDisabled"), this.GetString("Settings.Display.DisplayCurrentPhaseWhenToolDisabled.Desc"));
+        dictionary.Add(Mod.m_Settings.GetOptionGroupLocaleID(Settings.kGroupVersion), this.GetString("Settings.Version"));
+        dictionary.Add(Mod.m_Settings.GetOptionLabelLocaleID("m_ReleaseChannel"), this.GetString("Settings.Version.ReleaseChannel.Label"));
+        dictionary.Add(Mod.m_Settings.GetOptionDescLocaleID("m_ReleaseChannel"), this.GetString("Settings.Version.ReleaseChannel.Desc"));
+        dictionary.Add(Mod.m_Settings.GetOptionLabelLocaleID("m_Version"), this.GetString("Settings.Version.Version.Label"));
+        dictionary.Add(Mod.m_Settings.GetOptionDescLocaleID("m_Version"), this.GetString("Settings.Version.Version.Desc"));
 
         dictionary.Add(Mod.m_Settings.GetOptionTabLocaleID(Settings.kTabKeyBindings), this.GetString("KeyBindings"));
         dictionary.Add(Mod.m_Settings.GetOptionGroupLocaleID(Settings.kGroupMainPanel), this.GetString("MainPanel"));

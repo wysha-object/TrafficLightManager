@@ -11,17 +11,19 @@ if (args.length !== 1) {
   process.exit(1)
 }
 
-if (args[0] !== 'stable' && args[0] !== 'beta') {
+args[0] = args[0].toLocaleUpperCase()
+
+if (args[0] !== 'STABLE' && args[0] !== 'BETA') {
   console.error('Invalid argument. Please provide "stable" or "beta"')
   process.exit(1)
 }
 
 let publishConfiguration =
-  args[0] === 'stable'
+  args[0] === 'STABLE'
     ? fs.readFileSync(STABLE_PUBLISH_CONFIGURATION_PATH, 'utf-8')
     : fs.readFileSync(BETA_PUBLISH_CONFIGURATION_PATH, 'utf-8')
 
-if (args[0] === 'beta') {
+if (args[0] === 'BETA') {
   const parser = new XMLParser({
     ignoreAttributes: false,
   })
@@ -40,7 +42,10 @@ if (args[0] === 'beta') {
     String(now.getUTCHours()).padStart(2, '0') +
     String(now.getUTCMinutes()).padStart(2, '0')
 
-  const commitHash = execSync('git rev-parse HEAD').toString().trim().slice(0, 7)
+  const commitHash = execSync('git rev-parse HEAD')
+    .toString()
+    .trim()
+    .slice(0, 7)
 
   parsedPublishConfiguration['Publish']['ModVersion']['@_Value'] =
     parsedPublishConfiguration['Publish']['ModVersion']['@_Value'] +
@@ -56,4 +61,12 @@ fs.writeFileSync(
   './Code/Properties/PublishConfiguration.xml',
   publishConfiguration,
   'utf-8',
+)
+
+execSync(
+  `dotnet publish Code/Code.csproj -p:PublishProfile=PublishNewVersion -p:ReleaseChannel=${args[0]}`,
+  {
+    shell: true,
+    stdio: 'inherit'
+  },
 )

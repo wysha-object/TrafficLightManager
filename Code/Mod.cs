@@ -105,4 +105,15 @@ public class Mod : IMod
         m_Log.Error($"Assertion failed!\n{message}\nExpression: {expression}");
         m_Log.SetShowsErrorsInUI(showsErrorsInUI);
     }
+
+    public static string ReleaseChannel()
+    {
+#if STABLE
+        return "Stable";
+#elif BETA
+        return "Beta";
+#else
+        return "UNKNOWN";
+#endif
+    }
 }

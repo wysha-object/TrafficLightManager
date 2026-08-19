@@ -126,4 +126,8 @@
   <PropertyGroup Condition="'$(Verbosity)' == 'Debug'">
     <DefineConstants>$(DefineConstants);VERBOSITY_VERBOSE;VERBOSITY_DEBUG</DefineConstants>
   </PropertyGroup>
+
+  <PropertyGroup>
+    <DefineConstants>$(RELEASE_CHANNEL)</DefineConstants>
+  </PropertyGroup>
 </Project>
