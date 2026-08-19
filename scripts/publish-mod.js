@@ -2,6 +2,7 @@ import { XMLParser, XMLBuilder } from 'fast-xml-parser'
 import { execSync } from 'node:child_process'
 import fs from 'node:fs'
 
+const MOD_CONFIGURATION_PATH = './UI/mod.json'
 const STABLE_PUBLISH_CONFIGURATION_PATH = './PublishConfigurations/Stable.xml'
 const BETA_PUBLISH_CONFIGURATION_PATH = './PublishConfigurations/Beta.xml'
 
@@ -18,6 +19,9 @@ if (args[0] !== 'STABLE' && args[0] !== 'BETA') {
   process.exit(1)
 }
 
+let modConfiguration = fs.readFileSync(MOD_CONFIGURATION_PATH, 'utf-8')
+const parsedModConfiguration = JSON.parse(modConfiguration)
+
 let publishConfiguration =
   args[0] === 'STABLE'
     ? fs.readFileSync(STABLE_PUBLISH_CONFIGURATION_PATH, 'utf-8')
@@ -31,7 +35,7 @@ const commitHash = execSync('git rev-parse HEAD').toString().trim().slice(0, 7)
 
 if (args[0] === 'STABLE') {
   parsedPublishConfiguration['Publish']['ModVersion']['@_Value'] =
-    `${parsedPublishConfiguration['Publish']['ModVersion']['@_Value']}+${commitHash}`
+    `${parsedModConfiguration['version']}+${commitHash}`
 } else {
   const now = new Date()
   const date =
@@ -43,7 +47,7 @@ if (args[0] === 'STABLE') {
     String(now.getUTCMinutes()).padStart(2, '0')
 
   parsedPublishConfiguration['Publish']['ModVersion']['@_Value'] =
-    `${parsedPublishConfiguration['Publish']['ModVersion']['@_Value']}.${date}+${commitHash}`
+    `${parsedModConfiguration['version']}-beta.${date}+${commitHash}`
 }
 
 const releaseVersion =
