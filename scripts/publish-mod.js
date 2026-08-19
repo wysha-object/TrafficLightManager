@@ -27,7 +27,12 @@ const parsedPublishConfiguration = new XMLParser({
   ignoreAttributes: false,
 }).parse(publishConfiguration)
 
-if (args[0] === 'BETA') {
+const commitHash = execSync('git rev-parse HEAD').toString().trim().slice(0, 7)
+
+if (args[0] === 'STABLE') {
+  parsedPublishConfiguration['Publish']['ModVersion']['@_Value'] =
+    `${parsedPublishConfiguration['Publish']['ModVersion']['@_Value']}+${commitHash}`
+} else {
   const now = new Date()
   const date =
     now.getUTCFullYear().toString() +
@@ -37,20 +42,12 @@ if (args[0] === 'BETA') {
     String(now.getUTCHours()).padStart(2, '0') +
     String(now.getUTCMinutes()).padStart(2, '0')
 
-  const commitHash = execSync('git rev-parse HEAD')
-    .toString()
-    .trim()
-    .slice(0, 7)
-
   parsedPublishConfiguration['Publish']['ModVersion']['@_Value'] =
-    parsedPublishConfiguration['Publish']['ModVersion']['@_Value'] +
-    '.' +
-    date +
-    '+' +
-    commitHash
+    `${parsedPublishConfiguration['Publish']['ModVersion']['@_Value']}.${date}+${commitHash}`
 }
 
-const releaseVersion = parsedPublishConfiguration['Publish']['ModVersion']['@_Value']
+const releaseVersion =
+  parsedPublishConfiguration['Publish']['ModVersion']['@_Value']
 
 publishConfiguration = new XMLBuilder({
   ignoreAttributes: false,
