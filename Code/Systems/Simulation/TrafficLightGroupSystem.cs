@@ -28,14 +28,12 @@ public partial class TrafficLightGroupSystem : GameSystemBase
             customPhaseTemplates[i] = new CustomPhaseTemplate.Values(templateList[i]);
         }
 
-        var ecb = m_EcbSystem.CreateCommandBuffer().AsParallelWriter();
-
         JobHandle dependency = //JobChunkExtensions.Schedule(
         JobChunkExtensions.ScheduleParallel(
             new UpdateTrafficLightGroupJob
             {
                 m_EntityStorageInfoLookup = GetEntityStorageInfoLookup(),
-                m_EntityCommandBuffer = ecb,
+                m_EntityCommandBuffer = m_EndFrameBarrier.CreateCommandBuffer().AsParallelWriter(),
                 m_EntityType = GetEntityTypeHandle(),
                 m_TrafficLightGroupType = GetComponentTypeHandle<TrafficLightGroup>(isReadOnly: false),
                 m_TrafficLightsMemberRefType = GetBufferTypeHandle<TrafficLightsMemberRef>(isReadOnly: false),
@@ -60,7 +58,7 @@ public partial class TrafficLightGroupSystem : GameSystemBase
         );
 
         base.Dependency = customPhaseTemplates.Dispose(dependency);
-        m_EcbSystem.AddJobHandleForProducer(dependency);
+        m_EndFrameBarrier.AddJobHandleForProducer(dependency);
     }
 
     [BurstCompile]
@@ -776,7 +774,7 @@ public partial class TrafficLightGroupSystem : GameSystemBase
         }
     }
 
-    private EntityCommandBufferSystem m_EcbSystem;
+    private EndFrameBarrier m_EndFrameBarrier;
 
     private EntityQuery m_TrafficLightGroupQuery;
 
@@ -789,7 +787,7 @@ public partial class TrafficLightGroupSystem : GameSystemBase
     {
         base.OnCreate();
 
-        m_EcbSystem = base.World.GetOrCreateSystemManaged<EntityCommandBufferSystem>();
+        m_EndFrameBarrier = base.World.GetOrCreateSystemManaged<EndFrameBarrier>();
         m_SimulationSystem = base.World.GetOrCreateSystemManaged<SimulationSystem>();
         m_TimeSystem = base.World.GetOrCreateSystemManaged<TimeSystem>();
         m_TrafficLightGroupQuery = GetEntityQuery(

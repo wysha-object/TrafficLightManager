@@ -19,14 +19,12 @@ public partial class TrafficLightGroupUpdateSystem : GameSystemBase
     [Preserve]
     protected override void OnUpdate()
     {
-        var ecb = m_EcbSystem.CreateCommandBuffer().AsParallelWriter();
-
         JobHandle dependency = //JobChunkExtensions.Schedule(
         JobChunkExtensions.ScheduleParallel(
             new UpdateTrafficLightGroupJob
             {
                 m_EntityStorageInfoLookup = GetEntityStorageInfoLookup(),
-                m_EntityCommandBuffer = ecb,
+                m_EntityCommandBuffer = m_ModificationEndBarrier.CreateCommandBuffer().AsParallelWriter(),
                 m_EntityType = GetEntityTypeHandle(),
                 m_TrafficLightGroupType = GetComponentTypeHandle<TrafficLightGroup>(isReadOnly: false),
                 m_TrafficLightsMemberRefType = GetBufferTypeHandle<TrafficLightsMemberRef>(isReadOnly: false),
@@ -39,7 +37,7 @@ public partial class TrafficLightGroupUpdateSystem : GameSystemBase
         );
 
         base.Dependency = dependency;
-        m_EcbSystem.AddJobHandleForProducer(dependency);
+        m_ModificationEndBarrier.AddJobHandleForProducer(dependency);
     }
 
     [BurstCompile]
@@ -96,7 +94,7 @@ public partial class TrafficLightGroupUpdateSystem : GameSystemBase
         }
     }
 
-    private EntityCommandBufferSystem m_EcbSystem;
+    private ModificationEndBarrier m_ModificationEndBarrier;
 
     private EntityQuery m_TrafficLightGroupQuery;
 
@@ -109,7 +107,7 @@ public partial class TrafficLightGroupUpdateSystem : GameSystemBase
     {
         base.OnCreate();
 
-        m_EcbSystem = base.World.GetOrCreateSystemManaged<EntityCommandBufferSystem>();
+        m_ModificationEndBarrier = base.World.GetOrCreateSystemManaged<ModificationEndBarrier>();
         m_SimulationSystem = base.World.GetOrCreateSystemManaged<SimulationSystem>();
         m_TimeSystem = base.World.GetOrCreateSystemManaged<TimeSystem>();
         m_TrafficLightGroupQuery = GetEntityQuery(
