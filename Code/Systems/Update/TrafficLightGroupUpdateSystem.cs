@@ -23,14 +23,14 @@ public partial class TrafficLightGroupUpdateSystem : GameSystemBase
         JobChunkExtensions.ScheduleParallel(
             new UpdateTrafficLightGroupJob
             {
-                m_EntityStorageInfoLookup = GetEntityStorageInfoLookup(),
+                m_EntityStorageInfoLookup = SystemAPI.GetEntityStorageInfoLookup(),
                 m_EntityCommandBuffer = m_ModificationEndBarrier.CreateCommandBuffer().AsParallelWriter(),
-                m_EntityType = GetEntityTypeHandle(),
-                m_TrafficLightGroupType = GetComponentTypeHandle<TrafficLightGroup>(isReadOnly: false),
-                m_TrafficLightsMemberRefType = GetBufferTypeHandle<TrafficLightsMemberRef>(isReadOnly: false),
-                m_CustomPhaseDataBufferType = GetBufferTypeHandle<CustomPhaseData>(isReadOnly: false),
-                m_TrafficLightsLookup = GetComponentLookup<TrafficLights>(isReadOnly: false),
-                m_CustomTrafficLightsLookup = GetComponentLookup<CustomTrafficLights>(isReadOnly: false),
+                m_EntityType = SystemAPI.GetEntityTypeHandle(),
+                m_TrafficLightGroupType = SystemAPI.GetComponentTypeHandle<TrafficLightGroup>(isReadOnly: false),
+                m_TrafficLightsMemberRefType = SystemAPI.GetBufferTypeHandle<TrafficLightsMemberRef>(isReadOnly: false),
+                m_CustomPhaseDataBufferType = SystemAPI.GetBufferTypeHandle<CustomPhaseData>(isReadOnly: false),
+                m_TrafficLightsLookup = SystemAPI.GetComponentLookup<TrafficLights>(isReadOnly: false),
+                m_CustomTrafficLightsLookup = SystemAPI.GetComponentLookup<CustomTrafficLights>(isReadOnly: false),
             },
             m_TrafficLightGroupQuery,
             base.Dependency
