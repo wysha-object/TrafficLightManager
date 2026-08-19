@@ -9,6 +9,8 @@
     <RootNamespace>TrafficLightManager.Code</RootNamespace>
     <Version>$(RELEASE_VERSION)</Version>
 
+    <IncludeSourceRevisionInInformationalVersion>false</IncludeSourceRevisionInInformationalVersion>
+
     <!--The file where mod information which is required for publishing mod on PDX mods are stored-->
     <PublishConfigurationPath>Properties\PublishConfiguration.xml</PublishConfigurationPath>
   </PropertyGroup>
