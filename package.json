@@ -2,7 +2,7 @@
   "scripts": {
     "build": "npm run build --workspace UI",
     "i18n:format": "node ./scripts/i18n-format.js",
-    "publish": "node ./scripts/publish-configuration-manager.js"
+    "prepublish": "node ./scripts/publish-configuration-manager.js"
   },
   "workspaces": [
     "UI"
