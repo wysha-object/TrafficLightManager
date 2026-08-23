@@ -39,7 +39,7 @@ export default function CustomPhaseTool() {
     return () => {
       cancelled = true
     }
-  }, [edgeInfoList, camera]);
+  }, [edgeInfoList, JSON.stringify(camera)]);
 
   return (
     <>
