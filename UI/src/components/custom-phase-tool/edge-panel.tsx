@@ -9,7 +9,6 @@ import {
   EdgeGroupMask,
   EdgeGroupMaskOptions,
   EdgeInfo,
-  ScreenPoint,
 } from 'types'
 import { Button } from 'cs2/ui'
 import { updateEdgeGroupMaskCmd } from 'hooks/cmds'
@@ -37,7 +36,10 @@ const Content = styled.div`
 export default function EdgePanel(props: {
   data: EdgeInfo
   index: number
-  position: ScreenPoint
+  position: {
+    top: number
+    left: number
+  }
 }) {
   const { data, index, position } = props
   const clipboard = useContext(EdgeGroupMaskContextClipboard.context)

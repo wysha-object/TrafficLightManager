@@ -53,8 +53,6 @@ public partial class UISystem : UISystemBase
 
     private CameraUpdateSystem m_CameraUpdateSystem;
 
-    private float3 m_CameraPosition;
-
     private List<UITypes.WorldPosition> m_WorldPositionList;
 
     private Dictionary<Entity, NativeArray<NodeUtils.EdgeInfo>> m_EdgeInfoDictionary;
@@ -90,12 +88,17 @@ public partial class UISystem : UISystemBase
         GameManager.instance.localizationManager.onActiveDictionaryChanged += UpdateLocale;
     }
 
+    private Vector3 m_CameraPosition;
+    private Vector3 m_CameraRotation;
+
     protected override void OnUpdate()
     {
-        if (m_WorldPositionList.Count > 0 && !m_CameraPosition.Equals(m_CameraUpdateSystem.position))
+        var camera = m_CameraUpdateSystem.activeCamera;
+        if (camera != null && (!Equals(m_CameraPosition, camera.transform.position) || !Equals(m_CameraRotation, camera.transform.rotation.eulerAngles)))
         {
-            m_CameraPosition = m_CameraUpdateSystem.position;
-            m_ScreenPointBinding.Update();
+            m_CameraPosition = camera.transform.position;
+            m_CameraRotation = camera.transform.rotation.eulerAngles;
+            m_CameraBinding.Update();
         }
     }
 

@@ -26,7 +26,7 @@ public partial class UISystem : UISystemBase
 
     private GetterValueBinding<string> m_CityConfigurationBinding;
 
-    private GetterValueBinding<Dictionary<string, UITypes.ScreenPoint>> m_ScreenPointBinding;
+    private GetterValueBinding<string> m_CameraBinding;
 
     private GetterValueBinding<Dictionary<Entity, NativeArray<NodeUtils.EdgeInfo>>> m_EdgeInfoBinding;
 
@@ -71,26 +71,54 @@ public partial class UISystem : UISystemBase
                 }
             )
         );
+
         AddBinding(
-            m_ScreenPointBinding = new GetterValueBinding<Dictionary<string, UITypes.ScreenPoint>>(
+            m_CameraBinding = new GetterValueBinding<string>(
                 "TrafficLightManager",
-                "GetScreenPoint",
+                "GetCamera",
                 () =>
                 {
-                    Dictionary<string, UITypes.ScreenPoint> screenPointDictionary = [];
-                    m_Camera = Camera.main;
-                    m_ScreenHeight = Screen.height;
-                    foreach (var wp in m_WorldPositionList)
+                    var camera = m_CameraUpdateSystem.activeCamera;
+                    if (camera == null)
                     {
-                        if (!screenPointDictionary.ContainsKey(wp))
-                        {
-                            screenPointDictionary[wp] = new UITypes.ScreenPoint(m_Camera.WorldToScreenPoint(wp), m_ScreenHeight);
-                        }
+                        return JsonConvert.SerializeObject(
+                            new
+                            {
+                                position = new
+                                {
+                                    x = 0f,
+                                    y = 0f,
+                                    z = 0f,
+                                },
+                                rotation = new
+                                {
+                                    x = 0f,
+                                    y = 0f,
+                                    z = 0f,
+                                },
+                            }
+                        );
                     }
-                    return screenPointDictionary;
-                },
-                new DictionaryWriter<string, UITypes.ScreenPoint>(null, new ValueWriter<UITypes.ScreenPoint>()),
-                new JsonWriter.FalseEqualityComparer<Dictionary<string, UITypes.ScreenPoint>>()
+                    var position = camera.transform.position;
+                    var rotation = camera.transform.rotation;
+                    return JsonConvert.SerializeObject(
+                        new
+                        {
+                            position = new
+                            {
+                                x = position.x,
+                                y = position.y,
+                                z = position.z,
+                            },
+                            rotation = new
+                            {
+                                x = rotation.eulerAngles.x,
+                                y = rotation.eulerAngles.y,
+                                z = rotation.eulerAngles.z,
+                            },
+                        }
+                    );
+                }
             )
         );
         AddBinding(
@@ -713,32 +741,26 @@ public partial class UISystem : UISystemBase
         AddBinding(
             new CallBinding<string, string>(
                 "TrafficLightManager",
-                "AddWorldPosition",
-                (input) =>
+                "WorldToScreenPoint",
+                (inputJsonString) =>
                 {
-                    UITypes.WorldPosition[] posArray = JsonConvert.DeserializeObject<UITypes.WorldPosition[]>(input);
-                    foreach (var pos in posArray)
+                    var inputValue = JsonConvert.DeserializeAnonymousType(
+                        inputJsonString,
+                        new
+                        {
+                            x = 0f,
+                            y = 0f,
+                            z = 0f,
+                        }
+                    );
+
+                    var camera = m_CameraUpdateSystem.activeCamera;
+                    if (camera == null)
                     {
-                        m_WorldPositionList.Add(pos);
+                        return JsonConvert.SerializeObject(new { top = 0, left = 0 });
                     }
-                    m_CameraPosition = float.MaxValue; // Trigger binding update
-                    return "";
-                }
-            )
-        );
-        AddBinding(
-            new CallBinding<string, string>(
-                "TrafficLightManager",
-                "RemoveWorldPosition",
-                (input) =>
-                {
-                    UITypes.WorldPosition[] posArray = JsonConvert.DeserializeObject<UITypes.WorldPosition[]>(input);
-                    foreach (var pos in posArray)
-                    {
-                        m_WorldPositionList.Remove(pos);
-                    }
-                    m_CameraPosition = float.MaxValue; // Trigger binding update
-                    return "";
+                    var screenPoint = camera.WorldToScreenPoint(new Vector3(inputValue.x, inputValue.y, inputValue.z));
+                    return JsonConvert.SerializeObject(new { top = Screen.height - screenPoint.y, left = screenPoint.x });
                 }
             )
         );
@@ -748,14 +770,16 @@ public partial class UISystem : UISystemBase
                 "LookAt",
                 (inputJsonString) =>
                 {
-                    var inputDefinition = new
-                    {
-                        x = 0f,
-                        y = 0f,
-                        z = 0f,
-                        distance = 0f,
-                    };
-                    var inputValue = JsonConvert.DeserializeAnonymousType(inputJsonString, inputDefinition);
+                    var inputValue = JsonConvert.DeserializeAnonymousType(
+                        inputJsonString,
+                        new
+                        {
+                            x = 0f,
+                            y = 0f,
+                            z = 0f,
+                            distance = 0f,
+                        }
+                    );
                     var pivot = new float3(inputValue.x, inputValue.y, inputValue.z);
                     var zoom = inputValue.distance;
 

@@ -5,14 +5,12 @@ import {
   CityConfiguration,
   CustomPhaseItem,
   ToolState,
-  ScreenPointMap,
   EdgeInfo,
   TrafficLightGroup,
   Settings,
   CustomPhaseTemplate,
   EdgeGroupMask,
   SubLaneGroupMask,
-  WorldPosition,
 } from 'types'
 
 export function useGetToolStateCmd() {
@@ -43,10 +41,13 @@ export function useGetCityConfigurationCmd() {
     ),
   ) as CityConfiguration
 }
-export function useGetScreenPointCmd() {
-  return useValue(
-    bindValue('TrafficLightManager', 'GetScreenPoint', {}),
-  ) as ScreenPointMap
+export function useGetCameraCmd() {
+  return JSON.parse(
+    useValue(bindValue('TrafficLightManager', 'GetCamera', '{}')),
+  ) as {
+    position: { x: number; y: number; z: number }
+    rotation: { x: number; y: number; z: number }
+  }
 }
 export function useGetEdgeInfoCmd() {
   return useValue(
@@ -89,10 +90,14 @@ export function useGetSystemDefaultTemplateCmd() {
 export async function setToolStateCmd(inputValue: ToolState): Promise<void> {
   return await call('TrafficLightManager', 'SetToolState', inputValue)
 }
-export async function setDisplayPhaseIndexCmd(inputValue: number): Promise<void> {
+export async function setDisplayPhaseIndexCmd(
+  inputValue: number,
+): Promise<void> {
   return await call('TrafficLightManager', 'SetDisplayPhaseIndex', inputValue)
 }
-export async function setManualPhaseIndexCmd(inputValue: number): Promise<void> {
+export async function setManualPhaseIndexCmd(
+  inputValue: number,
+): Promise<void> {
   return await call('TrafficLightManager', 'SetManualPhaseIndex', inputValue)
 }
 export async function setCustomPhaseDataCmd(
@@ -135,7 +140,9 @@ export async function setCustomPhaseDataCmd(
     JSON.stringify(value),
   )
 }
-export async function setTemplateCmd(inputValue: CustomPhaseTemplate): Promise<void> {
+export async function setTemplateCmd(
+  inputValue: CustomPhaseTemplate,
+): Promise<void> {
   return await call(
     'TrafficLightManager',
     'SetTemplate',
@@ -145,7 +152,9 @@ export async function setTemplateCmd(inputValue: CustomPhaseTemplate): Promise<v
 export async function removeTemplateCmd(inputValue: string): Promise<void> {
   return await call('TrafficLightManager', 'RemoveTemplate', inputValue)
 }
-export async function setTrafficLightGroupNameCmd(inputValue: string): Promise<void> {
+export async function setTrafficLightGroupNameCmd(
+  inputValue: string,
+): Promise<void> {
   return await call(
     'TrafficLightManager',
     'SetTrafficLightGroupName',
@@ -158,7 +167,10 @@ export async function addCustomPhaseCmd(): Promise<void> {
 export async function removeCustomPhaseCmd(inputValue: number): Promise<void> {
   return await call('TrafficLightManager', 'RemoveCustomPhase', inputValue)
 }
-export async function swapCustomPhaseCmd(index1: number, index2: number): Promise<void> {
+export async function swapCustomPhaseCmd(
+  index1: number,
+  index2: number,
+): Promise<void> {
   return await call(
     'TrafficLightManager',
     'SwapCustomPhase',
@@ -185,18 +197,17 @@ export async function updateSubLaneGroupMaskCmd(
     JSON.stringify({ groupMaskArray, entity }),
   )
 }
-export async function addWorldPosition(inputValue: WorldPosition[]): Promise<void> {
-  return await call(
-    'TrafficLightManager',
-    'AddWorldPosition',
-    JSON.stringify(inputValue),
-  )
-}
-export async function removeWorldPosition(inputValue: WorldPosition[]): Promise<void> {
-  return await call(
-    'TrafficLightManager',
-    'RemoveWorldPosition',
-    JSON.stringify(inputValue),
+export async function worldToScreenPoint(inputValue: {
+  x: number
+  y: number
+  z: number
+}): Promise<{ top: number; left: number }> {
+  return JSON.parse(
+    await call(
+      'TrafficLightManager',
+      'WorldToScreenPoint',
+      JSON.stringify(inputValue),
+    ),
   )
 }
 export async function lookAt(
@@ -215,7 +226,11 @@ export async function copyPhaseCmd(index: number): Promise<number> {
   return (await call('TrafficLightManager', 'CopyPhase', index)) as number
 }
 export async function getStorage(key: string): Promise<object | null> {
-  const jsonString = await call('TrafficLightManager', 'GetStorage', key) as string
+  const jsonString = (await call(
+    'TrafficLightManager',
+    'GetStorage',
+    key,
+  )) as string
   if (!jsonString) {
     return null
   }
@@ -225,6 +240,6 @@ export async function updateStorage(key: string, value: object): Promise<void> {
   return await call(
     'TrafficLightManager',
     'UpdateStorage',
-    JSON.stringify({ key, value:  JSON.stringify(value) }),
+    JSON.stringify({ key, value: JSON.stringify(value) }),
   )
 }

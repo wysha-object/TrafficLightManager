@@ -1,50 +1,45 @@
-import { useContext, useEffect } from 'react'
-import { removeWorldPosition } from 'hooks/cmds'
+import { useContext, useEffect, useState } from 'react'
 import EdgePanel from '../components/custom-phase-tool/edge-panel'
 import SubLanePanel from '../components/custom-phase-tool/sublane-panel'
 import { EdgeGroupMaskOptions, ToolState } from 'types'
 import { CurrentFocusPhaseIndexContext } from 'context'
 import {
-  addWorldPosition,
+  useGetCameraCmd,
   useGetEdgeInfoCmd,
-  useGetScreenPointCmd,
   useGetToolStateCmd,
+  worldToScreenPoint,
 } from 'hooks/cmds'
 
 export default function CustomPhaseTool() {
   const [currrentFocusPhaseIndex] = useContext(CurrentFocusPhaseIndexContext)
   const edgeInfoList = useGetEdgeInfoCmd()
   const toolState = useGetToolStateCmd()
+  const camera = useGetCameraCmd()
 
+  const [screenPointMap, setScreenPointMap] = useState(new Map<string, { top: number; left: number }>())
   useEffect(() => {
-    const edgePositionArray = edgeInfoList
-      .filter(
-        (edge) =>
-          (edge.m_EdgeGroupMask.m_Options &
-            EdgeGroupMaskOptions.PerLaneSignal) ==
-          0,
-      )
-      .map((item) => item.m_Position)
-    const subLanePositionArray = edgeInfoList
-      .filter(
-        (edge) =>
-          (edge.m_EdgeGroupMask.m_Options &
-            EdgeGroupMaskOptions.PerLaneSignal) !=
-          0,
-      )
-      .map((item) =>
-        item.m_SubLaneInfoList.map((subLane) => subLane.m_Position),
-      )
-      .flat()
-    addWorldPosition(edgePositionArray)
-    addWorldPosition(subLanePositionArray)
-    return () => {
-      removeWorldPosition(edgePositionArray)
-      removeWorldPosition(subLanePositionArray)
+    let cancelled = false
+    const fetch = async () => {
+      const map = new Map<string, { top: number; left: number }>()
+      for (const edge of edgeInfoList) {
+        if ((edge.m_EdgeGroupMask.m_Options & EdgeGroupMaskOptions.PerLaneSignal) == 0) {
+          const screenPoint = await worldToScreenPoint(edge.m_Position)
+          map.set(JSON.stringify(edge.m_Position), screenPoint)
+        } else {
+          for (const subLane of edge.m_SubLaneInfoList) {
+            const screenPoint = await worldToScreenPoint(subLane.m_Position)
+            map.set(JSON.stringify(subLane.m_Position), screenPoint)
+          }
+        }
+      }
+      if (cancelled) return
+      setScreenPointMap(map)
     }
-  }, [edgeInfoList])
-
-  const screenPointMap = useGetScreenPointCmd()
+    fetch()
+    return () => {
+      cancelled = true
+    }
+  }, [edgeInfoList, camera]);
 
   return (
     <>
@@ -59,10 +54,10 @@ export default function CustomPhaseTool() {
             )
             .map((edge) => (
               <EdgePanel
-                key={`${edge.m_Position.key}`}
+                key={`${edge.m_Position.x}-${edge.m_Position.y}-${edge.m_Position.z}`}
                 data={edge}
                 index={currrentFocusPhaseIndex}
-                position={screenPointMap[edge.m_Position.key]}
+                position={screenPointMap.get(JSON.stringify(edge.m_Position)) ?? { top: 0, left: 0 }}
               />
             ))}
           {edgeInfoList
@@ -76,11 +71,11 @@ export default function CustomPhaseTool() {
               edge.m_SubLaneInfoList
                 .map((subLane) => (
                   <SubLanePanel
-                    key={`${subLane.m_Position.key}`}
+                    key={`${subLane.m_Position.x}-${subLane.m_Position.y}-${subLane.m_Position.z}`}
                     edge={edge}
                     subLane={subLane}
                     index={currrentFocusPhaseIndex}
-                    position={screenPointMap[subLane.m_Position.key]}
+                    position={screenPointMap.get(JSON.stringify(subLane.m_Position)) ?? { top: 0, left: 0 }}
                   />
                 ))
                 .flat(),

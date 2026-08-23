@@ -51,22 +51,6 @@ export interface TrafficLightGroup {
   targetDuration: number
 }
 
-export interface WorldPosition {
-  x: number
-  y: number
-  z: number
-  key: string
-}
-
-export interface ScreenPoint {
-  left: number
-  top: number
-}
-
-export interface ScreenPointMap {
-  [key: string]: ScreenPoint
-}
-
 export interface CityConfiguration {
   leftHandTraffic: boolean
 }
@@ -106,7 +90,11 @@ export interface GroupMaskTurn {
 
 export interface EdgeGroupMask {
   m_Edge: Entity
-  m_Position: WorldPosition
+  m_Position: {
+    x: number
+    y: number
+    z: number
+  }
   m_Options: number
   m_Car: GroupMaskTurn
   m_PublicCar: GroupMaskTurn
@@ -117,7 +105,11 @@ export interface EdgeGroupMask {
 
 export interface EdgeInfo {
   m_Edge: Entity
-  m_Position: WorldPosition
+  m_Position: {
+    x: number
+    y: number
+    z: number
+  }
   m_CarLaneLeftCount: number
   m_CarLaneStraightCount: number
   m_CarLaneRightCount: number
@@ -140,7 +132,11 @@ export interface EdgeInfo {
 
 export interface SubLaneGroupMask {
   m_SubLane: Entity
-  m_Position: WorldPosition
+  m_Position: {
+    x: number
+    y: number
+    z: number
+  }
   m_Options: number
   m_Car: GroupMaskTurn
   m_Track: GroupMaskTurn
@@ -149,7 +145,11 @@ export interface SubLaneGroupMask {
 
 export interface SubLaneInfo {
   m_SubLane: Entity
-  m_Position: WorldPosition
+  m_Position: {
+    x: number
+    y: number
+    z: number
+  }
   m_CarLaneLeftCount: number
   m_CarLaneStraightCount: number
   m_CarLaneRightCount: number
@@ -186,7 +186,11 @@ export interface CustomPhaseTemplate {
 
 export interface TrafficLightGroupName {
   name: string
-  worldPosition: WorldPosition
+  worldPosition: {
+    x: number
+    y: number
+    z: number
+  }
 }
 
 export interface CustomPhaseTemplate {

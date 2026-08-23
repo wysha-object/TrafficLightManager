@@ -10,7 +10,6 @@ import {
   EdgeGroupMask,
   EdgeGroupMaskOptions,
   EdgeInfo,
-  ScreenPoint,
   SubLaneGroupMask,
   SubLaneInfo,
 } from 'types'
@@ -47,7 +46,10 @@ export default function SubLanePanel(props: {
   edge: EdgeInfo
   subLane: SubLaneInfo
   index: number
-  position: ScreenPoint
+  position: {
+    top: number
+    left: number
+  }
 }) {
   const clipboard = useContext(SubLaneGroupMaskContextClipboard.context)
 
