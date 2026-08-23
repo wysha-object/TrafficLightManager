@@ -2,6 +2,7 @@ using System.Linq;
 using Colossal.Entities;
 using Game.Common;
 using Game.Net;
+using Game.Notifications;
 using Game.Prefabs;
 using Game.Rendering;
 using Game.Tools;
@@ -12,6 +13,7 @@ using TrafficLightManager.Code.Systems.Overlay;
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Jobs;
+using UnityEngine;
 using static TrafficLightManager.Code.Systems.UI.UISystem;
 
 namespace TrafficLightManager.Code.Systems.Tool;
@@ -69,6 +71,7 @@ public partial class ToolSystem : ToolBaseSystem
     {
         applyAction.shouldBeEnabled = true;
         secondaryApplyAction.shouldBeEnabled = true;
+        requireUnderground = false;
     }
 
     protected override void OnStopRunning()
@@ -92,14 +95,51 @@ public partial class ToolSystem : ToolBaseSystem
         return false;
     }
 
+    private bool m_Underground;
+
+    public override bool allowUnderground => true;
+
+    public override void SetUnderground(bool isUnderground)
+    {
+        m_Underground = isUnderground;
+    }
+
+    public override void ElevationUp()
+    {
+        m_Underground = false;
+    }
+
+    public override void ElevationDown()
+    {
+        m_Underground = true;
+    }
+
+    public override void ElevationScroll()
+    {
+        m_Underground = !m_Underground;
+    }
+
     public override void InitializeRaycast()
     {
-        m_ToolRaycastSystem.typeMask |= TypeMask.Net;
-        m_ToolRaycastSystem.netLayerMask = Layer.All;
+        if (m_Underground)
+        {
+            m_ToolRaycastSystem.collisionMask = CollisionMask.Underground;
+        }
+        else
+        {
+            m_ToolRaycastSystem.collisionMask = (CollisionMask.OnGround | CollisionMask.Overground);
+        }
+        m_ToolRaycastSystem.typeMask = (TypeMask.Net);
+        m_ToolRaycastSystem.raycastFlags = RaycastFlags.SubElements | RaycastFlags.Cargo | RaycastFlags.Passenger | RaycastFlags.EditorContainers;
+        m_ToolRaycastSystem.netLayerMask = Layer.Road | Layer.TrainTrack | Layer.TramTrack | Layer.SubwayTrack | Layer.PublicTransportRoad | Layer.Pathway;
+        m_ToolRaycastSystem.iconLayerMask = IconLayerMask.None;
+        m_ToolRaycastSystem.utilityTypeMask = UtilityTypes.None;
     }
 
     protected override JobHandle OnUpdate(JobHandle inputDeps)
     {
+        requireUnderground = m_Underground;
+
         base.applyAction.shouldBeEnabled = m_UISystem.GetToolState() != ToolState.Editing;
         base.secondaryApplyAction.shouldBeEnabled = m_UISystem.GetToolState() != ToolState.Editing;
         bool raycastFlag = GetRaycastResult(out Entity entity, out RaycastHit hit);
@@ -132,10 +172,7 @@ public partial class ToolSystem : ToolBaseSystem
                 }
             }
 
-            var overlayRenderSystem = World.GetOrCreateSystemManaged<OverlayRenderSystem>();
-            var overlayBuffer = overlayRenderSystem.GetBuffer(out JobHandle dependencies);
-            dependencies.Complete();
-            if (IsValidEntity(entity) && EntityManager.TryGetComponent<NodeGeometry>(entity, out var nodeGeometry))
+            if (IsValidEntity(entity))
             {
                 if (
                     new[] { ToolState.ChooseGroup, ToolState.Choosed }.Contains(m_UISystem.GetToolState())
@@ -145,23 +182,12 @@ public partial class ToolSystem : ToolBaseSystem
                 {
                     foreach (var item in trafficLightsMemberRefs)
                     {
-                        if (EntityManager.TryGetComponent<NodeGeometry>(item.m_Entity, out var itemNodeGeometry))
-                        {
-                            overlayBuffer.DrawCircle(
-                                new UnityEngine.Color(0.5f, 1.0f, 2.0f, 0.5f),
-                                (itemNodeGeometry.m_Bounds.min + itemNodeGeometry.m_Bounds.max) / 2,
-                                itemNodeGeometry.m_Bounds.max.x - itemNodeGeometry.m_Bounds.min.x
-                            );
-                        }
+                        m_UISystem.DrawNodeOutline(item.m_Entity, Color.white, 1.0f, 0.0f);
                     }
                 }
                 else
                 {
-                    overlayBuffer.DrawCircle(
-                        new UnityEngine.Color(0.5f, 1.0f, 2.0f, 0.5f),
-                        (nodeGeometry.m_Bounds.min + nodeGeometry.m_Bounds.max) / 2,
-                        nodeGeometry.m_Bounds.max.x - nodeGeometry.m_Bounds.min.x
-                    );
+                    m_UISystem.DrawNodeOutline(entity, Color.white, 1.0f, 0.0f);
                 }
             }
         }
