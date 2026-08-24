@@ -1,5 +1,7 @@
-﻿using System.Reflection;
+﻿using System.IO;
+using System.Reflection;
 using Colossal.Logging;
+using Colossal.PSI.Environment;
 using Game;
 using Game.Modding;
 using Game.SceneFlow;
@@ -44,6 +46,8 @@ public class Mod : IMod
             m_Log.Info($"Current mod asset at {asset.path}");
         }
 
+        MoveOldSettingsToNewSettings();
+
         m_World = updateSystem.World;
 
         m_TrafficLightInitializationSystem = m_World.GetOrCreateSystemManaged<Game.Net.TrafficLightInitializationSystem>();
@@ -58,6 +62,36 @@ public class Mod : IMod
 
         string netToolSystemToolID = m_World.GetOrCreateSystemManaged<Game.Tools.NetToolSystem>().toolID;
         Assert(netToolSystemToolID == "Net Tool", $"netToolSystemToolID: {netToolSystemToolID}");
+    }
+
+    public void MoveOldSettingsToNewSettings()
+    {
+        var oldLocation = Path.Combine(EnvPath.kUserDataPath, $"ModsSettings/TrafficLightManager.Code/Settings");
+
+        if (File.Exists(oldLocation))
+        {
+            var directory = Path.Combine(EnvPath.kUserDataPath, "ModsSettings", nameof(TrafficLightManager));
+
+            var correctLocation = Path.Combine(directory, nameof(TrafficLightManager) + ".coc");
+
+            Directory.CreateDirectory(directory);
+
+            if (File.Exists(correctLocation))
+            {
+                File.Delete(oldLocation);
+            }
+            else if (File.Exists(correctLocation))
+            {
+                var oldFileContent = File.ReadAllText(oldLocation);
+                if (oldFileContent.StartsWith("Settings"))
+                {
+                    oldFileContent = oldFileContent.Substring("Settings".Length);
+                    oldFileContent = nameof(TrafficLightManager) + oldFileContent;
+                }
+                File.WriteAllText(correctLocation, oldFileContent);
+                File.Delete(oldLocation);
+            }
+        }
     }
 
     public void OnDispose()
