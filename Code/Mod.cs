@@ -66,7 +66,7 @@ public class Mod : IMod
 
     public void MoveOldSettingsToNewSettings()
     {
-        var oldLocation = Path.Combine(EnvPath.kUserDataPath, $"ModsSettings/TrafficLightManager.Code/Settings");
+        var oldLocation = Path.Combine(EnvPath.kUserDataPath, $"ModsSettings/TrafficLightManager.Code/Settings.coc");
 
         if (File.Exists(oldLocation))
         {
