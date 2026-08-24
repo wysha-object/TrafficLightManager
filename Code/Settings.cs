@@ -11,7 +11,7 @@ using Unity.Entities;
 
 namespace TrafficLightManager.Code;
 
-[FileLocation("ModsSettings/TrafficLightManager.Code/Settings")]
+[FileLocation($"ModsSettings/{nameof(TrafficLightManager)}/{nameof(TrafficLightManager)}")]
 [SettingsUITabOrder(kTabGeneral, kTabKeyBindings)]
 [SettingsUIGroupOrder(kGroupGeneral, kGroupDefault, kGroupDisplay, kGroupMainPanel, kGroupKeyBindingReset)]
 [SettingsUIShowGroupName]
@@ -173,7 +173,7 @@ public class Settings : ModSetting
         : base(mod)
     {
         SetDefaults();
-        AssetDatabase.global.LoadSettings(nameof(Settings), this);
+        AssetDatabase.global.LoadSettings(nameof(TrafficLightManager), this);
         RegisterInOptionsUI();
         RegisterKeyBindings();
     }
