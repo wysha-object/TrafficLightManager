@@ -17,7 +17,7 @@ public class Mod : IMod
         (AssemblyInformationalVersionAttribute)System.Attribute.GetCustomAttribute(Assembly.GetAssembly(typeof(Mod)), typeof(AssemblyInformationalVersionAttribute))
     ).InformationalVersion;
 
-    public static readonly ILog m_Log = LogManager.GetLogger($"{m_Id}.{nameof(Mod)}").SetShowsErrorsInUI(false);
+    public static readonly ILog m_Log = LogManager.GetLogger(nameof(TrafficLightManager)).SetShowsErrorsInUI(false);
 
     public static TrafficLightManager.Code.Settings m_Settings;
 
