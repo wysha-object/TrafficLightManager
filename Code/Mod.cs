@@ -80,7 +80,7 @@ public class Mod : IMod
             {
                 File.Delete(oldLocation);
             }
-            else if (File.Exists(correctLocation))
+            else
             {
                 var oldFileContent = File.ReadAllText(oldLocation);
                 if (oldFileContent.StartsWith("Settings"))
