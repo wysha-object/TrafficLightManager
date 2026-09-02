@@ -18,7 +18,10 @@ A traffic light management mod based on slyh/Cities2-TrafficLightsEnhancement
 
 Mod-related information and usage tutorials can be found on 
 
-哔哩哔哩: https://space.bilibili.com/3546726445091690
+哔哩哔哩: [https://space.bilibili.com/3546726445091690](https://space.bilibili.com/3546726445091690)
+
+YouTube: [https://www.youtube.com/@StarsSail](https://www.youtube.com/@StarsSail)
+
 QQ: 760057820
 
 ## Feature
@@ -105,5 +108,6 @@ See commit history for details
     <!--External link. supported types are discord, github, youtube, twitch, x, paypal, patreon-->
     <ExternalLink Type="discord" Url="https://discord.gg/TBPYuMtN2" />
     <ExternalLink Type="github" Url="https://github.com/wysha-object/TrafficLightManager" />
+    <ExternalLink Type="youtube" Url="https://www.youtube.com/@StarsSail" />
     <ExternalLink Type="paypal" Url="https://paypal.me/SSObject" />
 </Publish>
