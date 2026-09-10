@@ -265,7 +265,7 @@ export default function PhaseDetailsPanel() {
                   )}
                   value={customPhaseItem.targetDurationMultiplier}
                   valuePrefix={''}
-                  valueSuffix={t('CustomPedestrianDurationMultiplierSuffix')}
+                  valueSuffix={t('CustomPhaseEditor.Adjustments.CustomPedestrianDurationMultiplierSuffix')}
                   min={0.1}
                   max={10}
                   step={0.1}
@@ -289,7 +289,7 @@ export default function PhaseDetailsPanel() {
                   )}
                   value={customPhaseItem.laneOccupiedMultiplier}
                   valuePrefix={''}
-                  valueSuffix={t('CustomPedestrianDurationMultiplierSuffix')}
+                  valueSuffix={t('CustomPhaseEditor.Adjustments.CustomPedestrianDurationMultiplierSuffix')}
                   min={0.1}
                   max={10}
                   step={0.1}

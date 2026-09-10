@@ -56,7 +56,7 @@ namespace TrafficLightManager.Code.Utils
 
         public static CustomPhaseTemplate Default = new CustomPhaseTemplate()
         {
-            m_Name = "Default",
+            m_Name = "Options.GROUP[TrafficLightManager.Code.TrafficLightManager.Code.Mod.GroupDefault]",
             m_IsPrioritiseTrack = true,
             m_IsPrioritisePublicCar = false,
             m_IsPrioritisePedestrian = false,

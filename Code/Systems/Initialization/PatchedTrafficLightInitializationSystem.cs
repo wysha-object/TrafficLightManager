@@ -42,10 +42,10 @@ using SecondaryLane = Game.Net.SecondaryLane;
 using SlaveLane = Game.Net.SlaveLane;
 using SubLane = Game.Net.SubLane;
 using TrackLane = Game.Net.TrackLane;
-using TrainTrack = Game.Net.TrainTrack;
 using TrafficLightFlags = Game.Net.TrafficLightFlags;
 using TrafficLights = Game.Net.TrafficLights;
 using TrafficLightState = Game.Net.TrafficLightState;
+using TrainTrack = Game.Net.TrainTrack;
 
 namespace TrafficLightManager.Code.Systems.Initialization;
 

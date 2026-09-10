@@ -7,6 +7,7 @@ using Game;
 using Game.Net;
 using Game.Rendering;
 using Game.SceneFlow;
+using Game.Settings;
 using Game.UI;
 using TrafficLightManager.Code.Components;
 using TrafficLightManager.Code.Systems.Overlay;
@@ -81,11 +82,10 @@ public partial class UISystem : UISystemBase
         m_SimulationUpdateSystem = World.GetOrCreateSystemManaged<SimulationUpdateSystem>();
         m_NameSystem = World.GetOrCreateSystemManaged<NameSystem>();
 
+        Mod.m_Settings.onSettingsApplied += OnSettingsApplied;
+
         AddUIBindings();
         SetupKeyBindings();
-        UpdateLocale();
-
-        GameManager.instance.localizationManager.onActiveDictionaryChanged += UpdateLocale;
     }
 
     private Vector3 m_CameraPosition;
@@ -129,27 +129,9 @@ public partial class UISystem : UISystemBase
         m_CustomPhaseItemsBinding.Update();
     }
 
-    public static string GetLocaleCode()
+    public void OnSettingsApplied(Setting settings)
     {
-        string locale = Utils.LocalisationUtils.GetAutoLocale(GameManager.instance.localizationManager.activeLocaleId, CultureInfo.CurrentCulture.Name);
-        if (Mod.m_Settings != null && Mod.m_Settings.m_Locale != "auto")
-        {
-            locale = Mod.m_Settings.m_Locale;
-        }
-        return locale;
-    }
-
-    public static void UpdateLocale()
-    {
-        LocalisationUtils localisationsHelper = new LocalisationUtils(GetLocaleCode());
-        localisationsHelper.AddToDictionary(GameManager.instance.localizationManager.activeDictionary);
-        localisationsHelper.UpdateActiveDictionary();
-
-        UISystem uiSystem = Mod.m_World.GetOrCreateSystemManaged<UISystem>();
-        if (uiSystem.m_LocalisationBinding != null)
-        {
-            uiSystem.m_LocalisationBinding.Update();
-        }
+        m_SettingsBinding.Update();
     }
 
     public void ForEachTrafficLight(Action<Entity> action)

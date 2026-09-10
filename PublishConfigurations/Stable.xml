@@ -103,7 +103,7 @@ Wherever you report an issue, please make sure to describe it clearly.
     <GameVersion Value="1.*" />
 
     <!--Dependency for the mod, can be set multiple times-->
-    <Dependency Id="" />
+	<Dependency Id="75426" DisplayName="I18n EveryWhere" />
 
     <!--Change log for new version. Single line or multi line. Supports minimal markdown subset-->
     <ChangeLog>

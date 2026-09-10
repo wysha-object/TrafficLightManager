@@ -22,8 +22,6 @@ public partial class UISystem : UISystemBase
 
     private ValueBinding<int> m_DisplayPhaseIndexBinding;
 
-    private GetterValueBinding<string> m_LocalisationBinding;
-
     private GetterValueBinding<string> m_CityConfigurationBinding;
 
     private GetterValueBinding<string> m_CameraBinding;
@@ -48,18 +46,6 @@ public partial class UISystem : UISystemBase
         AddBinding(m_DisplayPhaseIndexBinding = new ValueBinding<int>("TrafficLightManager", "GetDisplayPhaseIndex", -1));
 
         AddBinding(
-            m_LocalisationBinding = new GetterValueBinding<string>(
-                "TrafficLightManager",
-                "GetLocalisation",
-                () =>
-                {
-                    var result = LocalisationUtils.GetActiveDictionary();
-
-                    return JsonConvert.SerializeObject(result);
-                }
-            )
-        );
-        AddBinding(
             m_CityConfigurationBinding = new GetterValueBinding<string>(
                 "TrafficLightManager",
                 "GetCityConfiguration",
@@ -71,7 +57,6 @@ public partial class UISystem : UISystemBase
                 }
             )
         );
-
         AddBinding(
             m_CameraBinding = new GetterValueBinding<string>(
                 "TrafficLightManager",
@@ -844,11 +829,6 @@ public partial class UISystem : UISystemBase
                 }
             )
         );
-    }
-
-    public void SettingUpdate()
-    {
-        m_SettingsBinding.Update();
     }
 
     public void UpdateManualPhaseIndex(int index)

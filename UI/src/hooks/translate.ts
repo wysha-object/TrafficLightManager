@@ -1,12 +1,13 @@
-import { LocalisationContext } from 'context'
-import { useContext } from 'react'
+import { useLocalization } from 'cs2/l10n'
 
-const useTranslate = () => {
-  const localisation: any = useContext(LocalisationContext)
-  const t = (key: string) => localisation[key] || key
-  return {
-    t,
+export function useTranslate() {
+  const { translate } = useLocalization()
+  const t = (id: string, values: Record<string, string> = {}) => {
+    let str = translate(id, id) ?? ''
+    for (const key in values) {
+      str = str.replaceAll(`{{${key}}}`, values[key])
+    }
+    return str
   }
+  return { t }
 }
-
-export { useTranslate }

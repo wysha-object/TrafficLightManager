@@ -110,6 +110,12 @@
     <EmbeddedResource Include="Resources\**\*" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Content Include="lang\**">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
   <Target Name="CopyLaneSystem" BeforeTargets="CoreCompile">
     <ItemGroup>
       <LaneSystemFiles Include="..\Lib\LaneSystem\bin\$(Configuration)\$(TargetFramework)\*.*" />

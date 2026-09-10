@@ -24,12 +24,6 @@ export function useGetDisplayPhaseIndexCmd() {
   ) as number
 }
 
-export function useGetLocalisationCmd() {
-  return JSON.parse(
-    useValue(bindValue('TrafficLightManager', 'GetLocalisation', '{}')),
-  ) as Record<string, string>
-}
-
 export function useGetCityConfigurationCmd() {
   return JSON.parse(
     useValue(

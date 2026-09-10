@@ -7,7 +7,7 @@ const STABLE_PUBLISH_CONFIGURATION_PATH = './PublishConfigurations/Stable.xml'
 const BETA_PUBLISH_CONFIGURATION_PATH = './PublishConfigurations/Beta.xml'
 
 const args = process.argv.slice(2)
-if (args.length !== 1) {
+if (args.length === 0) {
   console.error('Please provide a valid argument: "stable" or "beta"')
   process.exit(1)
 }
@@ -63,6 +63,18 @@ fs.writeFileSync(
   publishConfiguration,
   'utf-8',
 )
+
+if (args.length >= 2) {
+  if (args[1].toLowerCase() === 'no-publish') {
+    console.log('Skipping publish step as no-publish flag is provided.')
+    process.exit(0)
+  } else {
+    console.error(
+      'Invalid second argument. Use "no-publish" to skip publishing.',
+    )
+    process.exit(1)
+  }
+}
 
 execSync(
   `dotnet publish Code/Code.csproj -p:PublishProfile=PublishNewVersion -p:RELEASE_CHANNEL=${args[0]} -p:RELEASE_VERSION=${releaseVersion}`,

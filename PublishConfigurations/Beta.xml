@@ -34,7 +34,7 @@ Beta version of Traffic Light Manager (https://mods.paradoxplaza.com/mods/139487
     
     <GameVersion Value="1.*" />
     
-    <Dependency Id="" />
+	<Dependency Id="75426" DisplayName="I18n EveryWhere" />
     
     <ChangeLog>
 

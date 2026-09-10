@@ -13,7 +13,7 @@ namespace TrafficLightManager.Code;
 
 [FileLocation($"ModsSettings/{nameof(TrafficLightManager)}/{nameof(TrafficLightManager)}")]
 [SettingsUITabOrder(kTabGeneral, kTabKeyBindings)]
-[SettingsUIGroupOrder(kGroupGeneral, kGroupDefault, kGroupDisplay, kGroupMainPanel, kGroupKeyBindingReset)]
+[SettingsUIGroupOrder(kGroupGeneral, kGroupDefault, kGroupDisplay, kGroupVersion, kGroupMainPanel, kGroupKeyBindingReset)]
 [SettingsUIShowGroupName]
 public class Settings : ModSetting
 {
@@ -46,42 +46,6 @@ public class Settings : ModSetting
 
     [SettingsUIHidden]
     public Dictionary<string, string> m_Storage;
-
-    [SettingsUISection(kTabGeneral, kGroupGeneral)]
-    [SettingsUIDropdown(typeof(Settings), "GetLanguageValues")]
-    public string m_LocaleOption
-    {
-        get { return m_Locale; }
-        set
-        {
-            m_Locale = value;
-            Colossal.Localization.LocalizationManager localizationManager = Game.SceneFlow.GameManager.instance.localizationManager;
-            localizationManager.GetType().GetTypeInfo().GetDeclaredMethod("NotifyActiveDictionaryChanged").Invoke(localizationManager, null);
-        }
-    }
-    public string m_Locale { get; private set; }
-
-    public DropdownItem<string>[] GetLanguageValues()
-    {
-        DropdownItem<string>[] list =
-        [
-            new DropdownItem<string> { value = "auto", displayName = "Auto" },
-            new DropdownItem<string> { value = "de-DE", displayName = "German" },
-            new DropdownItem<string> { value = "en-US", displayName = "English" },
-            new DropdownItem<string> { value = "es-ES", displayName = "Spanish" },
-            new DropdownItem<string> { value = "fr-FR", displayName = "French" },
-            new DropdownItem<string> { value = "it-IT", displayName = "Italian" },
-            new DropdownItem<string> { value = "ja-JP", displayName = "Japanese" },
-            new DropdownItem<string> { value = "ko-KR", displayName = "Korean" },
-            new DropdownItem<string> { value = "nl-NL", displayName = "Dutch" },
-            new DropdownItem<string> { value = "pl-PL", displayName = "Polish" },
-            new DropdownItem<string> { value = "pt-BR", displayName = "Portuguese (Brazil)" },
-            new DropdownItem<string> { value = "ru-RU", displayName = "Russian" },
-            new DropdownItem<string> { value = "zh-HANS", displayName = "Chinese (Simplified)" },
-            new DropdownItem<string> { value = "zh-HANT", displayName = "Chinese (Traditional)" },
-        ];
-        return list;
-    }
 
     [SettingsUISection(kTabGeneral, kGroupDefault)]
     public bool m_DefaultSplitPhasing { get; set; }
@@ -172,17 +136,20 @@ public class Settings : ModSetting
     public Settings(IMod mod)
         : base(mod)
     {
+        onSettingsApplied += (Setting setting) =>
+        {
+            Verify();
+            RegisterInOptionsUI();
+            RegisterKeyBindings();
+        };
         SetDefaults();
         AssetDatabase.global.LoadSettings(nameof(TrafficLightManager), this);
-        RegisterInOptionsUI();
-        RegisterKeyBindings();
+        Apply();
     }
 
     public override void SetDefaults()
     {
         m_Storage = new Dictionary<string, string>();
-
-        m_LocaleOption = "auto";
 
         m_DefaultSplitPhasing = false;
         m_DefaultAlwaysGreenKerbsideTurn = false;
@@ -195,13 +162,16 @@ public class Settings : ModSetting
         m_DisplayTrafficLightGroupNameWhenToolDisabled = false;
     }
 
-    public override void Apply()
+    public void Verify()
     {
-        base.Apply();
-        var uiSystem = Mod.m_World.GetOrCreateSystemManaged<Systems.UI.UISystem>();
-        uiSystem.SettingUpdate();
-        RegisterInOptionsUI();
-        RegisterKeyBindings();
+        if (m_CustomPhaseTemplates == null)
+        {
+            m_CustomPhaseTemplates = [];
+        }
+        if (m_Storage == null)
+        {
+            m_Storage = new Dictionary<string, string>();
+        }
     }
 
     public bool IsNotInGame()
@@ -211,8 +181,7 @@ public class Settings : ModSetting
 
     public List<CustomPhaseTemplate> GetCustomPhaseTemplates()
     {
-        var templates = new List<CustomPhaseTemplate>(m_CustomPhaseTemplates);
-        templates.Add(CustomPhaseTemplate.Default);
+        var templates = new List<CustomPhaseTemplate>(m_CustomPhaseTemplates) { CustomPhaseTemplate.Default };
         return templates;
     }
 
