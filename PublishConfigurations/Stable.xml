@@ -117,4 +117,5 @@ See commit history for details
     <ExternalLink Type="github" Url="https://github.com/wysha-object/TrafficLightManager" />
     <ExternalLink Type="youtube" Url="https://www.youtube.com/@StarsSail" />
     <ExternalLink Type="paypal" Url="https://paypal.me/SSObject" />
+    <ExternalLink Type="crowdin" Url="https://crowdin.com/project/trafficlightmanager" />
 </Publish>
