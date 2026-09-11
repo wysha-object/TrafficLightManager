@@ -1,10 +1,12 @@
-import { XMLParser, XMLBuilder } from 'fast-xml-parser'
+import { XMLParser } from 'fast-xml-parser'
+import XMLBuilder from 'fast-xml-builder'
 import { execSync } from 'node:child_process'
 import fs from 'node:fs'
 
 const MOD_CONFIGURATION_PATH = './UI/mod.json'
 const STABLE_PUBLISH_CONFIGURATION_PATH = './PublishConfigurations/Stable.xml'
 const BETA_PUBLISH_CONFIGURATION_PATH = './PublishConfigurations/Beta.xml'
+const CHANGELOG_PATH = './changelog.md'
 
 const args = process.argv.slice(2)
 if (args.length === 0) {
@@ -21,6 +23,8 @@ if (args[0] !== 'STABLE' && args[0] !== 'BETA') {
 
 let modConfiguration = fs.readFileSync(MOD_CONFIGURATION_PATH, 'utf-8')
 const parsedModConfiguration = JSON.parse(modConfiguration)
+
+let changelog = fs.readFileSync(CHANGELOG_PATH, 'utf-8')
 
 let publishConfiguration =
   args[0] === 'STABLE'
@@ -49,6 +53,7 @@ if (args[0] === 'STABLE') {
   parsedPublishConfiguration['Publish']['ModVersion']['@_Value'] =
     `${parsedModConfiguration['version']}-beta.${date}+${commitHash}`
 }
+parsedPublishConfiguration['Publish']['ChangeLog'] = changelog
 
 const releaseVersion =
   parsedPublishConfiguration['Publish']['ModVersion']['@_Value']
@@ -57,6 +62,9 @@ publishConfiguration = new XMLBuilder({
   ignoreAttributes: false,
   format: true,
 }).build(parsedPublishConfiguration)
+
+console.log(`Release Version: ${releaseVersion}`)
+console.log(`Changelog: ${changelog}`)
 
 fs.writeFileSync(
   './Code/Properties/PublishConfiguration.xml',
