@@ -74,6 +74,7 @@
     "Options.OPTION[TrafficLightManager.Code.TrafficLightManager.Code.Mod.Settings.m_ReleaseChannel]": "发布版本",
     "Options.OPTION[TrafficLightManager.Code.TrafficLightManager.Code.Mod.Settings.m_ResetBindings]": "重設快捷鍵",
     "Options.OPTION[TrafficLightManager.Code.TrafficLightManager.Code.Mod.Settings.m_Version]": "版本",
+    "Options.OPTION[TrafficLightManager.Code.TrafficLightManager.Code.Mod/KeyboardBindingMainPanelToggle/binding]": "Toggle Main Panel",
     "Options.OPTION_DESCRIPTION[TrafficLightManager.Code.TrafficLightManager.Code.Mod.Settings.m_DefaultAlwaysGreenKerbsideTurn]": "將所有未經設定的交通燈設為允許紅燈轉彎. 此選項適用於新建道路, 並會在遊戲資料更新時套用至現有道路",
     "Options.OPTION_DESCRIPTION[TrafficLightManager.Code.TrafficLightManager.Code.Mod.Settings.m_DefaultCustomPhaseTemplateOption]": "新建自定义相位的默认模板。",
     "Options.OPTION_DESCRIPTION[TrafficLightManager.Code.TrafficLightManager.Code.Mod.Settings.m_DefaultExclusivePedestrian]": "在所有未經設定的交通燈新增行人專用通行時段. 此選項適用於新建道路, 並會在遊戲資料更新時套用至現有道路",
@@ -86,8 +87,10 @@
     "Options.OPTION_DESCRIPTION[TrafficLightManager.Code.TrafficLightManager.Code.Mod.Settings.m_ReleaseChannel]": "此模组的发布版本",
     "Options.OPTION_DESCRIPTION[TrafficLightManager.Code.TrafficLightManager.Code.Mod.Settings.m_ResetBindings]": "重設所有快捷鍵",
     "Options.OPTION_DESCRIPTION[TrafficLightManager.Code.TrafficLightManager.Code.Mod.Settings.m_Version]": "此模组的版本",
+    "Options.SECTION[TrafficLightManager.Code.TrafficLightManager.Code.Mod]": "Traffic Light Manager",
     "Options.TAB[TrafficLightManager.Code.TrafficLightManager.Code.Mod.TabGeneral]": "一般",
     "Options.TAB[TrafficLightManager.Code.TrafficLightManager.Code.Mod.TabKeyBindings]": "快捷鍵",
     "Options.WARNING[TrafficLightManager.Code.TrafficLightManager.Code.Mod.Settings.m_ForceNodeUpdate]": "所有節點將被更新, 此模組的預設選項會套用至所有未經設定的交通燈",
+    "Options.WARNING[TrafficLightManager.Code.TrafficLightManager.Code.Mod.Settings.m_ResetBindings]": "Reset all key bindings",
     "TrafficLightManager": "號誌管理器"
 }
