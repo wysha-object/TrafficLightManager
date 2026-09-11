@@ -3,4 +3,4 @@ files:
     translation: /Code/lang/%locale%.json
 project_id: 929201
 api_token_env: "CROWDIN_PERSONAL_TOKEN"
-preserve_hierarchy: false
+preserve_hierarchy: true
