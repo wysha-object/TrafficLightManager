@@ -8,6 +8,8 @@ const STABLE_PUBLISH_CONFIGURATION_PATH = './PublishConfigurations/Stable.xml'
 const BETA_PUBLISH_CONFIGURATION_PATH = './PublishConfigurations/Beta.xml'
 const CHANGELOG_PATH = './changelog.md'
 
+console.log('Starting publish-mod script')
+
 const args = process.argv.slice(2)
 if (args.length === 0) {
   console.error('Please provide a valid argument: "stable" or "beta"')
@@ -84,6 +86,8 @@ if (args.length >= 2) {
   }
 }
 
+console.log('Finished preparing publish configuration')
+
 execSync(
   `dotnet publish Code/Code.csproj -p:PublishProfile=PublishNewVersion -p:RELEASE_CHANNEL=${args[0]} -p:RELEASE_VERSION=${releaseVersion}`,
   {
@@ -91,3 +95,5 @@ execSync(
     stdio: 'inherit',
   },
 )
+
+console.log('Finished dotnet publish')

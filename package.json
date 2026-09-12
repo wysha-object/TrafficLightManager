@@ -1,8 +1,9 @@
 {
   "scripts": {
     "build": "npm run build --workspace UI",
-    "i18n-format": "node ./scripts/i18n-format.js",
-    "publish-mod": "node ./scripts/publish-mod.js"
+    "crowdin-upload": "node ./scripts/crowdin-upload.js",
+    "publish-mod": "node ./scripts/publish-mod.js",
+    "bump-version": "node ./scripts/bump-version.js"
   },
   "workspaces": [
     "UI"
