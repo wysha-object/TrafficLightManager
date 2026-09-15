@@ -11,6 +11,8 @@
 
 Beta version of Traffic Light Manager (https://mods.paradoxplaza.com/mods/139487/Windows)
 
+# **IMPORTANT: DO NOT SWITCH BACK TO THE STABLE CHANNEL WHEN THE BETA VERSION IS AHEAD OF STABLE (THAT IS, THEY HAVE DIFFERENT COMMIT HASHES), AS THIS MAY CAUSE ISSUES.**
+
     </LongDescription>
     
     <Thumbnail Value="Properties/BetaThumbnail.png" />
@@ -37,9 +39,6 @@ Beta version of Traffic Light Manager (https://mods.paradoxplaza.com/mods/139487
 	<Dependency Id="75426" DisplayName="I18n EveryWhere" />
     
     <ChangeLog>
-
-See commit history for details
-
     </ChangeLog>
     
     <ExternalLink Type="discord" Url="https://discord.gg/TBPYuMtN2" />

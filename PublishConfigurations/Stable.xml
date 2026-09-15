@@ -72,7 +72,6 @@ Wherever you report an issue, please make sure to describe it clearly.
 * **Other contributors to Traffic Lights Enhancement**: See [slyh/Cities2-TrafficLightsEnhancement](https://github.com/slyh/Cities2-TrafficLightsEnhancement) for the full list of contributors.
 * **krzychu124**: Provided guidance.
 
-
     </LongDescription>
 
     <!--Thumbnail-->
@@ -107,9 +106,6 @@ Wherever you report an issue, please make sure to describe it clearly.
 
     <!--Change log for new version. Single line or multi line. Supports minimal markdown subset-->
     <ChangeLog>
-
-See commit history for details
-
     </ChangeLog>
 
     <!--External link. supported types are discord, github, youtube, twitch, x, paypal, patreon-->
