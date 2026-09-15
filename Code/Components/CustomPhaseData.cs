@@ -30,8 +30,6 @@ public struct CustomPhaseData : IBufferElementData, ISerializable
 
     public ushort m_LowPriorityTimer;
 
-    public float3 m_CarFlow;
-
     public ushort m_CarLaneOccupied;
 
     public ushort m_PublicCarLaneOccupied;
@@ -55,7 +53,7 @@ public struct CustomPhaseData : IBufferElementData, ISerializable
 
     public float m_LaneOccupiedMultiplier;
 
-    public float m_IntervalExponent;
+    public float m_IntervalFactor;
 
     // Schema 3
     public FixedString64Bytes m_Name;
@@ -65,12 +63,11 @@ public struct CustomPhaseData : IBufferElementData, ISerializable
     public void Serialize<TWriter>(TWriter writer)
         where TWriter : IWriter
     {
-        ushort schemaVersion = 3;
+        ushort schemaVersion = 4;
         writer.Write(schemaVersion);
         writer.Write(m_TurnsSinceLastRun);
         writer.Write(m_LowFlowTimer);
         writer.Write(m_LowPriorityTimer);
-        writer.Write(m_CarFlow);
         writer.Write(m_CarLaneOccupied);
         writer.Write(m_PublicCarLaneOccupied);
         writer.Write(m_TrackLaneOccupied);
@@ -82,7 +79,7 @@ public struct CustomPhaseData : IBufferElementData, ISerializable
         writer.Write(m_MaximumDuration);
         writer.Write(m_TargetDurationMultiplier);
         writer.Write(m_LaneOccupiedMultiplier);
-        writer.Write(m_IntervalExponent);
+        writer.Write(m_IntervalFactor);
         writer.Write(m_Name.ToString());
         writer.Write(m_BindTemplate.ToString());
     }
@@ -96,7 +93,10 @@ public struct CustomPhaseData : IBufferElementData, ISerializable
         reader.Read(out m_TurnsSinceLastRun);
         reader.Read(out m_LowFlowTimer);
         reader.Read(out m_LowPriorityTimer);
-        reader.Read(out m_CarFlow);
+        if (schemaVersion <= 3)
+        {
+            reader.Read(out float3 _);
+        }
         reader.Read(out m_CarLaneOccupied);
         reader.Read(out m_PublicCarLaneOccupied);
         reader.Read(out m_TrackLaneOccupied);
@@ -112,7 +112,15 @@ public struct CustomPhaseData : IBufferElementData, ISerializable
         reader.Read(out m_MaximumDuration);
         reader.Read(out m_TargetDurationMultiplier);
         reader.Read(out m_LaneOccupiedMultiplier);
-        reader.Read(out m_IntervalExponent);
+        if (schemaVersion <= 3)
+        {
+            reader.Read(out float _);
+            m_IntervalFactor = 1f;
+        }
+        if (schemaVersion >= 4)
+        {
+            reader.Read(out m_IntervalFactor);
+        }
         if (schemaVersion >= 3)
         {
             reader.Read(out string name);
@@ -134,7 +142,6 @@ public struct CustomPhaseData : IBufferElementData, ISerializable
         m_TurnsSinceLastRun = 0;
         m_LowFlowTimer = 0;
         m_LowPriorityTimer = 0;
-        m_CarFlow = 0;
         m_CarLaneOccupied = 0;
         m_PublicCarLaneOccupied = 0;
         m_TrackLaneOccupied = 0;
@@ -158,7 +165,7 @@ public struct CustomPhaseData : IBufferElementData, ISerializable
         m_MaximumDuration = customPhaseTemplate.m_MaximumDuration;
         m_TargetDurationMultiplier = customPhaseTemplate.m_TargetDurationMultiplier;
         m_LaneOccupiedMultiplier = customPhaseTemplate.m_LaneOccupiedMultiplier;
-        m_IntervalExponent = customPhaseTemplate.m_IntervalExponent;
+        m_IntervalFactor = customPhaseTemplate.m_IntervalFactor;
         m_BindTemplate = "";
     }
 
@@ -170,11 +177,6 @@ public struct CustomPhaseData : IBufferElementData, ISerializable
     public CustomPhaseData(CustomPhaseTemplate customPhaseTemplate)
     {
         Initialisation(customPhaseTemplate);
-    }
-
-    public readonly float AverageCarFlow()
-    {
-        return (m_CarFlow.x + m_CarFlow.y + m_CarFlow.z) / 3f;
     }
 
     public readonly int TotalLaneOccupied()

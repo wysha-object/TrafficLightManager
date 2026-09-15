@@ -12,8 +12,6 @@ public static class UITypes
 
         public ushort lowFlowTimer;
 
-        public float carFlow;
-
         public ushort carLaneOccupied;
 
         public ushort publicCarLaneOccupied;
@@ -34,7 +32,7 @@ public static class UITypes
 
         public float laneOccupiedMultiplier;
 
-        public float intervalExponent;
+        public float intervalFactor;
 
         public bool prioritiseTrack;
 
@@ -59,6 +57,7 @@ public static class UITypes
         public int currentPhaseIndex;
         public int manualPhaseIndex;
         public float targetDuration;
+        public float passedCarCount;
     }
 
     public struct UpdateCustomPhaseData

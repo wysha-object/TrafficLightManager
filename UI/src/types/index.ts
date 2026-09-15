@@ -21,7 +21,6 @@ export interface Settings {
 export interface CustomPhaseItem {
   turnsSinceLastRun: number
   lowFlowTimer: number
-  carFlow: number
   carLaneOccupied: number
   publicCarLaneOccupied: number
   trackLaneOccupied: number
@@ -33,7 +32,7 @@ export interface CustomPhaseItem {
   maximumDuration: number
   targetDurationMultiplier: number
   laneOccupiedMultiplier: number
-  intervalExponent: number
+  intervalFactor: number
   prioritiseTrack: boolean
   prioritisePublicCar: boolean
   prioritisePedestrian: boolean
@@ -49,6 +48,7 @@ export interface TrafficLightGroup {
   currentPhaseIndex: number
   manualPhaseIndex: number
   targetDuration: number
+  passedCarCount: number
 }
 
 export interface CityConfiguration {
@@ -74,11 +74,10 @@ export type CustomPhaseLaneType =
 export type CustomPhaseLaneDirection =
   'left' | 'straight' | 'right' | 'uTurn' | 'all'
 
-export type CustomPhaseSignalState = 'stop' | 'go' | 'yield' | 'none'
+export type CustomPhaseSignalState = 'stop' | 'go' | 'none'
 
 export interface GroupMaskSignal {
   m_GoGroupMask: number
-  m_YieldGroupMask: number
 }
 
 export interface GroupMaskTurn {
@@ -181,7 +180,7 @@ export interface CustomPhaseTemplate {
 
   m_LaneOccupiedMultiplier: number
 
-  m_IntervalExponent: number
+  m_IntervalFactor: number
 }
 
 export interface TrafficLightGroupName {
@@ -208,5 +207,5 @@ export interface CustomPhaseTemplate {
 
   m_LaneOccupiedMultiplier: number
 
-  m_IntervalExponent: number
+  m_IntervalFactor: number
 }

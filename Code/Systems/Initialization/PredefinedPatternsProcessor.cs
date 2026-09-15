@@ -723,7 +723,6 @@ public class PredefinedPatternsProcessor
             laneSignal.m_GroupMask |= groupMask;
 
             ExtraLaneSignal extraLaneSignal = new();
-            extraLaneSignal.m_YieldGroupMask = groupMask;
             extraLaneSignal.m_IgnorePriorityGroupMask = groupMask;
 
             TrafficLightManager.Code.Systems.Simulation.PatchedTrafficLightSystem.UpdateLaneSignal(trafficLights, ref laneSignal, ref extraLaneSignal);
@@ -756,7 +755,6 @@ public class PredefinedPatternsProcessor
             }
 
             ExtraLaneSignal extraLaneSignal = new();
-            extraLaneSignal.m_YieldGroupMask = laneSignal.m_GroupMask;
             extraLaneSignal.m_IgnorePriorityGroupMask = 0;
 
             TrafficLightManager.Code.Systems.Simulation.PatchedTrafficLightSystem.UpdateLaneSignal(trafficLights, ref laneSignal, ref extraLaneSignal);
@@ -779,7 +777,6 @@ public class PredefinedPatternsProcessor
             {
                 continue;
             }
-            extraLaneSignal.m_YieldGroupMask = 0;
             extraLaneSignal.m_IgnorePriorityGroupMask = 0;
             TrafficLightManager.Code.Systems.Simulation.PatchedTrafficLightSystem.UpdateLaneSignal(trafficLights, ref laneSignal, ref extraLaneSignal);
             job.m_LaneSignalData[subLane] = laneSignal;

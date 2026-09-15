@@ -92,26 +92,18 @@ public struct CustomPhaseProcessor
                     if ((nodeCarLane.m_Flags & (CarLaneFlags.TurnLeft | CarLaneFlags.GentleTurnLeft)) != 0)
                     {
                         laneSignal.m_GroupMask = turn.m_Left.m_GoGroupMask;
-                        extraLaneSignal.m_YieldGroupMask = turn.m_Left.m_YieldGroupMask;
-                        extraLaneSignal.m_IgnorePriorityGroupMask = turn.m_Left.m_YieldGroupMask;
                     }
                     else if ((nodeCarLane.m_Flags & (CarLaneFlags.TurnRight | CarLaneFlags.GentleTurnRight)) != 0)
                     {
                         laneSignal.m_GroupMask = turn.m_Right.m_GoGroupMask;
-                        extraLaneSignal.m_YieldGroupMask = turn.m_Right.m_YieldGroupMask;
-                        extraLaneSignal.m_IgnorePriorityGroupMask = turn.m_Right.m_YieldGroupMask;
                     }
                     else
                     {
                         laneSignal.m_GroupMask = turn.m_Straight.m_GoGroupMask;
-                        extraLaneSignal.m_YieldGroupMask = turn.m_Straight.m_YieldGroupMask;
-                        extraLaneSignal.m_IgnorePriorityGroupMask = turn.m_Straight.m_YieldGroupMask;
                     }
                     if ((nodeCarLane.m_Flags & (CarLaneFlags.UTurnLeft | CarLaneFlags.UTurnRight)) != 0)
                     {
                         laneSignal.m_GroupMask = turn.m_UTurn.m_GoGroupMask;
-                        extraLaneSignal.m_YieldGroupMask = turn.m_UTurn.m_YieldGroupMask;
-                        extraLaneSignal.m_IgnorePriorityGroupMask = turn.m_UTurn.m_YieldGroupMask;
                     }
                     laneSignal.m_Flags |= LaneSignalFlags.CanExtend;
                 }

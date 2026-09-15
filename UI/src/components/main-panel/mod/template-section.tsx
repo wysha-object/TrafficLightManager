@@ -61,7 +61,7 @@ export default function TemplateSection(props: {
                           props.item.targetDurationMultiplier,
                         m_LaneOccupiedMultiplier:
                           props.item.laneOccupiedMultiplier,
-                        m_IntervalExponent: props.item.intervalExponent,
+                        m_IntervalFactor: props.item.intervalFactor,
                       })
                     }}
                   >
@@ -190,7 +190,7 @@ export default function TemplateSection(props: {
                     m_TargetDurationMultiplier:
                       props.item.targetDurationMultiplier,
                     m_LaneOccupiedMultiplier: props.item.laneOccupiedMultiplier,
-                    m_IntervalExponent: props.item.intervalExponent,
+                    m_IntervalFactor: props.item.intervalFactor,
                   })
                 }}
               >
@@ -215,7 +215,7 @@ export default function TemplateSection(props: {
                     m_TargetDurationMultiplier:
                       props.item.targetDurationMultiplier,
                     m_LaneOccupiedMultiplier: props.item.laneOccupiedMultiplier,
-                    m_IntervalExponent: props.item.intervalExponent,
+                    m_IntervalFactor: props.item.intervalFactor,
                   })
                   setCustomPhaseDataCmd({
                     key: 'BindWithTemplate',

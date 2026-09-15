@@ -14,34 +14,10 @@ using UnityEngine.Scripting;
 
 namespace TrafficLightManager.Code.Systems.Update
 {
-    public partial class TrafficLightGroupUpdateSystem : GameSystemBase
+    public partial class TrafficLightGroupValidationSystem : GameSystemBase
     {
-        [Preserve]
-        protected override void OnUpdate()
-        {
-            JobHandle dependency = //JobChunkExtensions.Schedule(
-            JobChunkExtensions.ScheduleParallel(
-                new UpdateTrafficLightGroupJob
-                {
-                    m_EntityStorageInfoLookup = SystemAPI.GetEntityStorageInfoLookup(),
-                    m_EntityCommandBuffer = m_ModificationEndBarrier.CreateCommandBuffer().AsParallelWriter(),
-                    m_EntityType = SystemAPI.GetEntityTypeHandle(),
-                    m_TrafficLightGroupType = SystemAPI.GetComponentTypeHandle<TrafficLightGroup>(isReadOnly: false),
-                    m_TrafficLightsMemberRefType = SystemAPI.GetBufferTypeHandle<TrafficLightsMemberRef>(isReadOnly: false),
-                    m_CustomPhaseDataBufferType = SystemAPI.GetBufferTypeHandle<CustomPhaseData>(isReadOnly: false),
-                    m_TrafficLightsLookup = SystemAPI.GetComponentLookup<TrafficLights>(isReadOnly: false),
-                    m_CustomTrafficLightsLookup = SystemAPI.GetComponentLookup<CustomTrafficLights>(isReadOnly: false),
-                },
-                m_TrafficLightGroupQuery,
-                base.Dependency
-            );
-
-            base.Dependency = dependency;
-            m_ModificationEndBarrier.AddJobHandleForProducer(dependency);
-        }
-
         [BurstCompile]
-        public partial struct UpdateTrafficLightGroupJob : IJobChunk
+        public partial struct TrafficLightGroupValidationJob : IJobChunk
         {
             public EntityStorageInfoLookup m_EntityStorageInfoLookup;
 
@@ -98,18 +74,32 @@ namespace TrafficLightManager.Code.Systems.Update
 
         private EntityQuery m_TrafficLightGroupQuery;
 
-        public SimulationSystem m_SimulationSystem;
+        public JobHandle ScheduleTrafficLightGroupValidationJob(in JobHandle dependsOn, EntityCommandBuffer entityCommandBuffer)
+        {
+            JobHandle dependency = dependsOn;
+            dependency = JobChunkExtensions.ScheduleParallel(
+                new TrafficLightGroupValidationJob
+                {
+                    m_EntityStorageInfoLookup = SystemAPI.GetEntityStorageInfoLookup(),
+                    m_EntityCommandBuffer = entityCommandBuffer.AsParallelWriter(),
+                    m_EntityType = SystemAPI.GetEntityTypeHandle(),
+                    m_TrafficLightGroupType = SystemAPI.GetComponentTypeHandle<TrafficLightGroup>(isReadOnly: false),
+                    m_TrafficLightsMemberRefType = SystemAPI.GetBufferTypeHandle<TrafficLightsMemberRef>(isReadOnly: false),
+                    m_CustomPhaseDataBufferType = SystemAPI.GetBufferTypeHandle<CustomPhaseData>(isReadOnly: false),
+                    m_TrafficLightsLookup = SystemAPI.GetComponentLookup<TrafficLights>(isReadOnly: false),
+                    m_CustomTrafficLightsLookup = SystemAPI.GetComponentLookup<CustomTrafficLights>(isReadOnly: false),
+                },
+                m_TrafficLightGroupQuery,
+                dependency
+            );
+            return dependency;
+        }
 
-        public TimeSystem m_TimeSystem;
-
-        [Preserve]
         protected override void OnCreate()
         {
             base.OnCreate();
 
             m_ModificationEndBarrier = base.World.GetOrCreateSystemManaged<ModificationEndBarrier>();
-            m_SimulationSystem = base.World.GetOrCreateSystemManaged<SimulationSystem>();
-            m_TimeSystem = base.World.GetOrCreateSystemManaged<TimeSystem>();
             m_TrafficLightGroupQuery = GetEntityQuery(
                 ComponentType.ReadWrite<TrafficLightGroup>(),
                 ComponentType.Exclude<Deleted>(),
@@ -117,6 +107,12 @@ namespace TrafficLightManager.Code.Systems.Update
                 ComponentType.Exclude<Temp>()
             );
             RequireForUpdate(m_TrafficLightGroupQuery);
+        }
+
+        protected override void OnUpdate()
+        {
+            Dependency = ScheduleTrafficLightGroupValidationJob(Dependency, m_ModificationEndBarrier.CreateCommandBuffer());
+            m_ModificationEndBarrier.AddJobHandleForProducer(Dependency);
         }
     }
 }

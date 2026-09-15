@@ -305,25 +305,25 @@ export default function PhaseDetailsPanel() {
                 <RangeRow
                   onChange={(value) => {
                     setCustomPhaseDataCmd({
-                      key: 'IntervalExponent',
+                      key: 'IntervalFactor',
                       value: value,
                       index: index,
                     })
                   }}
-                  label={t('CustomPhaseEditor.Adjustments.IntervalExponent')}
-                  value={customPhaseItem.intervalExponent}
+                  label={t('CustomPhaseEditor.Adjustments.IntervalFactor')}
+                  value={customPhaseItem.intervalFactor}
                   valuePrefix={''}
                   valueSuffix={''}
                   min={0.1}
                   max={10}
                   step={0.1}
                   defaultValue={
-                    settings.defaultCustomPhaseTemplate.m_IntervalExponent
+                    settings.defaultCustomPhaseTemplate.m_IntervalFactor
                   }
                   enableTextField={true}
                   textFieldRegExp={'^\\d{0,4}(\\.\\d{0,2})?$'}
                   tooltip={t(
-                    'CustomPhaseEditor.Adjustments.IntervalExponent.Tooltip',
+                    'CustomPhaseEditor.Adjustments.IntervalFactor.Tooltip',
                   )}
                 />
               </PanelFoldout>
@@ -371,7 +371,7 @@ export default function PhaseDetailsPanel() {
             />
             <TextRow
               title={t('CustomPhaseEditor.Statistics.CarFlow')}
-              secondaryText={`${customPhaseItem.carFlow.toFixed(8)}`}
+              secondaryText={`${(trafficLightGroup.currentPhaseIndex == index ? trafficLightGroup.passedCarCount : 0).toFixed(8)}`}
               dim={true}
             />
             <TextRow

@@ -7,24 +7,27 @@ public struct GroupMask
 {
     public struct Signal : ISerializable, IJsonWritable
     {
-        private ushort m_SchemaVersion;
-
         public ushort m_GoGroupMask;
 
-        public ushort m_YieldGroupMask;
-
-        public void Deserialize<TReader>(TReader reader) where TReader : IReader
+        public void Deserialize<TReader>(TReader reader)
+            where TReader : IReader
         {
-            reader.Read(out m_SchemaVersion);
+            reader.Read(out ushort schemaVersion);
+
             reader.Read(out m_GoGroupMask);
-            reader.Read(out m_YieldGroupMask);
+            if (schemaVersion <= 1)
+            {
+                reader.Read(out ushort _);
+            }
         }
 
-        public void Serialize<TWriter>(TWriter writer) where TWriter : IWriter
+        public void Serialize<TWriter>(TWriter writer)
+            where TWriter : IWriter
         {
-            writer.Write(m_SchemaVersion);
+            ushort schemaVersion = 2;
+            writer.Write(schemaVersion);
+
             writer.Write(m_GoGroupMask);
-            writer.Write(m_YieldGroupMask);
         }
 
         public void Write(IJsonWriter writer)
@@ -32,16 +35,12 @@ public struct GroupMask
             writer.TypeBegin(typeof(Signal).FullName);
             writer.PropertyName("m_GoGroupMask");
             writer.Write(m_GoGroupMask);
-            writer.PropertyName("m_YieldGroupMask");
-            writer.Write(m_YieldGroupMask);
             writer.TypeEnd();
         }
 
         public Signal()
         {
-            m_SchemaVersion = 1;
             m_GoGroupMask = 0;
-            m_YieldGroupMask = 0;
         }
     }
 
@@ -57,7 +56,8 @@ public struct GroupMask
 
         public Signal m_UTurn;
 
-        public void Deserialize<TReader>(TReader reader) where TReader : IReader
+        public void Deserialize<TReader>(TReader reader)
+            where TReader : IReader
         {
             reader.Read(out m_SchemaVersion);
             reader.Read(out m_Left);
@@ -66,7 +66,8 @@ public struct GroupMask
             reader.Read(out m_UTurn);
         }
 
-        public void Serialize<TWriter>(TWriter writer) where TWriter : IWriter
+        public void Serialize<TWriter>(TWriter writer)
+            where TWriter : IWriter
         {
             writer.Write(m_SchemaVersion);
             writer.Write(m_Left);

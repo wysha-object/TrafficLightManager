@@ -35,7 +35,7 @@ public class Mod : IMod
 
     private static Systems.Simulation.TrafficLightGroupSystem m_TrafficLightGroupSystem;
 
-    private static Systems.Update.TrafficLightGroupUpdateSystem m_TrafficLightGroupUpdateSystem;
+    private static TrafficLightGroupValidationSystem m_TrafficLightGroupValidateSystem;
 
     public void OnLoad(UpdateSystem updateSystem)
     {
@@ -55,13 +55,10 @@ public class Mod : IMod
         m_PatchedTrafficLightInitializationSystem = m_World.GetOrCreateSystemManaged<Systems.Initialization.PatchedTrafficLightInitializationSystem>();
         m_PatchedTrafficLightSystem = m_World.GetOrCreateSystemManaged<Systems.Simulation.PatchedTrafficLightSystem>();
         m_TrafficLightGroupSystem = m_World.GetOrCreateSystemManaged<Systems.Simulation.TrafficLightGroupSystem>();
-        m_TrafficLightGroupUpdateSystem = m_World.GetOrCreateSystemManaged<Systems.Update.TrafficLightGroupUpdateSystem>();
+        m_TrafficLightGroupValidateSystem = m_World.GetOrCreateSystemManaged<TrafficLightGroupValidationSystem>();
         m_Settings = new Settings(this);
 
         SystemSetup(updateSystem);
-
-        string netToolSystemToolID = m_World.GetOrCreateSystemManaged<Game.Tools.NetToolSystem>().toolID;
-        Assert(netToolSystemToolID == "Net Tool", $"netToolSystemToolID: {netToolSystemToolID}");
     }
 
     public void MoveOldSettingsToNewSettings()
@@ -109,35 +106,19 @@ public class Mod : IMod
         Utils.EntityQueryUtils.UpdateEntityQuery(m_TrafficLightInitializationSystem, "m_TrafficLightsQuery", noneList);
         Utils.EntityQueryUtils.UpdateEntityQuery(m_TrafficLightSystem, "m_TrafficLightQuery", noneList);
 
-        updateSystem.UpdateBefore<Systems.Initialization.PatchedTrafficLightInitializationSystem, Game.Net.TrafficLightInitializationSystem>(SystemUpdatePhase.Modification4B);
-        updateSystem.UpdateBefore<Systems.Simulation.PatchedTrafficLightSystem, Game.Simulation.TrafficLightSystem>(SystemUpdatePhase.GameSimulation);
-        updateSystem.UpdateAt<Systems.Simulation.TrafficLightGroupSystem>(SystemUpdatePhase.GameSimulation);
+        updateSystem.UpdateAt<Systems.Initialization.PatchedTrafficLightInitializationSystem>(SystemUpdatePhase.Modification4B);
+        updateSystem.UpdateBefore<Systems.Simulation.TrafficLightGroupSystem, Systems.Simulation.PatchedTrafficLightSystem>(SystemUpdatePhase.GameSimulation);
+        updateSystem.UpdateAt<Systems.Simulation.PatchedTrafficLightSystem>(SystemUpdatePhase.GameSimulation);
+        updateSystem.UpdateAt<Systems.Simulation.CarTrackSystem>(SystemUpdatePhase.GameSimulation);
         updateSystem.UpdateAt<Systems.UI.TooltipSystem>(SystemUpdatePhase.UITooltip);
         updateSystem.UpdateAt<Systems.UI.UISystem>(SystemUpdatePhase.UIUpdate);
         updateSystem.UpdateAt<Systems.Tool.ToolSystem>(SystemUpdatePhase.ToolUpdate);
         updateSystem.UpdateAt<ModificationUpdateSystem>(SystemUpdatePhase.ModificationEnd);
-        updateSystem.UpdateAt<Systems.Update.TrafficLightGroupUpdateSystem>(SystemUpdatePhase.ModificationEnd);
+        updateSystem.UpdateAt<TrafficLightGroupValidationSystem>(SystemUpdatePhase.ModificationEnd);
         updateSystem.UpdateAfter<SimulationUpdateSystem>(SystemUpdatePhase.GameSimulation);
 
         m_TrafficLightInitializationSystem.Enabled = false;
         m_TrafficLightSystem.Enabled = false;
-    }
-
-    public static void Assert(
-        bool condition,
-        string message = "",
-        bool showInUI = false,
-        [System.Runtime.CompilerServices.CallerArgumentExpression(nameof(condition))] string expression = ""
-    )
-    {
-        if (condition == true)
-        {
-            return;
-        }
-        bool showsErrorsInUI = m_Log.showsErrorsInUI;
-        m_Log.SetShowsErrorsInUI(showInUI);
-        m_Log.Error($"Assertion failed!\n{message}\nExpression: {expression}");
-        m_Log.SetShowsErrorsInUI(showsErrorsInUI);
     }
 
     public static string ReleaseChannel()

@@ -21,7 +21,7 @@ namespace TrafficLightManager.Code.Utils
 
             public float m_LaneOccupiedMultiplier;
 
-            public float m_IntervalExponent;
+            public float m_IntervalFactor;
 
             public Values(CustomPhaseTemplate template)
             {
@@ -33,7 +33,7 @@ namespace TrafficLightManager.Code.Utils
                 m_MaximumDuration = template.m_MaximumDuration;
                 m_TargetDurationMultiplier = template.m_TargetDurationMultiplier;
                 m_LaneOccupiedMultiplier = template.m_LaneOccupiedMultiplier;
-                m_IntervalExponent = template.m_IntervalExponent;
+                m_IntervalFactor = template.m_IntervalFactor;
             }
         }
 
@@ -52,7 +52,7 @@ namespace TrafficLightManager.Code.Utils
 
         public float m_LaneOccupiedMultiplier;
 
-        public float m_IntervalExponent;
+        public float m_IntervalFactor;
 
         public static CustomPhaseTemplate Default = new CustomPhaseTemplate()
         {
@@ -64,7 +64,7 @@ namespace TrafficLightManager.Code.Utils
             m_MaximumDuration = 300,
             m_TargetDurationMultiplier = 1f,
             m_LaneOccupiedMultiplier = 1f,
-            m_IntervalExponent = 2f,
+            m_IntervalFactor = 1f,
         };
     }
 }

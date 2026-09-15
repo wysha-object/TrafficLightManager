@@ -1,6 +1,8 @@
 using System.Linq;
 using Colossal.Serialization.Entities;
+using Game.Vehicles;
 using Unity.Entities;
+using Unity.Mathematics;
 
 namespace TrafficLightManager.Code.Components;
 
@@ -49,15 +51,13 @@ public struct CustomTrafficLights : IComponentData, IQueryTypeParameter, ISerial
     // Schema 5
     public Entity m_TrafficLightGroupEntity;
 
-    // Schema 6
-    public float m_TargetDuration;
-
-    public byte m_Status;
+    // Schema 7
+    public int m_NextPassedCarCount;
 
     public void Serialize<TWriter>(TWriter writer)
         where TWriter : IWriter
     {
-        int schemaVersion = 6;
+        int schemaVersion = 7;
         writer.Write(uint.MaxValue);
         writer.Write(schemaVersion);
         writer.Write(uint.MaxValue);
@@ -65,13 +65,12 @@ public struct CustomTrafficLights : IComponentData, IQueryTypeParameter, ISerial
         writer.Write(m_PedestrianPhaseGroupMask);
         writer.Write(m_Timer);
         writer.Write(m_TrafficLightGroupEntity);
-        writer.Write(m_TargetDuration);
+        writer.Write(m_NextPassedCarCount);
     }
 
     public void Deserialize<TReader>(TReader reader)
         where TReader : IReader
     {
-        m_Status = 0;
         int schemaVersion;
 
         reader.Read(out uint uint1);
@@ -123,9 +122,14 @@ public struct CustomTrafficLights : IComponentData, IQueryTypeParameter, ISerial
             SetPatternOnly(Patterns.ModDefault);
         }
 
-        if (schemaVersion >= 6)
+        if (schemaVersion == 6)
         {
-            reader.Read(out m_TargetDuration);
+            reader.Read(out float _);
+        }
+
+        if (schemaVersion >= 7)
+        {
+            reader.Read(out m_NextPassedCarCount);
         }
     }
 

@@ -77,22 +77,6 @@ function GetCustomPhaseLane(
       (edgeGroupMask.m_Car.m_UTurn.m_GoGroupMask & (1 << index)) != 0
         ? 'go'
         : result.uTurn
-    result.left =
-      (edgeGroupMask.m_Car.m_Left.m_YieldGroupMask & (1 << index)) != 0
-        ? 'yield'
-        : result.left
-    result.straight =
-      (edgeGroupMask.m_Car.m_Straight.m_YieldGroupMask & (1 << index)) != 0
-        ? 'yield'
-        : result.straight
-    result.right =
-      (edgeGroupMask.m_Car.m_Right.m_YieldGroupMask & (1 << index)) != 0
-        ? 'yield'
-        : result.right
-    result.uTurn =
-      (edgeGroupMask.m_Car.m_UTurn.m_YieldGroupMask & (1 << index)) != 0
-        ? 'yield'
-        : result.uTurn
     result.left = displayOptions.carLane.left ? result.left : 'none'
     result.straight = displayOptions.carLane.straight ? result.straight : 'none'
     result.right = displayOptions.carLane.right ? result.right : 'none'
@@ -115,23 +99,6 @@ function GetCustomPhaseLane(
       (edgeGroupMask.m_PublicCar.m_UTurn.m_GoGroupMask & (1 << index)) != 0
         ? 'go'
         : result.uTurn
-    result.left =
-      (edgeGroupMask.m_PublicCar.m_Left.m_YieldGroupMask & (1 << index)) != 0
-        ? 'yield'
-        : result.left
-    result.straight =
-      (edgeGroupMask.m_PublicCar.m_Straight.m_YieldGroupMask & (1 << index)) !=
-      0
-        ? 'yield'
-        : result.straight
-    result.right =
-      (edgeGroupMask.m_PublicCar.m_Right.m_YieldGroupMask & (1 << index)) != 0
-        ? 'yield'
-        : result.right
-    result.uTurn =
-      (edgeGroupMask.m_PublicCar.m_UTurn.m_YieldGroupMask & (1 << index)) != 0
-        ? 'yield'
-        : result.uTurn
     result.left = displayOptions.publicCarLane.left ? result.left : 'none'
     result.straight = displayOptions.publicCarLane.straight
       ? result.straight
@@ -151,18 +118,6 @@ function GetCustomPhaseLane(
     result.right =
       (edgeGroupMask.m_Track.m_Right.m_GoGroupMask & (1 << index)) != 0
         ? 'go'
-        : result.right
-    result.left =
-      (edgeGroupMask.m_Track.m_Left.m_YieldGroupMask & (1 << index)) != 0
-        ? 'yield'
-        : result.left
-    result.straight =
-      (edgeGroupMask.m_Track.m_Straight.m_YieldGroupMask & (1 << index)) != 0
-        ? 'yield'
-        : result.straight
-    result.right =
-      (edgeGroupMask.m_Track.m_Right.m_YieldGroupMask & (1 << index)) != 0
-        ? 'yield'
         : result.right
     result.left = displayOptions.trackLane.left ? result.left : 'none'
     result.straight = displayOptions.trackLane.straight
@@ -207,12 +162,10 @@ export default function EdgeViewer(
       currentSignal: CustomPhaseSignalState,
     ) => {
       if (edgeUpdateHandler) {
-        let newSignal =
+        let newSignal: CustomPhaseSignalState =
           currentSignal == 'stop'
             ? 'go'
-            : currentSignal == 'go'
-              ? 'yield'
-              : 'stop'
+            : 'stop'
         const newGroupMask: EdgeGroupMask = JSON.parse(JSON.stringify(data))
         if (type == 'carLane') {
           if (direction == 'left') {
@@ -221,22 +174,12 @@ export default function EdgeViewer(
               index,
               newSignal != 'stop' ? 1 : 0,
             )
-            newGroupMask.m_Car.m_Left.m_YieldGroupMask = SetBit(
-              newGroupMask.m_Car.m_Left.m_YieldGroupMask,
-              index,
-              newSignal == 'yield' ? 1 : 0,
-            )
           }
           if (direction == 'straight') {
             newGroupMask.m_Car.m_Straight.m_GoGroupMask = SetBit(
               newGroupMask.m_Car.m_Straight.m_GoGroupMask,
               index,
               newSignal != 'stop' ? 1 : 0,
-            )
-            newGroupMask.m_Car.m_Straight.m_YieldGroupMask = SetBit(
-              newGroupMask.m_Car.m_Straight.m_YieldGroupMask,
-              index,
-              newSignal == 'yield' ? 1 : 0,
             )
           }
           if (direction == 'right') {
@@ -245,22 +188,12 @@ export default function EdgeViewer(
               index,
               newSignal != 'stop' ? 1 : 0,
             )
-            newGroupMask.m_Car.m_Right.m_YieldGroupMask = SetBit(
-              newGroupMask.m_Car.m_Right.m_YieldGroupMask,
-              index,
-              newSignal == 'yield' ? 1 : 0,
-            )
           }
           if (direction == 'uTurn') {
             newGroupMask.m_Car.m_UTurn.m_GoGroupMask = SetBit(
               newGroupMask.m_Car.m_UTurn.m_GoGroupMask,
               index,
               newSignal != 'stop' ? 1 : 0,
-            )
-            newGroupMask.m_Car.m_UTurn.m_YieldGroupMask = SetBit(
-              newGroupMask.m_Car.m_UTurn.m_YieldGroupMask,
-              index,
-              newSignal == 'yield' ? 1 : 0,
             )
           }
         }
@@ -271,22 +204,12 @@ export default function EdgeViewer(
               index,
               newSignal != 'stop' ? 1 : 0,
             )
-            newGroupMask.m_PublicCar.m_Left.m_YieldGroupMask = SetBit(
-              newGroupMask.m_PublicCar.m_Left.m_YieldGroupMask,
-              index,
-              newSignal == 'yield' ? 1 : 0,
-            )
           }
           if (direction == 'straight') {
             newGroupMask.m_PublicCar.m_Straight.m_GoGroupMask = SetBit(
               newGroupMask.m_PublicCar.m_Straight.m_GoGroupMask,
               index,
               newSignal != 'stop' ? 1 : 0,
-            )
-            newGroupMask.m_PublicCar.m_Straight.m_YieldGroupMask = SetBit(
-              newGroupMask.m_PublicCar.m_Straight.m_YieldGroupMask,
-              index,
-              newSignal == 'yield' ? 1 : 0,
             )
           }
           if (direction == 'right') {
@@ -295,22 +218,12 @@ export default function EdgeViewer(
               index,
               newSignal != 'stop' ? 1 : 0,
             )
-            newGroupMask.m_PublicCar.m_Right.m_YieldGroupMask = SetBit(
-              newGroupMask.m_PublicCar.m_Right.m_YieldGroupMask,
-              index,
-              newSignal == 'yield' ? 1 : 0,
-            )
           }
           if (direction == 'uTurn') {
             newGroupMask.m_PublicCar.m_UTurn.m_GoGroupMask = SetBit(
               newGroupMask.m_PublicCar.m_UTurn.m_GoGroupMask,
               index,
               newSignal != 'stop' ? 1 : 0,
-            )
-            newGroupMask.m_PublicCar.m_UTurn.m_YieldGroupMask = SetBit(
-              newGroupMask.m_PublicCar.m_UTurn.m_YieldGroupMask,
-              index,
-              newSignal == 'yield' ? 1 : 0,
             )
           }
         }
@@ -322,11 +235,6 @@ export default function EdgeViewer(
               index,
               newSignal != 'stop' ? 1 : 0,
             )
-            newGroupMask.m_Track.m_Left.m_YieldGroupMask = SetBit(
-              newGroupMask.m_Track.m_Left.m_YieldGroupMask,
-              index,
-              newSignal == 'yield' ? 1 : 0,
-            )
           }
           if (direction == 'straight') {
             newGroupMask.m_Track.m_Straight.m_GoGroupMask = SetBit(
@@ -334,22 +242,12 @@ export default function EdgeViewer(
               index,
               newSignal != 'stop' ? 1 : 0,
             )
-            newGroupMask.m_Track.m_Straight.m_YieldGroupMask = SetBit(
-              newGroupMask.m_Track.m_Straight.m_YieldGroupMask,
-              index,
-              newSignal == 'yield' ? 1 : 0,
-            )
           }
           if (direction == 'right') {
             newGroupMask.m_Track.m_Right.m_GoGroupMask = SetBit(
               newGroupMask.m_Track.m_Right.m_GoGroupMask,
               index,
               newSignal != 'stop' ? 1 : 0,
-            )
-            newGroupMask.m_Track.m_Right.m_YieldGroupMask = SetBit(
-              newGroupMask.m_Track.m_Right.m_YieldGroupMask,
-              index,
-              newSignal == 'yield' ? 1 : 0,
             )
           }
         }
@@ -417,8 +315,8 @@ export default function EdgeViewer(
             displayTrackLane ||
             displayOptions.pedestrianLaneStopLine ||
             displayOptions.pedestrianLaneNonStopLine) && (
-            <div className='vertical-divider-with-gap' />
-          )}
+              <div className='vertical-divider-with-gap' />
+            )}
         </>
       )}
       {displayPublicCarLane && (
@@ -439,8 +337,8 @@ export default function EdgeViewer(
           {(displayTrackLane ||
             displayOptions.pedestrianLaneStopLine ||
             displayOptions.pedestrianLaneNonStopLine) && (
-            <div className='vertical-divider-with-gap' />
-          )}
+              <div className='vertical-divider-with-gap' />
+            )}
         </>
       )}
       {displayTrackLane && (
@@ -460,8 +358,8 @@ export default function EdgeViewer(
           </Column>
           {(displayOptions.pedestrianLaneStopLine ||
             displayOptions.pedestrianLaneNonStopLine) && (
-            <div className='vertical-divider-with-gap' />
-          )}
+              <div className='vertical-divider-with-gap' />
+            )}
         </>
       )}
       {cityConfiguration.leftHandTraffic && (

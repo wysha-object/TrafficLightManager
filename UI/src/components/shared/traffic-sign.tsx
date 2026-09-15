@@ -8,8 +8,6 @@ export default function TrafficSignTooltip(props: {
   let text = ''
   if (props.state == 'go') {
     text = t('TrafficSignGo')
-  } else if (props.state == 'yield') {
-    text = t('TrafficSignYield')
   } else if (props.state == 'stop') {
     text = t('TrafficSignStop')
   }

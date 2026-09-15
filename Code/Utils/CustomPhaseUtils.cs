@@ -218,7 +218,6 @@ public struct CustomPhaseUtils
     public static void SignalCopyBit(ref GroupMask.Signal signal, int sourceIndex, int destIndex)
     {
         signal.m_GoGroupMask = CopyBit(signal.m_GoGroupMask, sourceIndex, destIndex);
-        signal.m_YieldGroupMask = CopyBit(signal.m_YieldGroupMask, sourceIndex, destIndex);
     }
 
     public static ushort CopyBit(ushort input, int sourceIndex, int destIndex)
@@ -284,7 +283,6 @@ public struct CustomPhaseUtils
     public static void SignalSwapBit(ref GroupMask.Signal signal, int index1, int index2)
     {
         signal.m_GoGroupMask = SwapBit(signal.m_GoGroupMask, index1, index2);
-        signal.m_YieldGroupMask = SwapBit(signal.m_YieldGroupMask, index1, index2);
     }
 
     public static ushort SwapBit(ushort input, int index1, int index2)

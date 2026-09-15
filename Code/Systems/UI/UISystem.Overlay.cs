@@ -204,13 +204,6 @@ public partial class UISystem : UISystemBase
                             if (EntityManager.TryGetComponent<LaneSignal>(subLaneEntity, out var laneSignal) && EntityManager.TryGetComponent<Curve>(subLaneEntity, out var curve))
                             {
                                 Color color = Color.green;
-                                if (
-                                    EntityManager.TryGetComponent<ExtraLaneSignal>(subLaneEntity, out var extraLaneSignal)
-                                    && (extraLaneSignal.m_YieldGroupMask & 1 << displayIndex) != 0
-                                )
-                                {
-                                    color = Color.blue;
-                                }
                                 color = new Color(color.r * 0.3f, color.g * 0.3f, color.b * 0.3f, color.a * 0.5f);
                                 if ((laneSignal.m_GroupMask & 1 << displayIndex) != 0)
                                 {
@@ -258,17 +251,9 @@ public partial class UISystem : UISystemBase
                         }
                         if (EntityManager.TryGetComponent<LaneSignal>(subLaneEntity, out var laneSignal) && EntityManager.TryGetComponent<Curve>(subLaneEntity, out var curve))
                         {
-                            Color color = Color.green;
-                            if (
-                                EntityManager.TryGetComponent<ExtraLaneSignal>(subLaneEntity, out var extraLaneSignal)
-                                && (extraLaneSignal.m_YieldGroupMask & 1 << displayIndex) != 0
-                            )
-                            {
-                                color = Color.blue;
-                            }
                             if ((laneSignal.m_GroupMask & 1 << displayIndex) != 0)
                             {
-                                overlayBuffer.DrawCurve(color, curve.m_Bezier, 0.3f);
+                                overlayBuffer.DrawCurve(Color.green, curve.m_Bezier, 0.3f);
                             }
                         }
                     }

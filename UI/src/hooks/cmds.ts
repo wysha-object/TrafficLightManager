@@ -100,7 +100,7 @@ export async function setCustomPhaseDataCmd(
     | { key: 'MaximumDuration'; value: number }
     | { key: 'TargetDurationMultiplier'; value: number }
     | { key: 'LaneOccupiedMultiplier'; value: number }
-    | { key: 'IntervalExponent'; value: number }
+    | { key: 'IntervalFactor'; value: number }
     | { key: 'PrioritiseTrack'; value: boolean }
     | { key: 'PrioritisePublicCar'; value: boolean }
     | { key: 'PrioritisePedestrian'; value: boolean }

@@ -9,36 +9,30 @@ public struct ExtraLaneSignal : IComponentData, IQueryTypeParameter, ISerializab
     {
         Yield = 1 << 0,
 
-        IgnorePriority = 1 << 1
+        IgnorePriority = 1 << 1,
     }
-
-    private int m_SchemaVersion;
-
-    public ushort m_YieldGroupMask;
 
     public ushort m_IgnorePriorityGroupMask;
 
     public Entity m_SourceSubLane;
 
-    public void Serialize<TWriter>(TWriter writer) where TWriter : IWriter
+    public void Serialize<TWriter>(TWriter writer)
+        where TWriter : IWriter
     {
-        writer.Write(m_SchemaVersion);
-        writer.Write(m_YieldGroupMask);
+        int schemaVersion = 4;
+        writer.Write(schemaVersion);
         writer.Write(m_IgnorePriorityGroupMask);
         writer.Write(m_SourceSubLane);
     }
 
-    public void Deserialize<TReader>(TReader reader) where TReader : IReader
+    public void Deserialize<TReader>(TReader reader)
+        where TReader : IReader
     {
         Initialisation();
         reader.Read(out int schemaVersion);
         if (schemaVersion == 1)
         {
             reader.Read(out uint flags);
-            if ((flags & (uint)Flags.Yield) != 0)
-            {
-                m_YieldGroupMask = ushort.MaxValue;
-            }
             if ((flags & (uint)Flags.IgnorePriority) != 0)
             {
                 m_IgnorePriorityGroupMask = ushort.MaxValue;
@@ -46,7 +40,10 @@ public struct ExtraLaneSignal : IComponentData, IQueryTypeParameter, ISerializab
         }
         if (schemaVersion >= 2)
         {
-            reader.Read(out m_YieldGroupMask);
+            if (schemaVersion <= 3)
+            {
+                reader.Read(out ushort _);
+            }
             reader.Read(out m_IgnorePriorityGroupMask);
         }
         if (schemaVersion >= 3)
@@ -57,8 +54,6 @@ public struct ExtraLaneSignal : IComponentData, IQueryTypeParameter, ISerializab
 
     private void Initialisation()
     {
-        m_SchemaVersion = 3;
-        m_YieldGroupMask = 0;
         m_IgnorePriorityGroupMask = 0;
         m_SourceSubLane = Entity.Null;
     }

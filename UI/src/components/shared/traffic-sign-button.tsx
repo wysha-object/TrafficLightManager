@@ -36,7 +36,6 @@ export default function TrafficSignButton(props: {
     border = '#111111'
     backgroundColor = '#111111'
     signColor = props.state != 'stop' ? '#476a4c' : '#a83c19'
-    signColor = props.state == 'yield' ? '#4348b2' : signColor
   }
 
   if (props.sign == '↶') {

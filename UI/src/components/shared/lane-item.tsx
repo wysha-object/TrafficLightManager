@@ -6,9 +6,9 @@ import BusSideSvg from 'assets/images/bus-side.svg'
 import { ReactNode, useContext } from 'react'
 import styled from 'styled-components'
 import { CityConfigurationContext } from 'context'
-import TrafficSignButton from 'components/custom-phase-tool/traffic-sign-button'
+import TrafficSignButton from 'components/shared/traffic-sign-button'
 import TipArea from 'components/base/tip-area'
-import TrafficSignTooltip from '../custom-phase-tool/traffic-sign'
+import TrafficSignTooltip from './traffic-sign'
 import {
   CustomPhaseSignalState,
   CustomPhaseLane,
