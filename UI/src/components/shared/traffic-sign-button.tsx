@@ -72,11 +72,6 @@ export default function TrafficSignButton(props: {
         width='100%'
         height='100%'
         viewBox='0 0 100 100'
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-        }}
       >
         {props.state != 'none' && (
           <circle
@@ -104,14 +99,20 @@ export default function TrafficSignButton(props: {
           </text>
         )}
         {props.variant == 'pedestrian' && props.state == 'go' && (
-          <div className=''>
-            <WalkSvg className='big-icon' style={{ fill: signColor }} />
-          </div>
+          <WalkSvg
+            x='10'
+            y='10'
+            className='big-icon'
+            style={{ fill: signColor, width: '80%', height: '80%' }}
+          />
         )}
         {props.variant == 'pedestrian' && props.state != 'go' && (
-          <div className=''>
-            <HumanMaleSvg className='big-icon' style={{ fill: signColor }} />
-          </div>
+          <HumanMaleSvg
+            x='10'
+            y='10'
+            className='big-icon'
+            style={{ fill: signColor, width: '80%', height: '80%' }}
+          />
         )}
         {!props.allow && props.variant == 'sign' && (
           <rect
