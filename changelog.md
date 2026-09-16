@@ -1,4 +1,0 @@
-- change car flow cal method
-- remove yield signal
-- use interval factor instead interval exponent
-- update translations
