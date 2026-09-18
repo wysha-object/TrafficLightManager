@@ -326,7 +326,7 @@ namespace TrafficLightManager.Code.Systems.Simulation
                     float targetDuration = ((float)math.csum(trafficLightGroup.m_PassedCarCount) / 4) * phase.m_TargetDurationMultiplier;
                     bool preferChange = false;
                     trafficLightGroup.m_TargetDuration = targetDuration;
-                    if (trafficLightGroup.m_Timer <= phase.m_MinimumDuration)
+                    if (trafficLightGroup.m_Timer < phase.m_MinimumDuration)
                     {
                         phase.m_LowFlowTimer = 0;
                         phase.m_LowPriorityTimer = 0;
