@@ -1,1 +1,0 @@
-- fixed the issue of an extra second occurring when Minimum Duration and Maximum Duration are the same.
