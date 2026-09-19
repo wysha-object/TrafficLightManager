@@ -38,8 +38,6 @@ Customize the traffic lights at any intersection to look and work exactly the wa
 
 * Display Current Phase: Always show the current phase, allowing you to know the current state of an intersection at any time.
 
-* Sound Feedback: Provides sound feedback when hovering over buttons or pressing buttons.
-
 In addition to these features, this mod includes many other thoughtful designs:
 
 * When viewing an intersection, you can click another intersection to immediately switch the viewing target.
@@ -52,7 +50,11 @@ If you find this mod helpful, please consider giving it a star !
 
 ## Contribution
 
-Please check on GitHub.
+Contributions are welcome.
+
+If you would like to help translate and improve this project, you can contribute through Crowdin. You can help translate new languages, review existing translations, or improve translations to make the project more accessible to users around the world.
+
+Code contributions are also welcome on GitHub.
 
 ## Comments
 
