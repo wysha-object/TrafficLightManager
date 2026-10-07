@@ -1,13 +1,12 @@
 using Game.Net;
 using TrafficLightManager.Code.Components;
 using TrafficLightManager.Code.Systems.Simulation;
-using TrafficLightManager.Code.Utils;
 using Unity.Collections;
 using Unity.Entities;
 using static TrafficLightManager.Code.Systems.Initialization.PatchedTrafficLightInitializationSystem;
 using static TrafficLightManager.Code.Utils.NodeUtils;
 
-namespace TrafficLightManager.Code.Systems.Initialization;
+namespace TrafficLightManager.Code.Utils;
 
 public class PredefinedPatternsProcessor
 {

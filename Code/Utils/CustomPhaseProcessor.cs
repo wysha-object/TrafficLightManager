@@ -1,12 +1,11 @@
 using Game.Net;
 using TrafficLightManager.Code.Components;
-using TrafficLightManager.Code.Utils;
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
 using static TrafficLightManager.Code.Systems.Initialization.PatchedTrafficLightInitializationSystem;
 
-namespace TrafficLightManager.Code.Systems.Simulation;
+namespace TrafficLightManager.Code.Utils;
 
 public struct CustomPhaseProcessor
 {
