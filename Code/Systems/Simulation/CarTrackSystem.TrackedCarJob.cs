@@ -72,6 +72,8 @@ namespace TrafficLightManager.Code.Systems.Simulation
         private struct IncrementJob : IJob
         {
             public NativeList<Entity> m_NeedIncrementList;
+
+            [NativeDisableParallelForRestriction]
             public ComponentLookup<CustomTrafficLights> m_CustomTrafficLightsLookup;
 
             public void Execute()

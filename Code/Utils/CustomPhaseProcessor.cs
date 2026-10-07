@@ -135,7 +135,7 @@ public struct CustomPhaseProcessor
                 }
             }
 
-            PatchedTrafficLightSystem.UpdateLaneSignal(trafficLights, ref laneSignal, ref extraLaneSignal);
+            TrafficLightsUtils.UpdateLaneSignal(trafficLights, ref laneSignal, ref extraLaneSignal);
             if (job.m_LaneSignalData.HasComponent(subLane))
             {
                 job.m_LaneSignalData[subLane] = laneSignal;
@@ -178,7 +178,7 @@ public struct CustomPhaseProcessor
             }
 
             ExtraLaneSignal extraLaneSignal = new();
-            PatchedTrafficLightSystem.UpdateLaneSignal(trafficLights, ref laneSignal, ref extraLaneSignal);
+            TrafficLightsUtils.UpdateLaneSignal(trafficLights, ref laneSignal, ref extraLaneSignal);
             job.m_LaneSignalData[subLane] = laneSignal;
         }
 
@@ -242,7 +242,7 @@ public struct CustomPhaseProcessor
                 }
             }
 
-            PatchedTrafficLightSystem.UpdateLaneSignal(trafficLights, ref laneSignal, ref extraLaneSignal);
+            TrafficLightsUtils.UpdateLaneSignal(trafficLights, ref laneSignal, ref extraLaneSignal);
             if (!job.m_LaneSignalData.HasComponent(subLane))
             {
                 job.m_CommandBuffer.AddComponent(unfilteredChunkIndex, subLane, laneSignal);

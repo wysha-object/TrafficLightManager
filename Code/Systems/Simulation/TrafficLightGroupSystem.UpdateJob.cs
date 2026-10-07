@@ -32,8 +32,10 @@ namespace TrafficLightManager.Code.Systems.Simulation
 
             public BufferTypeHandle<CustomPhaseData> m_CustomPhaseDataBufferType;
 
+            [NativeDisableParallelForRestriction]
             public ComponentLookup<TrafficLights> m_TrafficLightsLookup;
 
+            [NativeDisableParallelForRestriction]
             public ComponentLookup<CustomTrafficLights> m_CustomTrafficLightsLookup;
 
             [ReadOnly]
@@ -270,7 +272,7 @@ namespace TrafficLightManager.Code.Systems.Simulation
                 }
             }
 
-            public static bool UpdateTrafficLightState(ref TrafficLightGroup trafficLightGroup, DynamicBuffer<CustomPhaseData> customPhaseDataBuffer)
+            public bool UpdateTrafficLightState(ref TrafficLightGroup trafficLightGroup, DynamicBuffer<CustomPhaseData> customPhaseDataBuffer)
             {
                 if (
                     trafficLightGroup.m_State == Game.Net.TrafficLightState.None
@@ -406,7 +408,7 @@ namespace TrafficLightManager.Code.Systems.Simulation
                 return false;
             }
 
-            public static byte GetNextSignalGroup(byte currentGroup, DynamicBuffer<CustomPhaseData> customPhaseDataBuffer, TrafficLightGroup trafficLightGroup, out bool linked)
+            public byte GetNextSignalGroup(byte currentGroup, DynamicBuffer<CustomPhaseData> customPhaseDataBuffer, TrafficLightGroup trafficLightGroup, out bool linked)
             {
                 linked = false;
                 byte nextGroup = 0;
@@ -477,7 +479,7 @@ namespace TrafficLightManager.Code.Systems.Simulation
                 return nextGroup;
             }
 
-            private static int MaxPriority(DynamicBuffer<CustomPhaseData> customPhaseDataBuffer)
+            private int MaxPriority(DynamicBuffer<CustomPhaseData> customPhaseDataBuffer)
             {
                 int max = int.MinValue;
                 foreach (var phase in customPhaseDataBuffer)
@@ -487,7 +489,7 @@ namespace TrafficLightManager.Code.Systems.Simulation
                 return max;
             }
 
-            private static float Max(float4 f)
+            private float Max(float4 f)
             {
                 return math.max(f.w, math.max(f.x, math.max(f.y, f.z)));
             }
@@ -510,7 +512,7 @@ namespace TrafficLightManager.Code.Systems.Simulation
                 }
             }
 
-            public static void UpdateLaneSignal(TrafficLightGroup trafficLightGroup, ref LaneSignal laneSignal, ref ExtraLaneSignal extraLaneSignal)
+            public void UpdateLaneSignal(TrafficLightGroup trafficLightGroup, ref LaneSignal laneSignal, ref ExtraLaneSignal extraLaneSignal)
             {
                 int num = 0;
                 int num2 = 0;
