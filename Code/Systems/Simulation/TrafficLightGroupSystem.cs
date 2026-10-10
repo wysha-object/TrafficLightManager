@@ -24,8 +24,6 @@ namespace TrafficLightManager.Code.Systems.Simulation
 
         private TimeSystem m_TimeSystem;
 
-        private TrafficLightGroupValidationSystem m_TrafficLightGroupValidationSystem;
-
         private EntityQuery m_TrafficLightGroupQuery;
 
         public override int GetUpdateInterval(SystemUpdatePhase phase)
@@ -40,7 +38,6 @@ namespace TrafficLightManager.Code.Systems.Simulation
             m_EndFrameBarrier = base.World.GetOrCreateSystemManaged<EndFrameBarrier>();
             m_SimulationSystem = base.World.GetOrCreateSystemManaged<SimulationSystem>();
             m_TimeSystem = base.World.GetOrCreateSystemManaged<TimeSystem>();
-            m_TrafficLightGroupValidationSystem = base.World.GetOrCreateSystemManaged<TrafficLightGroupValidationSystem>();
 
             m_TrafficLightGroupQuery = GetEntityQuery(
                 ComponentType.ReadWrite<TrafficLightGroup>(),
@@ -61,7 +58,7 @@ namespace TrafficLightManager.Code.Systems.Simulation
                 customPhaseTemplates[i] = new CustomPhaseTemplate.Values(templateList[i]);
             }
 
-            Dependency = m_TrafficLightGroupValidationSystem.ScheduleTrafficLightGroupValidationJob(Dependency, m_EndFrameBarrier.CreateCommandBuffer());
+            Dependency = ScheduleTrafficLightGroupValidationJob(Dependency, m_EndFrameBarrier.CreateCommandBuffer());
             Dependency = JobChunkExtensions.ScheduleParallel(
                 new UpdateTrafficLightGroupJob
                 {
