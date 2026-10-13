@@ -1,3 +1,4 @@
+using System;
 using Colossal.Serialization.Entities;
 using Colossal.UI.Binding;
 
@@ -5,9 +6,18 @@ namespace TrafficLightManager.Code.Components;
 
 public struct GroupMask
 {
-    public struct Signal : ISerializable, IJsonWritable
+    public struct Signal : ISerializable, IJsonReadable, IJsonWritable
     {
         public ushort m_GoGroupMask;
+
+        public void Read(IJsonReader reader)
+        {
+            reader.ReadMapBegin();
+            reader.ReadProperty(nameof(m_GoGroupMask));
+            reader.Read(out int mask);
+            m_GoGroupMask = (ushort)Math.Clamp(mask, 0, ushort.MaxValue);
+            reader.ReadMapEnd();
+        }
 
         public void Deserialize<TReader>(TReader reader)
             where TReader : IReader
@@ -44,7 +54,7 @@ public struct GroupMask
         }
     }
 
-    public struct Turn : ISerializable, IJsonWritable
+    public struct Turn : ISerializable, IJsonReadable, IJsonWritable
     {
         private ushort m_SchemaVersion;
 
@@ -55,6 +65,20 @@ public struct GroupMask
         public Signal m_Right;
 
         public Signal m_UTurn;
+
+        public void Read(IJsonReader reader)
+        {
+            reader.ReadMapBegin();
+            reader.ReadProperty(nameof(m_Left));
+            m_Left.Read(reader);
+            reader.ReadProperty(nameof(m_Straight));
+            m_Straight.Read(reader);
+            reader.ReadProperty(nameof(m_Right));
+            m_Right.Read(reader);
+            reader.ReadProperty(nameof(m_UTurn));
+            m_UTurn.Read(reader);
+            reader.ReadMapEnd();
+        }
 
         public void Deserialize<TReader>(TReader reader)
             where TReader : IReader

@@ -6,7 +6,7 @@ using static TrafficLightManager.Code.Systems.UI.UITypes;
 
 namespace TrafficLightManager.Code.Components;
 
-public struct SubLaneGroupMask : IBufferElementData, ISerializable, IJsonWritable
+public struct SubLaneGroupMask : IBufferElementData, ISerializable, IJsonReadable, IJsonWritable
 {
     public enum Options : uint
     {
@@ -25,6 +25,25 @@ public struct SubLaneGroupMask : IBufferElementData, ISerializable, IJsonWritabl
     public GroupMask.Turn m_Track;
 
     public GroupMask.Signal m_Pedestrian;
+
+    public void Read(IJsonReader reader)
+    {
+        reader.ReadMapBegin();
+        reader.ReadProperty(nameof(m_SubLane));
+        ValueReaders.Create<Entity>().Read(reader, out m_SubLane);
+        reader.ReadProperty(nameof(m_Position));
+        m_Position.Read(reader);
+        reader.ReadProperty(nameof(m_Options));
+        reader.Read(out uint options);
+        m_Options = (Options)options;
+        reader.ReadProperty(nameof(m_Car));
+        m_Car.Read(reader);
+        reader.ReadProperty(nameof(m_Track));
+        m_Track.Read(reader);
+        reader.ReadProperty(nameof(m_Pedestrian));
+        m_Pedestrian.Read(reader);
+        reader.ReadMapEnd();
+    }
 
     public void Serialize<TWriter>(TWriter writer) where TWriter : IWriter
     {

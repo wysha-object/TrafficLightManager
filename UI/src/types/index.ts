@@ -4,6 +4,22 @@ export const enum EdgeGroupMaskOptions {
   PerLaneSignal = 1 << 0,
 }
 
+export enum UpdateCustomPhaseType {
+  MinimumDuration = 0,
+  MaximumDuration = 1,
+  TargetDurationMultiplier = 2,
+  LaneOccupiedMultiplier = 3,
+  IntervalFactor = 4,
+  PrioritiseTrack = 5,
+  PrioritisePublicCar = 6,
+  PrioritisePedestrian = 7,
+  LinkedWithNextPhase = 8,
+  EndPhasePrematurely = 9,
+  Name = 10,
+  BindWithTemplate = 11,
+  ApplyTemplate = 12,
+}
+
 export const enum ToolState {
   Disabled = 0,
   ChooseGroup = 1,

@@ -13,7 +13,7 @@ import { useCallback, useContext, useEffect, useMemo, useState } from 'react'
 import styled from 'styled-components'
 import TextInput from 'components/base/text-input'
 import { Button } from 'cs2/ui'
-import { ToolState, TrafficLightGroup } from 'types'
+import { ToolState, TrafficLightGroup, UpdateCustomPhaseType } from 'types'
 import {
   swapCustomPhaseCmd,
   useGetCustomPhaseItemsCmd,
@@ -52,7 +52,7 @@ function PhaseItemDivider(props: { index: number; linked: boolean }) {
 
   const clickHandler = () => {
     setCustomPhaseDataCmd({
-      key: 'LinkedWithNextPhase',
+      key: UpdateCustomPhaseType.LinkedWithNextPhase,
       index: props.index,
       value: !props.linked,
     })
@@ -140,7 +140,7 @@ export default function PhaseRow(props: {
             style={{ flex: '1' }}
             onChange={(value) =>
               setCustomPhaseDataCmd({
-                key: 'Name',
+                key: UpdateCustomPhaseType.Name,
                 value: value,
                 index: props.itemIndex,
               })

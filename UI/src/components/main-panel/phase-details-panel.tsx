@@ -4,7 +4,7 @@ import RangeRow from 'components/main-panel/mod/range-row'
 import { Button, PanelFoldout, Scrollable } from 'cs2/ui'
 import TemplateSection from './mod/template-section'
 import { useContext, useMemo } from 'react'
-import { ToolState } from 'types'
+import { ToolState, UpdateCustomPhaseType } from 'types'
 import {
   setCustomPhaseDataCmd,
   useGetCustomPhaseItemsCmd,
@@ -71,7 +71,7 @@ const TextItem = (props: {
 const EndPhaseButton = (props: { index: number; disabled?: boolean }) => {
   const clickHandler = () => {
     if (!props.disabled) {
-      setCustomPhaseDataCmd({ key: 'EndPhasePrematurely', index: props.index })
+      setCustomPhaseDataCmd({ key: UpdateCustomPhaseType.EndPhasePrematurely, index: props.index })
     }
   }
   const { t } = useTranslate()
@@ -164,7 +164,7 @@ export default function PhaseDetailsPanel() {
                   )}
                   onClick={() => {
                     setCustomPhaseDataCmd({
-                      key: 'PrioritiseTrack',
+                      key: UpdateCustomPhaseType.PrioritiseTrack,
                       index: index,
                       value: !customPhaseItem?.prioritiseTrack,
                     })
@@ -178,7 +178,7 @@ export default function PhaseDetailsPanel() {
                   )}
                   onClick={() => {
                     setCustomPhaseDataCmd({
-                      key: 'PrioritisePublicCar',
+                      key: UpdateCustomPhaseType.PrioritisePublicCar,
                       index: index,
                       value: !customPhaseItem?.prioritisePublicCar,
                     })
@@ -192,7 +192,7 @@ export default function PhaseDetailsPanel() {
                   )}
                   onClick={() => {
                     setCustomPhaseDataCmd({
-                      key: 'PrioritisePedestrian',
+                      key: UpdateCustomPhaseType.PrioritisePedestrian,
                       index: index,
                       value: !customPhaseItem?.prioritisePedestrian,
                     })
@@ -213,7 +213,7 @@ export default function PhaseDetailsPanel() {
                 <RangeRow
                   onChange={(value) => {
                     setCustomPhaseDataCmd({
-                      key: 'MinimumDuration',
+                      key: UpdateCustomPhaseType.MinimumDuration,
                       value: value,
                       index: index,
                     })
@@ -234,7 +234,7 @@ export default function PhaseDetailsPanel() {
                 <RangeRow
                   onChange={(value) => {
                     setCustomPhaseDataCmd({
-                      key: 'MaximumDuration',
+                      key: UpdateCustomPhaseType.MaximumDuration,
                       value: value,
                       index: index,
                     })
@@ -255,7 +255,7 @@ export default function PhaseDetailsPanel() {
                 <RangeRow
                   onChange={(value) => {
                     setCustomPhaseDataCmd({
-                      key: 'TargetDurationMultiplier',
+                      key: UpdateCustomPhaseType.TargetDurationMultiplier,
                       value: value,
                       index: index,
                     })
@@ -279,7 +279,7 @@ export default function PhaseDetailsPanel() {
                 <RangeRow
                   onChange={(value) => {
                     setCustomPhaseDataCmd({
-                      key: 'LaneOccupiedMultiplier',
+                      key: UpdateCustomPhaseType.LaneOccupiedMultiplier,
                       value: value,
                       index: index,
                     })
@@ -305,7 +305,7 @@ export default function PhaseDetailsPanel() {
                 <RangeRow
                   onChange={(value) => {
                     setCustomPhaseDataCmd({
-                      key: 'IntervalFactor',
+                      key: UpdateCustomPhaseType.IntervalFactor,
                       value: value,
                       index: index,
                     })

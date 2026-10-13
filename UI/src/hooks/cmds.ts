@@ -1,4 +1,3 @@
-import { DEFAULT_CITY_CONFIGURATION } from 'context'
 import { bindValue, call, useValue } from 'cs2/api'
 import { Entity } from 'cs2/utils'
 import {
@@ -11,74 +10,118 @@ import {
   CustomPhaseTemplate,
   EdgeGroupMask,
   SubLaneGroupMask,
+  UpdateCustomPhaseType,
 } from 'types'
 
+type Position = { x: number; y: number; z: number }
+type Camera = { position: Position; rotation: Position }
+type TrafficLightMember = { entityIndex: number; position: Position | null }
+
+const GetToolState = bindValue<ToolState>(
+  'TrafficLightManager',
+  'GetToolState',
+  ToolState.Disabled,
+)
+const GetDisplayPhaseIndex = bindValue<number>(
+  'TrafficLightManager',
+  'GetDisplayPhaseIndex',
+  -1,
+)
+const GetCityConfiguration = bindValue<CityConfiguration>(
+  'TrafficLightManager',
+  'GetCityConfiguration',
+  {
+    leftHandTraffic: false,
+  },
+)
+const GetCamera = bindValue<Camera>('TrafficLightManager', 'GetCamera', {
+  position: { x: 0, y: 0, z: 0 },
+  rotation: { x: 0, y: 0, z: 0 },
+})
+const GetEdgeInfo = bindValue<EdgeInfo[]>(
+  'TrafficLightManager',
+  'GetEdgeInfo',
+  [],
+)
+const GetCustomPhaseItems = bindValue<CustomPhaseItem[]>(
+  'TrafficLightManager',
+  'GetCustomPhaseItems',
+  [],
+)
+const GetTrafficLightGroup = bindValue<TrafficLightGroup>(
+  'TrafficLightManager',
+  'GetTrafficLightGroup',
+  {
+    timer: 0,
+    currentPhaseIndex: 0,
+    manualPhaseIndex: 0,
+    targetDuration: 0,
+    passedCarCount: 0,
+  },
+)
+const GetTrafficLightsMembers = bindValue<TrafficLightMember[]>(
+  'TrafficLightManager',
+  'GetTrafficLightsMembers',
+  [],
+)
+const defaultTemplate: CustomPhaseTemplate = {
+  m_Name: 'Default',
+  m_IsPrioritiseTrack: true,
+  m_IsPrioritisePublicCar: false,
+  m_IsPrioritisePedestrian: false,
+  m_MinimumDuration: 2,
+  m_MaximumDuration: 300,
+  m_TargetDurationMultiplier: 1,
+  m_LaneOccupiedMultiplier: 1,
+  m_IntervalFactor: 1,
+}
+const GetSettings = bindValue<Settings>('TrafficLightManager', 'GetSettings', {
+  customPhaseTemplates: [],
+  defaultCustomPhaseTemplate: defaultTemplate,
+})
+const GetTrafficLightGroupName = bindValue<string>(
+  'TrafficLightManager',
+  'GetTrafficLightManagerGroupName',
+  '',
+)
+const GetSystemDefaultTemplate = bindValue<CustomPhaseTemplate>(
+  'TrafficLightManager',
+  'GetSystemDefaultTemplate',
+  defaultTemplate,
+)
+
 export function useGetToolStateCmd() {
-  return JSON.parse(
-    useValue(bindValue('TrafficLightManager', 'GetToolState', '-1')),
-  ) as ToolState
+  return useValue(GetToolState)
 }
 export function useGetDisplayPhaseIndexCmd() {
-  return JSON.parse(
-    useValue(bindValue('TrafficLightManager', 'GetDisplayPhaseIndex', '-1')),
-  ) as number
+  return useValue(GetDisplayPhaseIndex)
 }
-
 export function useGetCityConfigurationCmd() {
-  return JSON.parse(
-    useValue(
-      bindValue(
-        'TrafficLightManager',
-        'GetCityConfiguration',
-        JSON.stringify(DEFAULT_CITY_CONFIGURATION),
-      ),
-    ),
-  ) as CityConfiguration
+  return useValue(GetCityConfiguration)
 }
 export function useGetCameraCmd() {
-  return JSON.parse(
-    useValue(bindValue('TrafficLightManager', 'GetCamera', '{}')),
-  ) as {
-    position: { x: number; y: number; z: number }
-    rotation: { x: number; y: number; z: number }
-  }
+  return useValue(GetCamera)
 }
 export function useGetEdgeInfoCmd() {
-  return useValue(
-    bindValue('TrafficLightManager', 'GetEdgeInfo', []),
-  ) as EdgeInfo[]
+  return useValue(GetEdgeInfo)
 }
 export function useGetCustomPhaseItemsCmd() {
-  return JSON.parse(
-    useValue(bindValue('TrafficLightManager', 'GetCustomPhaseItems', '[]')),
-  ) as CustomPhaseItem[]
+  return useValue(GetCustomPhaseItems)
 }
 export function useGetTrafficLightGroupCmd() {
-  return JSON.parse(
-    useValue(bindValue('TrafficLightManager', 'GetTrafficLightGroup', '{}')),
-  ) as TrafficLightGroup
+  return useValue(GetTrafficLightGroup)
 }
 export function useGetTrafficLightsMembersCmd() {
-  return JSON.parse(
-    useValue(bindValue('TrafficLightManager', 'GetTrafficLightsMembers', '[]')),
-  ) as any[]
+  return useValue(GetTrafficLightsMembers)
 }
 export function useGetSettingsCmd() {
-  return JSON.parse(
-    useValue(bindValue('TrafficLightManager', 'GetSettings', '{}')),
-  ) as Settings
+  return useValue(GetSettings)
 }
 export function useGetTrafficLightGroupNameCmd() {
-  return useValue(
-    bindValue('TrafficLightManager', 'GetTrafficLightManagerGroupName', ''),
-  ) as string
+  return useValue(GetTrafficLightGroupName)
 }
 export function useGetSystemDefaultTemplateCmd() {
-  return JSON.parse(
-    useValue(
-      bindValue('TrafficLightManager', 'GetSystemDefaultTemplate', '{}'),
-    ),
-  ) as CustomPhaseTemplate
+  return useValue(GetSystemDefaultTemplate)
 }
 
 export async function setToolStateCmd(inputValue: ToolState): Promise<void> {
@@ -94,54 +137,41 @@ export async function setManualPhaseIndexCmd(
 ): Promise<void> {
   return await call('TrafficLightManager', 'SetManualPhaseIndex', inputValue)
 }
-export async function setCustomPhaseDataCmd(
-  inputValue: { index: number } & (
-    | { key: 'MinimumDuration'; value: number }
-    | { key: 'MaximumDuration'; value: number }
-    | { key: 'TargetDurationMultiplier'; value: number }
-    | { key: 'LaneOccupiedMultiplier'; value: number }
-    | { key: 'IntervalFactor'; value: number }
-    | { key: 'PrioritiseTrack'; value: boolean }
-    | { key: 'PrioritisePublicCar'; value: boolean }
-    | { key: 'PrioritisePedestrian'; value: boolean }
-    | { key: 'LinkedWithNextPhase'; value: boolean }
-    | { key: 'EndPhasePrematurely' }
-    | { key: 'Name'; value: string }
-    | {
-        key: 'BindWithTemplate'
-        value:
-          | {
-              bindWithTemplate: true
-              templateName: string
-            }
-          | {
-              bindWithTemplate: false
-            }
-      }
-    | { key: 'ApplyTemplate'; value: string }
-  ),
-): Promise<void> {
-  let value: any = inputValue
-  if (inputValue.key === 'BindWithTemplate') {
-    value = {
-      ...inputValue,
-      value: JSON.stringify(inputValue.value),
+export type UpdateCustomPhaseInput = { index: number } & (
+  | { key: UpdateCustomPhaseType.MinimumDuration; value: number }
+  | { key: UpdateCustomPhaseType.MaximumDuration; value: number }
+  | { key: UpdateCustomPhaseType.TargetDurationMultiplier; value: number }
+  | { key: UpdateCustomPhaseType.LaneOccupiedMultiplier; value: number }
+  | { key: UpdateCustomPhaseType.IntervalFactor; value: number }
+  | { key: UpdateCustomPhaseType.PrioritiseTrack; value: boolean }
+  | { key: UpdateCustomPhaseType.PrioritisePublicCar; value: boolean }
+  | { key: UpdateCustomPhaseType.PrioritisePedestrian; value: boolean }
+  | { key: UpdateCustomPhaseType.LinkedWithNextPhase; value: boolean }
+  | { key: UpdateCustomPhaseType.EndPhasePrematurely }
+  | { key: UpdateCustomPhaseType.Name; value: string }
+  | {
+      key: UpdateCustomPhaseType.BindWithTemplate
+      value:
+        | {
+            bindWithTemplate: true
+            templateName: string
+          }
+        | {
+            bindWithTemplate: false
+          }
     }
-  }
-  return await call(
-    'TrafficLightManager',
-    'SetCustomPhaseData',
-    JSON.stringify(value),
-  )
+  | { key: UpdateCustomPhaseType.ApplyTemplate; value: string }
+)
+
+export async function setCustomPhaseDataCmd(
+  inputValue: UpdateCustomPhaseInput,
+): Promise<void> {
+  return await call('TrafficLightManager', 'SetCustomPhaseData', inputValue)
 }
 export async function setTemplateCmd(
   inputValue: CustomPhaseTemplate,
 ): Promise<void> {
-  return await call(
-    'TrafficLightManager',
-    'SetTemplate',
-    JSON.stringify(inputValue),
-  )
+  return await call('TrafficLightManager', 'SetTemplate', inputValue)
 }
 export async function removeTemplateCmd(inputValue: string): Promise<void> {
   return await call('TrafficLightManager', 'RemoveTemplate', inputValue)
@@ -165,44 +195,35 @@ export async function swapCustomPhaseCmd(
   index1: number,
   index2: number,
 ): Promise<void> {
-  return await call(
-    'TrafficLightManager',
-    'SwapCustomPhase',
-    JSON.stringify({ index1, index2 }),
-  )
+  return await call('TrafficLightManager', 'SwapCustomPhase', {
+    index1,
+    index2,
+  })
 }
 export async function updateEdgeGroupMaskCmd(
   groupMaskArray: EdgeGroupMask[],
   entity: Entity,
 ): Promise<void> {
-  return await call(
-    'TrafficLightManager',
-    'UpdateEdgeGroupMask',
-    JSON.stringify({ groupMaskArray, entity }),
-  )
+  return await call('TrafficLightManager', 'UpdateEdgeGroupMask', {
+    groupMaskArray,
+    entity,
+  })
 }
 export async function updateSubLaneGroupMaskCmd(
   groupMaskArray: SubLaneGroupMask[],
   entity: Entity,
 ): Promise<void> {
-  return await call(
-    'TrafficLightManager',
-    'UpdateSubLaneGroupMask',
-    JSON.stringify({ groupMaskArray, entity }),
-  )
+  return await call('TrafficLightManager', 'UpdateSubLaneGroupMask', {
+    groupMaskArray,
+    entity,
+  })
 }
 export async function worldToScreenPoint(inputValue: {
   x: number
   y: number
   z: number
 }): Promise<{ top: number; left: number }> {
-  return JSON.parse(
-    await call(
-      'TrafficLightManager',
-      'WorldToScreenPoint',
-      JSON.stringify(inputValue),
-    ),
-  )
+  return await call('TrafficLightManager', 'WorldToScreenPoint', inputValue)
 }
 export async function lookAt(
   x: number,
@@ -210,11 +231,10 @@ export async function lookAt(
   z: number,
   distance: number,
 ): Promise<void> {
-  return await call(
-    'TrafficLightManager',
-    'LookAt',
-    JSON.stringify({ x, y, z, distance }),
-  )
+  return await call('TrafficLightManager', 'LookAt', {
+    position: { x, y, z },
+    distance,
+  })
 }
 export async function copyPhaseCmd(index: number): Promise<number> {
   return (await call('TrafficLightManager', 'CopyPhase', index)) as number
@@ -231,9 +251,8 @@ export async function getStorage(key: string): Promise<object | null> {
   return JSON.parse(jsonString) as object
 }
 export async function updateStorage(key: string, value: object): Promise<void> {
-  return await call(
-    'TrafficLightManager',
-    'UpdateStorage',
-    JSON.stringify({ key, value: JSON.stringify(value) }),
-  )
+  return await call('TrafficLightManager', 'UpdateStorage', {
+    key,
+    value: JSON.stringify(value),
+  })
 }

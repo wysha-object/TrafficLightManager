@@ -4,7 +4,7 @@ import { useTranslate } from 'hooks/translate'
 import { getModule } from 'cs2/modding'
 import { Button, Dropdown, DropdownItem, DropdownToggle } from 'cs2/ui'
 import { useState } from 'react'
-import { CustomPhaseItem } from 'types'
+import { CustomPhaseItem, UpdateCustomPhaseType } from 'types'
 import {
   setCustomPhaseDataCmd,
   removeTemplateCmd,
@@ -78,7 +78,7 @@ export default function TemplateSection(props: {
                 onClick={() => {
                   setCustomPhaseDataCmd({
                     index: props.itemIndex,
-                    key: 'BindWithTemplate',
+                    key: UpdateCustomPhaseType.BindWithTemplate,
                     value: { bindWithTemplate: false },
                   })
                 }}
@@ -132,7 +132,7 @@ export default function TemplateSection(props: {
               variant='flat'
               onClick={() =>
                 setCustomPhaseDataCmd({
-                  key: 'ApplyTemplate',
+                  key: UpdateCustomPhaseType.ApplyTemplate,
                   index: props.itemIndex,
                   value: selectTemplate,
                 })
@@ -147,12 +147,12 @@ export default function TemplateSection(props: {
               variant='flat'
               onClick={() => {
                 setCustomPhaseDataCmd({
-                  key: 'ApplyTemplate',
+                  key: UpdateCustomPhaseType.ApplyTemplate,
                   index: props.itemIndex,
                   value: selectTemplate,
                 })
                 setCustomPhaseDataCmd({
-                  key: 'BindWithTemplate',
+                  key: UpdateCustomPhaseType.BindWithTemplate,
                   index: props.itemIndex,
                   value: {
                     bindWithTemplate: true,
@@ -218,7 +218,7 @@ export default function TemplateSection(props: {
                     m_IntervalFactor: props.item.intervalFactor,
                   })
                   setCustomPhaseDataCmd({
-                    key: 'BindWithTemplate',
+                    key: UpdateCustomPhaseType.BindWithTemplate,
                     index: props.itemIndex,
                     value: {
                       bindWithTemplate: true,
