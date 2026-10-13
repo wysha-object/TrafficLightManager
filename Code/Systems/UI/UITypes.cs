@@ -7,6 +7,134 @@ namespace TrafficLightManager.Code.Systems.UI;
 
 public static class UITypes
 {
+    public struct WorldPosition : IJsonReadable, IJsonWritable
+    {
+        public float x;
+
+        public float y;
+
+        public float z;
+
+        public void Read(IJsonReader reader)
+        {
+            reader.ReadMapBegin();
+            reader.ReadProperty(nameof(x));
+            reader.Read(out x);
+            reader.ReadProperty(nameof(y));
+            reader.Read(out y);
+            reader.ReadProperty(nameof(z));
+            reader.Read(out z);
+            if (reader.ReadProperty(nameof(key)))
+            {
+                reader.Read(out string _);
+            }
+            reader.ReadMapEnd();
+        }
+
+        public string key
+        {
+            get => $"{x.ToString("0.0")},{y.ToString("0.0")},{z.ToString("0.0")}";
+        }
+
+        public static implicit operator WorldPosition(float pos) =>
+            new WorldPosition
+            {
+                x = pos,
+                y = pos,
+                z = pos,
+            };
+
+        public static implicit operator WorldPosition(Unity.Mathematics.float3 pos) =>
+            new WorldPosition
+            {
+                x = pos.x,
+                y = pos.y,
+                z = pos.z,
+            };
+
+        public static implicit operator Unity.Mathematics.float3(WorldPosition pos) => new Unity.Mathematics.float3(pos.x, pos.y, pos.z);
+
+        public static implicit operator UnityEngine.Vector3(WorldPosition pos) => new UnityEngine.Vector3(pos.x, pos.y, pos.z);
+
+        public static implicit operator string(WorldPosition pos) => pos.key;
+
+        public override bool Equals(object obj)
+        {
+            if (obj is not WorldPosition)
+            {
+                return false;
+            }
+            return Equals((WorldPosition)obj);
+        }
+
+        public bool Equals(WorldPosition other)
+        {
+            return x == other.x && y == other.y && z == other.z;
+        }
+
+        public override int GetHashCode()
+        {
+            return x.GetHashCode() ^ (y.GetHashCode() << 2) ^ (z.GetHashCode() >> 2);
+        }
+
+        public void Write(IJsonWriter writer)
+        {
+            writer.TypeBegin(typeof(WorldPosition).FullName);
+            writer.PropertyName("x");
+            writer.Write(x);
+            writer.PropertyName("y");
+            writer.Write(y);
+            writer.PropertyName("z");
+            writer.Write(z);
+            writer.TypeEnd();
+        }
+    }
+
+    public struct ScreenPoint : System.IEquatable<ScreenPoint>, IJsonWritable
+    {
+        public int top;
+
+        public int left;
+
+        public ScreenPoint(int topPos, int leftPos)
+        {
+            left = leftPos;
+            top = topPos;
+        }
+
+        public ScreenPoint(UnityEngine.Vector3 pos, int screenHeight)
+        {
+            left = (int)pos.x;
+            top = (int)(screenHeight - pos.y);
+        }
+
+        public void Write(IJsonWriter writer)
+        {
+            writer.TypeBegin(typeof(ScreenPoint).FullName);
+            writer.PropertyName("top");
+            writer.Write(top);
+            writer.PropertyName("left");
+            writer.Write(left);
+            writer.TypeEnd();
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (obj is ScreenPoint other)
+            {
+                return Equals(other);
+            }
+            return false;
+        }
+
+        public bool Equals(ScreenPoint other)
+        {
+            return other.top == top && other.left == left;
+        }
+
+        public override int GetHashCode() => (top, left).GetHashCode();
+    }
+
     public struct CustomPhaseItem : IJsonWritable
     {
         public ushort turnsSinceLastRun;
@@ -412,134 +540,6 @@ public static class UITypes
             reader.Read(out value);
             reader.ReadMapEnd();
         }
-    }
-
-    public struct WorldPosition : IJsonReadable, IJsonWritable
-    {
-        public float x;
-
-        public float y;
-
-        public float z;
-
-        public void Read(IJsonReader reader)
-        {
-            reader.ReadMapBegin();
-            reader.ReadProperty(nameof(x));
-            reader.Read(out x);
-            reader.ReadProperty(nameof(y));
-            reader.Read(out y);
-            reader.ReadProperty(nameof(z));
-            reader.Read(out z);
-            if (reader.ReadProperty(nameof(key)))
-            {
-                reader.Read(out string _);
-            }
-            reader.ReadMapEnd();
-        }
-
-        public string key
-        {
-            get => $"{x.ToString("0.0")},{y.ToString("0.0")},{z.ToString("0.0")}";
-        }
-
-        public static implicit operator WorldPosition(float pos) =>
-            new WorldPosition
-            {
-                x = pos,
-                y = pos,
-                z = pos,
-            };
-
-        public static implicit operator WorldPosition(Unity.Mathematics.float3 pos) =>
-            new WorldPosition
-            {
-                x = pos.x,
-                y = pos.y,
-                z = pos.z,
-            };
-
-        public static implicit operator Unity.Mathematics.float3(WorldPosition pos) => new Unity.Mathematics.float3(pos.x, pos.y, pos.z);
-
-        public static implicit operator UnityEngine.Vector3(WorldPosition pos) => new UnityEngine.Vector3(pos.x, pos.y, pos.z);
-
-        public static implicit operator string(WorldPosition pos) => pos.key;
-
-        public override bool Equals(object obj)
-        {
-            if (obj is not WorldPosition)
-            {
-                return false;
-            }
-            return Equals((WorldPosition)obj);
-        }
-
-        public bool Equals(WorldPosition other)
-        {
-            return x == other.x && y == other.y && z == other.z;
-        }
-
-        public override int GetHashCode()
-        {
-            return x.GetHashCode() ^ (y.GetHashCode() << 2) ^ (z.GetHashCode() >> 2);
-        }
-
-        public void Write(IJsonWriter writer)
-        {
-            writer.TypeBegin(typeof(WorldPosition).FullName);
-            writer.PropertyName("x");
-            writer.Write(x);
-            writer.PropertyName("y");
-            writer.Write(y);
-            writer.PropertyName("z");
-            writer.Write(z);
-            writer.TypeEnd();
-        }
-    }
-
-    public struct ScreenPoint : System.IEquatable<ScreenPoint>, IJsonWritable
-    {
-        public int top;
-
-        public int left;
-
-        public ScreenPoint(int topPos, int leftPos)
-        {
-            left = leftPos;
-            top = topPos;
-        }
-
-        public ScreenPoint(UnityEngine.Vector3 pos, int screenHeight)
-        {
-            left = (int)pos.x;
-            top = (int)(screenHeight - pos.y);
-        }
-
-        public void Write(IJsonWriter writer)
-        {
-            writer.TypeBegin(typeof(ScreenPoint).FullName);
-            writer.PropertyName("top");
-            writer.Write(top);
-            writer.PropertyName("left");
-            writer.Write(left);
-            writer.TypeEnd();
-        }
-
-        public override bool Equals(object obj)
-        {
-            if (obj is ScreenPoint other)
-            {
-                return Equals(other);
-            }
-            return false;
-        }
-
-        public bool Equals(ScreenPoint other)
-        {
-            return other.top == top && other.left == left;
-        }
-
-        public override int GetHashCode() => (top, left).GetHashCode();
     }
 
     public struct ToolTooltipMessage : IJsonWritable

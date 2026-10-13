@@ -10,12 +10,30 @@ import {
   CustomPhaseTemplate,
   EdgeGroupMask,
   SubLaneGroupMask,
-  UpdateCustomPhaseType,
+  UpdateCustomPhaseInput,
+  SwapCustomPhaseInput,
+  UpdateGroupMaskInput,
+  LookAtInput,
+  UpdateStorageInput,
+  Position,
+  ScreenPoint,
+  Camera,
+  TrafficLightMember,
 } from 'types'
 
-type Position = { x: number; y: number; z: number }
-type Camera = { position: Position; rotation: Position }
-type TrafficLightMember = { entityIndex: number; position: Position | null }
+export type { UpdateCustomPhaseInput } from 'types'
+
+const defaultTemplate: CustomPhaseTemplate = {
+  m_Name: 'Default',
+  m_IsPrioritiseTrack: true,
+  m_IsPrioritisePublicCar: false,
+  m_IsPrioritisePedestrian: false,
+  m_MinimumDuration: 2,
+  m_MaximumDuration: 300,
+  m_TargetDurationMultiplier: 1,
+  m_LaneOccupiedMultiplier: 1,
+  m_IntervalFactor: 1,
+}
 
 const GetToolState = bindValue<ToolState>(
   'TrafficLightManager',
@@ -64,17 +82,6 @@ const GetTrafficLightsMembers = bindValue<TrafficLightMember[]>(
   'GetTrafficLightsMembers',
   [],
 )
-const defaultTemplate: CustomPhaseTemplate = {
-  m_Name: 'Default',
-  m_IsPrioritiseTrack: true,
-  m_IsPrioritisePublicCar: false,
-  m_IsPrioritisePedestrian: false,
-  m_MinimumDuration: 2,
-  m_MaximumDuration: 300,
-  m_TargetDurationMultiplier: 1,
-  m_LaneOccupiedMultiplier: 1,
-  m_IntervalFactor: 1,
-}
 const GetSettings = bindValue<Settings>('TrafficLightManager', 'GetSettings', {
   customPhaseTemplates: [],
   defaultCustomPhaseTemplate: defaultTemplate,
@@ -137,31 +144,6 @@ export async function setManualPhaseIndexCmd(
 ): Promise<void> {
   return await call('TrafficLightManager', 'SetManualPhaseIndex', inputValue)
 }
-export type UpdateCustomPhaseInput = { index: number } & (
-  | { key: UpdateCustomPhaseType.MinimumDuration; value: number }
-  | { key: UpdateCustomPhaseType.MaximumDuration; value: number }
-  | { key: UpdateCustomPhaseType.TargetDurationMultiplier; value: number }
-  | { key: UpdateCustomPhaseType.LaneOccupiedMultiplier; value: number }
-  | { key: UpdateCustomPhaseType.IntervalFactor; value: number }
-  | { key: UpdateCustomPhaseType.PrioritiseTrack; value: boolean }
-  | { key: UpdateCustomPhaseType.PrioritisePublicCar; value: boolean }
-  | { key: UpdateCustomPhaseType.PrioritisePedestrian; value: boolean }
-  | { key: UpdateCustomPhaseType.LinkedWithNextPhase; value: boolean }
-  | { key: UpdateCustomPhaseType.EndPhasePrematurely }
-  | { key: UpdateCustomPhaseType.Name; value: string }
-  | {
-      key: UpdateCustomPhaseType.BindWithTemplate
-      value:
-        | {
-            bindWithTemplate: true
-            templateName: string
-          }
-        | {
-            bindWithTemplate: false
-          }
-    }
-  | { key: UpdateCustomPhaseType.ApplyTemplate; value: string }
-)
 
 export async function setCustomPhaseDataCmd(
   inputValue: UpdateCustomPhaseInput,
@@ -195,34 +177,32 @@ export async function swapCustomPhaseCmd(
   index1: number,
   index2: number,
 ): Promise<void> {
-  return await call('TrafficLightManager', 'SwapCustomPhase', {
-    index1,
-    index2,
-  })
+  const inputValue: SwapCustomPhaseInput = { index1, index2 }
+  return await call('TrafficLightManager', 'SwapCustomPhase', inputValue)
 }
 export async function updateEdgeGroupMaskCmd(
   groupMaskArray: EdgeGroupMask[],
   entity: Entity,
 ): Promise<void> {
-  return await call('TrafficLightManager', 'UpdateEdgeGroupMask', {
+  const inputValue: UpdateGroupMaskInput<EdgeGroupMask> = {
     groupMaskArray,
     entity,
-  })
+  }
+  return await call('TrafficLightManager', 'UpdateEdgeGroupMask', inputValue)
 }
 export async function updateSubLaneGroupMaskCmd(
   groupMaskArray: SubLaneGroupMask[],
   entity: Entity,
 ): Promise<void> {
-  return await call('TrafficLightManager', 'UpdateSubLaneGroupMask', {
+  const inputValue: UpdateGroupMaskInput<SubLaneGroupMask> = {
     groupMaskArray,
     entity,
-  })
+  }
+  return await call('TrafficLightManager', 'UpdateSubLaneGroupMask', inputValue)
 }
-export async function worldToScreenPoint(inputValue: {
-  x: number
-  y: number
-  z: number
-}): Promise<{ top: number; left: number }> {
+export async function worldToScreenPoint(
+  inputValue: Position,
+): Promise<ScreenPoint> {
   return await call('TrafficLightManager', 'WorldToScreenPoint', inputValue)
 }
 export async function lookAt(
@@ -231,10 +211,11 @@ export async function lookAt(
   z: number,
   distance: number,
 ): Promise<void> {
-  return await call('TrafficLightManager', 'LookAt', {
+  const inputValue: LookAtInput = {
     position: { x, y, z },
     distance,
-  })
+  }
+  return await call('TrafficLightManager', 'LookAt', inputValue)
 }
 export async function copyPhaseCmd(index: number): Promise<number> {
   return (await call('TrafficLightManager', 'CopyPhase', index)) as number
@@ -251,8 +232,9 @@ export async function getStorage(key: string): Promise<object | null> {
   return JSON.parse(jsonString) as object
 }
 export async function updateStorage(key: string, value: object): Promise<void> {
-  return await call('TrafficLightManager', 'UpdateStorage', {
+  const inputValue: UpdateStorageInput = {
     key,
     value: JSON.stringify(value),
-  })
+  }
+  return await call('TrafficLightManager', 'UpdateStorage', inputValue)
 }

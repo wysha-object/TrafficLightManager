@@ -45,44 +45,14 @@ public partial class UISystem : UISystemBase
         AddBinding(m_DisplayPhaseIndexBinding = new ValueBinding<int>("TrafficLightManager", "GetDisplayPhaseIndex", -1));
 
         AddBinding(
-            m_CityConfigurationBinding = new GetterValueBinding<UITypes.CityConfiguration>(
-                "TrafficLightManager",
-                "GetCityConfiguration",
-                () =>
-                {
-                    return new UITypes.CityConfiguration { leftHandTraffic = m_CityConfigurationSystem.leftHandTraffic };
-                }
-            )
+            m_CityConfigurationBinding = new GetterValueBinding<UITypes.CityConfiguration>("TrafficLightManager", "GetCityConfiguration", GetCityConfiguration)
         );
-        AddBinding(
-            m_CameraBinding = new GetterValueBinding<UITypes.Camera>(
-                "TrafficLightManager",
-                "GetCamera",
-                () =>
-                {
-                    var camera = m_CameraUpdateSystem.activeCamera;
-                    if (camera == null)
-                    {
-                        return new UITypes.Camera();
-                    }
-                    var position = camera.transform.position;
-                    var rotation = camera.transform.rotation;
-                    return new UITypes.Camera
-                    {
-                        position = new UITypes.WorldPosition { x = position.x, y = position.y, z = position.z },
-                        rotation = new UITypes.WorldPosition { x = rotation.eulerAngles.x, y = rotation.eulerAngles.y, z = rotation.eulerAngles.z },
-                    };
-                }
-            )
-        );
+        AddBinding(m_CameraBinding = new GetterValueBinding<UITypes.Camera>("TrafficLightManager", "GetCamera", GetCamera));
         AddBinding(
             m_EdgeInfoBinding = new GetterValueBinding<Dictionary<Entity, NativeArray<NodeUtils.EdgeInfo>>>(
                 "TrafficLightManager",
                 "GetEdgeInfo",
-                () =>
-                {
-                    return m_EdgeInfoDictionary;
-                },
+                GetEdgeInfo,
                 new JsonWriter.EdgeInfoWriter(),
                 new JsonWriter.FalseEqualityComparer<Dictionary<Entity, NativeArray<NodeUtils.EdgeInfo>>>()
             )
@@ -91,142 +61,34 @@ public partial class UISystem : UISystemBase
             m_CustomPhaseItemsBinding = new GetterValueBinding<UITypes.CustomPhaseItem[]>(
                 "TrafficLightManager",
                 "GetCustomPhaseItems",
-                () =>
-                {
-                    UITypes.CustomPhaseItem[] rs;
-                    if (EntityManager.TryGetBuffer<CustomPhaseData>(m_SelectedTrafficLightGroupEntity, true, out var customPhaseDataBuffer))
-                    {
-                        rs = new UITypes.CustomPhaseItem[customPhaseDataBuffer.Length];
-                        for (int i = 0; i < customPhaseDataBuffer.Length; i++)
-                        {
-                            CustomPhaseData item = customPhaseDataBuffer[i];
-                            rs[i] = new UITypes.CustomPhaseItem
-                            {
-                                turnsSinceLastRun = item.m_TurnsSinceLastRun,
-                                lowFlowTimer = item.m_LowFlowTimer,
-                                carLaneOccupied = item.m_CarLaneOccupied,
-                                publicCarLaneOccupied = item.m_PublicCarLaneOccupied,
-                                trackLaneOccupied = item.m_TrackLaneOccupied,
-                                pedestrianLaneOccupied = item.m_PedestrianLaneOccupied,
-                                weightedWaiting = item.m_WeightedWaiting,
-                                priority = item.m_Priority,
-                                minimumDuration = item.m_MinimumDuration,
-                                maximumDuration = item.m_MaximumDuration,
-                                targetDurationMultiplier = item.m_TargetDurationMultiplier,
-                                laneOccupiedMultiplier = item.m_LaneOccupiedMultiplier,
-                                intervalFactor = item.m_IntervalFactor,
-                                prioritiseTrack = (item.m_Options & CustomPhaseData.Options.PrioritiseTrack) != 0,
-                                prioritisePublicCar = (item.m_Options & CustomPhaseData.Options.PrioritisePublicCar) != 0,
-                                prioritisePedestrian = (item.m_Options & CustomPhaseData.Options.PrioritisePedestrian) != 0,
-                                linkedWithNextPhase = (item.m_Options & CustomPhaseData.Options.LinkedWithNextPhase) != 0,
-                                endPhasePrematurely = (item.m_Options & CustomPhaseData.Options.EndPhasePrematurely) != 0,
-                                bindWithTemplate = (item.m_Options & CustomPhaseData.Options.BindWithTemplate) != 0,
-                                name = item.m_Name.ToString(),
-                                bindTemplate = item.m_BindTemplate.ToString(),
-                            };
-                        }
-                    }
-                    else
-                    {
-                        rs = [];
-                    }
-                    return rs;
-                },
+                GetCustomPhaseItems,
                 new ListWriter<UITypes.CustomPhaseItem>()
             )
         );
         AddBinding(
-            m_TrafficLightGroupBinding = new GetterValueBinding<UITypes.TrafficLightGroup>(
-                "TrafficLightManager",
-                "GetTrafficLightGroup",
-                () =>
-                {
-                    UITypes.TrafficLightGroup rs;
-                    if (EntityManager.TryGetComponent<TrafficLightGroup>(m_SelectedTrafficLightGroupEntity, out var trafficLightGroup))
-                    {
-                        rs = new UITypes.TrafficLightGroup
-                        {
-                            timer = trafficLightGroup.m_Timer,
-                            currentPhaseIndex = trafficLightGroup.m_CurrentSignalGroup - 1,
-                            manualPhaseIndex = trafficLightGroup.m_ManualSignalGroup - 1,
-                            targetDuration = trafficLightGroup.m_TargetDuration,
-                            passedCarCount = (float)math.csum(trafficLightGroup.m_PassedCarCount) / 4,
-                        };
-                    }
-                    else
-                    {
-                        rs = new UITypes.TrafficLightGroup { };
-                    }
-                    return rs;
-                }
-            )
+            m_TrafficLightGroupBinding = new GetterValueBinding<UITypes.TrafficLightGroup>("TrafficLightManager", "GetTrafficLightGroup", GetTrafficLightGroup)
         );
         AddBinding(
             m_TrafficLightsMembersBinding = new GetterValueBinding<UITypes.TrafficLightMember[]>(
                 "TrafficLightManager",
                 "GetTrafficLightsMembers",
-                () =>
-                {
-                    List<UITypes.TrafficLightMember> members = [];
-                    if (EntityManager.TryGetBuffer<TrafficLightsMemberRef>(m_SelectedTrafficLightGroupEntity, true, out var trafficLightsMembers))
-                    {
-                        foreach (var trafficLight in trafficLightsMembers)
-                        {
-                            UITypes.WorldPosition? entityPosition = EntityManager.TryGetComponent<Node>(trafficLight.m_Entity, out var node)
-                                ? new UITypes.WorldPosition
-                                {
-                                    x = node.m_Position.x,
-                                    y = node.m_Position.y,
-                                    z = node.m_Position.z,
-                                }
-                                : null;
-                            members.Add(new UITypes.TrafficLightMember { entityIndex = trafficLight.m_Entity.Index, position = entityPosition });
-                        }
-                    }
-                    return members.ToArray();
-                },
+                GetTrafficLightsMembers,
                 new ListWriter<UITypes.TrafficLightMember>()
             )
         );
-        AddBinding(
-            m_SettingsBinding = new GetterValueBinding<UITypes.SettingsValue>(
-                "TrafficLightManager",
-                "GetSettings",
-                () =>
-                {
-                    return new UITypes.SettingsValue
-                    {
-                        customPhaseTemplates = Mod.m_Settings.GetCustomPhaseTemplates(),
-                        defaultCustomPhaseTemplate = Mod.m_Settings.m_DefaultCustomPhaseTemplate,
-                    };
-                }
-            )
-        );
+        AddBinding(m_SettingsBinding = new GetterValueBinding<UITypes.SettingsValue>("TrafficLightManager", "GetSettings", GetSettings));
         AddBinding(
             m_TrafficLightManagerGroupNameBinding = new GetterValueBinding<string>(
                 "TrafficLightManager",
                 "GetTrafficLightManagerGroupName",
-                () =>
-                {
-                    if (!m_SelectedTrafficLightGroupEntity.Equals(Entity.Null))
-                    {
-                        if (m_NameSystem.TryGetCustomName(m_SelectedTrafficLightGroupEntity, out var customName))
-                        {
-                            return customName;
-                        }
-                    }
-                    return string.Empty;
-                }
+                GetTrafficLightManagerGroupName
             )
         );
         AddBinding(
             m_SystemDefaultTemplateBinding = new GetterValueBinding<UITypes.TemplateValue>(
                 "TrafficLightManager",
                 "GetSystemDefaultTemplate",
-                () =>
-                {
-                    return new UITypes.TemplateValue { template = CustomPhaseTemplate.Default };
-                }
+                GetSystemDefaultTemplate
             )
         );
 
@@ -247,6 +109,142 @@ public partial class UISystem : UISystemBase
         AddBinding(new CallBinding<int, int>("TrafficLightManager", "CopyPhase", CopyPhase));
         AddBinding(new CallBinding<string, string>("TrafficLightManager", "GetStorage", GetStorage));
         AddBinding(new CallBinding<UITypes.UpdateStorageInput, int>("TrafficLightManager", "UpdateStorage", UpdateStorage));
+    }
+
+    private UITypes.CityConfiguration GetCityConfiguration()
+    {
+        return new UITypes.CityConfiguration { leftHandTraffic = m_CityConfigurationSystem.leftHandTraffic };
+    }
+
+    private UITypes.Camera GetCamera()
+    {
+        var camera = m_CameraUpdateSystem.activeCamera;
+        if (camera == null)
+        {
+            return new UITypes.Camera();
+        }
+        var position = camera.transform.position;
+        var rotation = camera.transform.rotation;
+        return new UITypes.Camera
+        {
+            position = new UITypes.WorldPosition { x = position.x, y = position.y, z = position.z },
+            rotation = new UITypes.WorldPosition { x = rotation.eulerAngles.x, y = rotation.eulerAngles.y, z = rotation.eulerAngles.z },
+        };
+    }
+
+    private Dictionary<Entity, NativeArray<NodeUtils.EdgeInfo>> GetEdgeInfo()
+    {
+        return m_EdgeInfoDictionary;
+    }
+
+    private UITypes.CustomPhaseItem[] GetCustomPhaseItems()
+    {
+        UITypes.CustomPhaseItem[] rs;
+        if (EntityManager.TryGetBuffer<CustomPhaseData>(m_SelectedTrafficLightGroupEntity, true, out var customPhaseDataBuffer))
+        {
+            rs = new UITypes.CustomPhaseItem[customPhaseDataBuffer.Length];
+            for (int i = 0; i < customPhaseDataBuffer.Length; i++)
+            {
+                CustomPhaseData item = customPhaseDataBuffer[i];
+                rs[i] = new UITypes.CustomPhaseItem
+                {
+                    turnsSinceLastRun = item.m_TurnsSinceLastRun,
+                    lowFlowTimer = item.m_LowFlowTimer,
+                    carLaneOccupied = item.m_CarLaneOccupied,
+                    publicCarLaneOccupied = item.m_PublicCarLaneOccupied,
+                    trackLaneOccupied = item.m_TrackLaneOccupied,
+                    pedestrianLaneOccupied = item.m_PedestrianLaneOccupied,
+                    weightedWaiting = item.m_WeightedWaiting,
+                    priority = item.m_Priority,
+                    minimumDuration = item.m_MinimumDuration,
+                    maximumDuration = item.m_MaximumDuration,
+                    targetDurationMultiplier = item.m_TargetDurationMultiplier,
+                    laneOccupiedMultiplier = item.m_LaneOccupiedMultiplier,
+                    intervalFactor = item.m_IntervalFactor,
+                    prioritiseTrack = (item.m_Options & CustomPhaseData.Options.PrioritiseTrack) != 0,
+                    prioritisePublicCar = (item.m_Options & CustomPhaseData.Options.PrioritisePublicCar) != 0,
+                    prioritisePedestrian = (item.m_Options & CustomPhaseData.Options.PrioritisePedestrian) != 0,
+                    linkedWithNextPhase = (item.m_Options & CustomPhaseData.Options.LinkedWithNextPhase) != 0,
+                    endPhasePrematurely = (item.m_Options & CustomPhaseData.Options.EndPhasePrematurely) != 0,
+                    bindWithTemplate = (item.m_Options & CustomPhaseData.Options.BindWithTemplate) != 0,
+                    name = item.m_Name.ToString(),
+                    bindTemplate = item.m_BindTemplate.ToString(),
+                };
+            }
+        }
+        else
+        {
+            rs = [];
+        }
+        return rs;
+    }
+
+    private UITypes.TrafficLightGroup GetTrafficLightGroup()
+    {
+        UITypes.TrafficLightGroup rs;
+        if (EntityManager.TryGetComponent<TrafficLightGroup>(m_SelectedTrafficLightGroupEntity, out var trafficLightGroup))
+        {
+            rs = new UITypes.TrafficLightGroup
+            {
+                timer = trafficLightGroup.m_Timer,
+                currentPhaseIndex = trafficLightGroup.m_CurrentSignalGroup - 1,
+                manualPhaseIndex = trafficLightGroup.m_ManualSignalGroup - 1,
+                targetDuration = trafficLightGroup.m_TargetDuration,
+                passedCarCount = (float)math.csum(trafficLightGroup.m_PassedCarCount) / 4,
+            };
+        }
+        else
+        {
+            rs = new UITypes.TrafficLightGroup { };
+        }
+        return rs;
+    }
+
+    private UITypes.TrafficLightMember[] GetTrafficLightsMembers()
+    {
+        List<UITypes.TrafficLightMember> members = [];
+        if (EntityManager.TryGetBuffer<TrafficLightsMemberRef>(m_SelectedTrafficLightGroupEntity, true, out var trafficLightsMembers))
+        {
+            foreach (var trafficLight in trafficLightsMembers)
+            {
+                UITypes.WorldPosition? entityPosition = EntityManager.TryGetComponent<Node>(trafficLight.m_Entity, out var node)
+                    ? new UITypes.WorldPosition
+                    {
+                        x = node.m_Position.x,
+                        y = node.m_Position.y,
+                        z = node.m_Position.z,
+                    }
+                    : null;
+                members.Add(new UITypes.TrafficLightMember { entityIndex = trafficLight.m_Entity.Index, position = entityPosition });
+            }
+        }
+        return members.ToArray();
+    }
+
+    private UITypes.SettingsValue GetSettings()
+    {
+        return new UITypes.SettingsValue
+        {
+            customPhaseTemplates = Mod.m_Settings.GetCustomPhaseTemplates(),
+            defaultCustomPhaseTemplate = Mod.m_Settings.m_DefaultCustomPhaseTemplate,
+        };
+    }
+
+    private string GetTrafficLightManagerGroupName()
+    {
+        if (!m_SelectedTrafficLightGroupEntity.Equals(Entity.Null))
+        {
+            if (m_NameSystem.TryGetCustomName(m_SelectedTrafficLightGroupEntity, out var customName))
+            {
+                return customName;
+            }
+        }
+        return string.Empty;
+    }
+
+    private UITypes.TemplateValue GetSystemDefaultTemplate()
+    {
+        return new UITypes.TemplateValue { template = CustomPhaseTemplate.Default };
     }
 
     private int SetToolState(int inputValue)
