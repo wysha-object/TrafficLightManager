@@ -381,7 +381,11 @@ namespace TrafficLightManager.Code.Systems.Simulation
                         trafficLightGroup.m_NextSignalGroup = nextGroup;
                         if (linked)
                         {
-                            for (int i = trafficLightGroup.m_CurrentSignalGroup; i < trafficLightGroup.m_NextSignalGroup - 1; i++)
+                            for (
+                                int i = trafficLightGroup.m_CurrentSignalGroup % customPhaseDataBuffer.Length;
+                                i != trafficLightGroup.m_NextSignalGroup - 1;
+                                i = (i + 1) % customPhaseDataBuffer.Length
+                            )
                             {
                                 CustomPhaseData nextPhase = customPhaseDataBuffer[i];
                                 if (nextPhase.m_Priority <= 0)
@@ -411,6 +415,11 @@ namespace TrafficLightManager.Code.Systems.Simulation
             public byte GetNextSignalGroup(byte currentGroup, DynamicBuffer<CustomPhaseData> customPhaseDataBuffer, TrafficLightGroup trafficLightGroup, out bool linked)
             {
                 linked = false;
+                if (customPhaseDataBuffer.Length == 0)
+                {
+                    return 0;
+                }
+
                 byte nextGroup = 0;
                 int maxPriority = -1;
                 float maxWaiting = -1;
@@ -441,9 +450,44 @@ namespace TrafficLightManager.Code.Systems.Simulation
                     customPhaseDataBuffer[i] = phase;
                 }
 
-                int linkedPriority = -1;
-                byte linkedNextGroup = 0;
-                for (int i = currentGroup - 1; i >= 0 && i < customPhaseDataBuffer.Length - 1; i++)
+                if (currentGroup > 0)
+                {
+                    int linkedPriority = -1;
+                    byte linkedNextGroup = 0;
+                    int currentGroupIndex = currentGroup - 1;
+                    for (
+                        int i = currentGroupIndex % customPhaseDataBuffer.Length;
+                        i != (currentGroupIndex + customPhaseDataBuffer.Length - 1) % customPhaseDataBuffer.Length;
+                        i = (i + 1) % customPhaseDataBuffer.Length
+                    )
+                    {
+                        CustomPhaseData phase = customPhaseDataBuffer[i];
+                        if ((phase.m_Options & CustomPhaseData.Options.LinkedWithNextPhase) == 0)
+                        {
+                            break;
+                        }
+
+                        int nextPhaseIndex = (i + 1) % customPhaseDataBuffer.Length;
+                        CustomPhaseData nextPhase = customPhaseDataBuffer[nextPhaseIndex];
+                        if (linkedNextGroup == 0 && nextPhase.m_Priority > 0)
+                        {
+                            linkedNextGroup = (byte)(nextPhaseIndex + 1);
+                        }
+                        linkedPriority = math.max(linkedPriority, nextPhase.m_Priority);
+                    }
+                    if (linkedNextGroup > 0 && linkedPriority >= maxPriority)
+                    {
+                        linked = true;
+                        return linkedNextGroup;
+                    }
+                }
+
+                int nextGroupIndex = nextGroup - 1;
+                for (
+                    int i = (nextGroupIndex + customPhaseDataBuffer.Length - 1) % customPhaseDataBuffer.Length;
+                    ;
+                    i = (i + customPhaseDataBuffer.Length - 1) % customPhaseDataBuffer.Length
+                )
                 {
                     CustomPhaseData phase = customPhaseDataBuffer[i];
                     if ((phase.m_Options & CustomPhaseData.Options.LinkedWithNextPhase) == 0)
@@ -451,26 +495,12 @@ namespace TrafficLightManager.Code.Systems.Simulation
                         break;
                     }
 
-                    CustomPhaseData nextPhase = customPhaseDataBuffer[i + 1];
-                    if (linkedNextGroup == 0 && nextPhase.m_Priority > 0)
+                    if (i == nextGroupIndex) // 全 linked 了
                     {
-                        linkedNextGroup = (byte)(i + 2);
-                    }
-                    linkedPriority = math.max(linkedPriority, nextPhase.m_Priority);
-                }
-                if (linkedNextGroup > 0 && linkedPriority >= maxPriority)
-                {
-                    linked = true;
-                    return linkedNextGroup;
-                }
-
-                for (int i = nextGroup - 2; i >= 0; i--)
-                {
-                    CustomPhaseData phase = customPhaseDataBuffer[i];
-                    if ((phase.m_Options & CustomPhaseData.Options.LinkedWithNextPhase) == 0)
-                    {
+                        nextGroup = (byte)(nextGroupIndex + 1);
                         break;
                     }
+
                     if (phase.m_Priority > 0)
                     {
                         nextGroup = (byte)(i + 1);
