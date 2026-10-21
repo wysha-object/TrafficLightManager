@@ -21,6 +21,8 @@ namespace TrafficLightManager.Code.Systems.Simulation
 
             public Settings.Values m_Settings;
 
+            public CustomPhaseTemplate.Values m_DefaultCustomPhaseTemplate;
+
             public NativeArray<CustomPhaseTemplate.Values> m_CustomPhaseTemplates;
 
             public EntityCommandBuffer.ParallelWriter m_EntityCommandBuffer;
@@ -117,23 +119,23 @@ namespace TrafficLightManager.Code.Systems.Simulation
 
                     if (customPhaseData.m_TargetDurationMultiplier == 0f)
                     {
-                        customPhaseData.m_TargetDurationMultiplier = CustomPhaseTemplate.Default.m_TargetDurationMultiplier;
+                        customPhaseData.m_TargetDurationMultiplier = m_DefaultCustomPhaseTemplate.m_TargetDurationMultiplier;
                     }
                     if (customPhaseData.m_CarLaneOccupiedMultiplier == 0f)
                     {
-                        customPhaseData.m_CarLaneOccupiedMultiplier = CustomPhaseTemplate.Default.m_CarLaneOccupiedMultiplier;
+                        customPhaseData.m_CarLaneOccupiedMultiplier = m_DefaultCustomPhaseTemplate.m_CarLaneOccupiedMultiplier;
                     }
                     if (customPhaseData.m_TrackLaneOccupiedMultiplier == 0f)
                     {
-                        customPhaseData.m_TrackLaneOccupiedMultiplier = CustomPhaseTemplate.Default.m_TrackLaneOccupiedMultiplier;
+                        customPhaseData.m_TrackLaneOccupiedMultiplier = m_DefaultCustomPhaseTemplate.m_TrackLaneOccupiedMultiplier;
                     }
                     if (customPhaseData.m_PedestrianLaneOccupiedMultiplier == 0f)
                     {
-                        customPhaseData.m_PedestrianLaneOccupiedMultiplier = CustomPhaseTemplate.Default.m_PedestrianLaneOccupiedMultiplier;
+                        customPhaseData.m_PedestrianLaneOccupiedMultiplier = m_DefaultCustomPhaseTemplate.m_PedestrianLaneOccupiedMultiplier;
                     }
                     if (customPhaseData.m_IntervalFactor == 0f)
                     {
-                        customPhaseData.m_IntervalFactor = CustomPhaseTemplate.Default.m_IntervalFactor;
+                        customPhaseData.m_IntervalFactor = m_DefaultCustomPhaseTemplate.m_IntervalFactor;
                     }
 
                     customPhaseDataBuffer[j] = customPhaseData;
@@ -703,6 +705,7 @@ namespace TrafficLightManager.Code.Systems.Simulation
                 {
                     m_FrameIndex = m_SimulationSystem.frameIndex,
                     m_Settings = new Settings.Values(Mod.m_Settings),
+                    m_DefaultCustomPhaseTemplate = new CustomPhaseTemplate.Values(CustomPhaseTemplate.Default),
                     m_CustomPhaseTemplates = customPhaseTemplates,
                     m_EntityCommandBuffer = m_EndFrameBarrier.CreateCommandBuffer().AsParallelWriter(),
                     m_EntityStorageInfoLookup = SystemAPI.GetEntityStorageInfoLookup(),
