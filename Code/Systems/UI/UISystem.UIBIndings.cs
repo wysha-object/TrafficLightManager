@@ -385,6 +385,7 @@ public partial class UISystem : UISystemBase
                         newValue.m_CarLaneOccupiedMultiplier = templates[templateIndex].m_CarLaneOccupiedMultiplier;
                         newValue.m_TrackLaneOccupiedMultiplier = templates[templateIndex].m_TrackLaneOccupiedMultiplier;
                         newValue.m_PedestrianLaneOccupiedMultiplier = templates[templateIndex].m_PedestrianLaneOccupiedMultiplier;
+                        newValue.m_IntervalFactor = templates[templateIndex].m_IntervalFactor;
                         if (templates[templateIndex].m_IsPrioritiseTrack)
                         {
                             newValue.m_Options |= CustomPhaseData.Options.PrioritiseTrack;
@@ -431,6 +432,7 @@ public partial class UISystem : UISystemBase
                         m_CarLaneOccupiedMultiplier = newValue.m_CarLaneOccupiedMultiplier,
                         m_TrackLaneOccupiedMultiplier = newValue.m_TrackLaneOccupiedMultiplier,
                         m_PedestrianLaneOccupiedMultiplier = newValue.m_PedestrianLaneOccupiedMultiplier,
+                        m_IntervalFactor = newValue.m_IntervalFactor,
                         m_IsPrioritiseTrack = (newValue.m_Options & CustomPhaseData.Options.PrioritiseTrack) != 0,
                         m_IsPrioritisePublicCar = (newValue.m_Options & CustomPhaseData.Options.PrioritisePublicCar) != 0,
                         m_IsPrioritisePedestrian = (newValue.m_Options & CustomPhaseData.Options.PrioritisePedestrian) != 0,
