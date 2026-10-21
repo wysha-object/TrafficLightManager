@@ -172,6 +172,27 @@ public class Settings : ModSetting
         {
             m_Storage = new Dictionary<string, string>();
         }
+        for (int i = 0; i < m_CustomPhaseTemplates.Count; i++)
+        {
+            var template = m_CustomPhaseTemplates[i];
+            if (template.m_CarLaneOccupiedMultiplier == 0f)
+            {
+                template.m_CarLaneOccupiedMultiplier = CustomPhaseTemplate.Default.m_CarLaneOccupiedMultiplier;
+            }
+            if (template.m_TrackLaneOccupiedMultiplier == 0f)
+            {
+                template.m_TrackLaneOccupiedMultiplier = CustomPhaseTemplate.Default.m_TrackLaneOccupiedMultiplier;
+            }
+            if (template.m_PedestrianLaneOccupiedMultiplier == 0f)
+            {
+                template.m_PedestrianLaneOccupiedMultiplier = CustomPhaseTemplate.Default.m_PedestrianLaneOccupiedMultiplier;
+            }
+            if (template.m_IntervalFactor == 0f)
+            {
+                template.m_IntervalFactor = CustomPhaseTemplate.Default.m_IntervalFactor;
+            }
+            m_CustomPhaseTemplates[i] = template;
+        }
     }
 
     public bool IsNotInGame()

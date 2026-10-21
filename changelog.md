@@ -1,2 +1,3 @@
 - Add separate car, track, and pedestrian lane occupancy multipliers
 - Sync interval factor between phase templates and custom phase data
+- Restore defaults for new template settings in existing saves
