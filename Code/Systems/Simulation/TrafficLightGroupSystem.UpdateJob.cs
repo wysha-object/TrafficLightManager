@@ -112,9 +112,31 @@ namespace TrafficLightManager.Code.Systems.Simulation
                             customPhaseData.m_TrackLaneOccupiedMultiplier = template.m_TrackLaneOccupiedMultiplier;
                             customPhaseData.m_PedestrianLaneOccupiedMultiplier = template.m_PedestrianLaneOccupiedMultiplier;
                             customPhaseData.m_IntervalFactor = template.m_IntervalFactor;
-                            customPhaseDataBuffer[j] = customPhaseData;
                         }
                     }
+
+                    if (customPhaseData.m_TargetDurationMultiplier == 0f)
+                    {
+                        customPhaseData.m_TargetDurationMultiplier = CustomPhaseTemplate.Default.m_TargetDurationMultiplier;
+                    }
+                    if (customPhaseData.m_CarLaneOccupiedMultiplier == 0f)
+                    {
+                        customPhaseData.m_CarLaneOccupiedMultiplier = CustomPhaseTemplate.Default.m_CarLaneOccupiedMultiplier;
+                    }
+                    if (customPhaseData.m_TrackLaneOccupiedMultiplier == 0f)
+                    {
+                        customPhaseData.m_TrackLaneOccupiedMultiplier = CustomPhaseTemplate.Default.m_TrackLaneOccupiedMultiplier;
+                    }
+                    if (customPhaseData.m_PedestrianLaneOccupiedMultiplier == 0f)
+                    {
+                        customPhaseData.m_PedestrianLaneOccupiedMultiplier = CustomPhaseTemplate.Default.m_PedestrianLaneOccupiedMultiplier;
+                    }
+                    if (customPhaseData.m_IntervalFactor == 0f)
+                    {
+                        customPhaseData.m_IntervalFactor = CustomPhaseTemplate.Default.m_IntervalFactor;
+                    }
+
+                    customPhaseDataBuffer[j] = customPhaseData;
                 }
 
                 NativeList<Entity> allLaneSignalEntities = new NativeList<Entity>(Allocator.Temp);
