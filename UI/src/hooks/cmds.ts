@@ -31,7 +31,9 @@ const defaultTemplate: CustomPhaseTemplate = {
   m_MinimumDuration: 2,
   m_MaximumDuration: 300,
   m_TargetDurationMultiplier: 1,
-  m_LaneOccupiedMultiplier: 1,
+  m_CarLaneOccupiedMultiplier: 1,
+  m_TrackLaneOccupiedMultiplier: 1,
+  m_PedestrianLaneOccupiedMultiplier: 1,
   m_IntervalFactor: 1,
 }
 

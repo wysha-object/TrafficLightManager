@@ -51,7 +51,11 @@ public struct CustomPhaseData : IBufferElementData, ISerializable
 
     public float m_TargetDurationMultiplier;
 
-    public float m_LaneOccupiedMultiplier;
+    public float m_CarLaneOccupiedMultiplier;
+
+    public float m_TrackLaneOccupiedMultiplier;
+
+    public float m_PedestrianLaneOccupiedMultiplier;
 
     public float m_IntervalFactor;
 
@@ -63,7 +67,7 @@ public struct CustomPhaseData : IBufferElementData, ISerializable
     public void Serialize<TWriter>(TWriter writer)
         where TWriter : IWriter
     {
-        ushort schemaVersion = 4;
+        ushort schemaVersion = 5;
         writer.Write(schemaVersion);
         writer.Write(m_TurnsSinceLastRun);
         writer.Write(m_LowFlowTimer);
@@ -78,7 +82,9 @@ public struct CustomPhaseData : IBufferElementData, ISerializable
         writer.Write(m_MinimumDuration);
         writer.Write(m_MaximumDuration);
         writer.Write(m_TargetDurationMultiplier);
-        writer.Write(m_LaneOccupiedMultiplier);
+        writer.Write(m_CarLaneOccupiedMultiplier);
+        writer.Write(m_TrackLaneOccupiedMultiplier);
+        writer.Write(m_PedestrianLaneOccupiedMultiplier);
         writer.Write(m_IntervalFactor);
         writer.Write(m_Name.ToString());
         writer.Write(m_BindTemplate.ToString());
@@ -111,7 +117,19 @@ public struct CustomPhaseData : IBufferElementData, ISerializable
         reader.Read(out m_MinimumDuration);
         reader.Read(out m_MaximumDuration);
         reader.Read(out m_TargetDurationMultiplier);
-        reader.Read(out m_LaneOccupiedMultiplier);
+        if (schemaVersion <= 4)
+        {
+            reader.Read(out float legacyLaneOccupiedMultiplier);
+            m_CarLaneOccupiedMultiplier = legacyLaneOccupiedMultiplier;
+            m_TrackLaneOccupiedMultiplier = legacyLaneOccupiedMultiplier;
+            m_PedestrianLaneOccupiedMultiplier = legacyLaneOccupiedMultiplier;
+        }
+        if (schemaVersion >= 5)
+        {
+            reader.Read(out m_CarLaneOccupiedMultiplier);
+            reader.Read(out m_TrackLaneOccupiedMultiplier);
+            reader.Read(out m_PedestrianLaneOccupiedMultiplier);
+        }
         if (schemaVersion <= 3)
         {
             reader.Read(out float _);
@@ -164,7 +182,9 @@ public struct CustomPhaseData : IBufferElementData, ISerializable
         m_MinimumDuration = customPhaseTemplate.m_MinimumDuration;
         m_MaximumDuration = customPhaseTemplate.m_MaximumDuration;
         m_TargetDurationMultiplier = customPhaseTemplate.m_TargetDurationMultiplier;
-        m_LaneOccupiedMultiplier = customPhaseTemplate.m_LaneOccupiedMultiplier;
+        m_CarLaneOccupiedMultiplier = customPhaseTemplate.m_CarLaneOccupiedMultiplier;
+        m_TrackLaneOccupiedMultiplier = customPhaseTemplate.m_TrackLaneOccupiedMultiplier;
+        m_PedestrianLaneOccupiedMultiplier = customPhaseTemplate.m_PedestrianLaneOccupiedMultiplier;
         m_IntervalFactor = customPhaseTemplate.m_IntervalFactor;
         m_BindTemplate = "";
     }
@@ -177,10 +197,5 @@ public struct CustomPhaseData : IBufferElementData, ISerializable
     public CustomPhaseData(CustomPhaseTemplate customPhaseTemplate)
     {
         Initialisation(customPhaseTemplate);
-    }
-
-    public readonly int TotalLaneOccupied()
-    {
-        return m_CarLaneOccupied + m_TrackLaneOccupied + m_PedestrianLaneOccupied;
     }
 }

@@ -8,16 +8,18 @@ export enum UpdateCustomPhaseType {
   MinimumDuration = 0,
   MaximumDuration = 1,
   TargetDurationMultiplier = 2,
-  LaneOccupiedMultiplier = 3,
-  IntervalFactor = 4,
-  PrioritiseTrack = 5,
-  PrioritisePublicCar = 6,
-  PrioritisePedestrian = 7,
-  LinkedWithNextPhase = 8,
-  EndPhasePrematurely = 9,
-  Name = 10,
-  BindWithTemplate = 11,
-  ApplyTemplate = 12,
+  CarLaneOccupiedMultiplier = 3,
+  TrackLaneOccupiedMultiplier = 4,
+  PedestrianLaneOccupiedMultiplier = 5,
+  IntervalFactor = 6,
+  PrioritiseTrack = 7,
+  PrioritisePublicCar = 8,
+  PrioritisePedestrian = 9,
+  LinkedWithNextPhase = 10,
+  EndPhasePrematurely = 11,
+  Name = 12,
+  BindWithTemplate = 13,
+  ApplyTemplate = 14,
 }
 
 export const enum ToolState {
@@ -85,7 +87,9 @@ export interface CustomPhaseItem {
   minimumDuration: number
   maximumDuration: number
   targetDurationMultiplier: number
-  laneOccupiedMultiplier: number
+  carLaneOccupiedMultiplier: number
+  trackLaneOccupiedMultiplier: number
+  pedestrianLaneOccupiedMultiplier: number
   intervalFactor: number
   prioritiseTrack: boolean
   prioritisePublicCar: boolean
@@ -105,7 +109,9 @@ export interface CustomPhaseTemplate {
   m_MinimumDuration: number
   m_MaximumDuration: number
   m_TargetDurationMultiplier: number
-  m_LaneOccupiedMultiplier: number
+  m_CarLaneOccupiedMultiplier: number
+  m_TrackLaneOccupiedMultiplier: number
+  m_PedestrianLaneOccupiedMultiplier: number
   m_IntervalFactor: number
 }
 
@@ -211,7 +217,9 @@ export type UpdateCustomPhaseInput = { index: number } & (
   | { key: UpdateCustomPhaseType.MinimumDuration; value: number }
   | { key: UpdateCustomPhaseType.MaximumDuration; value: number }
   | { key: UpdateCustomPhaseType.TargetDurationMultiplier; value: number }
-  | { key: UpdateCustomPhaseType.LaneOccupiedMultiplier; value: number }
+  | { key: UpdateCustomPhaseType.CarLaneOccupiedMultiplier; value: number }
+  | { key: UpdateCustomPhaseType.TrackLaneOccupiedMultiplier; value: number }
+  | { key: UpdateCustomPhaseType.PedestrianLaneOccupiedMultiplier; value: number }
   | { key: UpdateCustomPhaseType.IntervalFactor; value: number }
   | { key: UpdateCustomPhaseType.PrioritiseTrack; value: boolean }
   | { key: UpdateCustomPhaseType.PrioritisePublicCar; value: boolean }

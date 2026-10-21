@@ -24,8 +24,8 @@ const PanelContainer = styled.div`
   backdrop-filter: var(--panelBlur);
   flex: 1;
   position: relative;
-  width: 17em;
-  max-width: 17em;
+  width: 18em;
+  max-width: 18em;
 `
 
 const TextItem = (props: {
@@ -279,27 +279,79 @@ export default function PhaseDetailsPanel() {
                 <RangeRow
                   onChange={(value) => {
                     setCustomPhaseDataCmd({
-                      key: UpdateCustomPhaseType.LaneOccupiedMultiplier,
+                      key: UpdateCustomPhaseType.CarLaneOccupiedMultiplier,
                       value: value,
                       index: index,
                     })
                   }}
                   label={t(
-                    'CustomPhaseEditor.Adjustments.LaneOccupiedMultiplier',
+                    'CustomPhaseEditor.Adjustments.CarLaneOccupiedMultiplier',
                   )}
-                  value={customPhaseItem.laneOccupiedMultiplier}
+                  value={customPhaseItem.carLaneOccupiedMultiplier}
                   valuePrefix={''}
                   valueSuffix={t('CustomPhaseEditor.Adjustments.CustomPedestrianDurationMultiplierSuffix')}
                   min={0.1}
                   max={10}
                   step={0.1}
                   defaultValue={
-                    settings.defaultCustomPhaseTemplate.m_LaneOccupiedMultiplier
+                    settings.defaultCustomPhaseTemplate.m_CarLaneOccupiedMultiplier
                   }
                   enableTextField={true}
                   textFieldRegExp={'^\\d{0,4}(\\.\\d{0,2})?$'}
                   tooltip={t(
-                    'CustomPhaseEditor.Adjustments.LaneOccupiedMultiplier.Tooltip',
+                    'CustomPhaseEditor.Adjustments.CarLaneOccupiedMultiplier.Tooltip',
+                  )}
+                />
+                <RangeRow
+                  onChange={(value) => {
+                    setCustomPhaseDataCmd({
+                      key: UpdateCustomPhaseType.TrackLaneOccupiedMultiplier,
+                      value: value,
+                      index: index,
+                    })
+                  }}
+                  label={t(
+                    'CustomPhaseEditor.Adjustments.TrackLaneOccupiedMultiplier',
+                  )}
+                  value={customPhaseItem.trackLaneOccupiedMultiplier}
+                  valuePrefix={''}
+                  valueSuffix={t('CustomPhaseEditor.Adjustments.CustomPedestrianDurationMultiplierSuffix')}
+                  min={0.1}
+                  max={10}
+                  step={0.1}
+                  defaultValue={
+                    settings.defaultCustomPhaseTemplate.m_TrackLaneOccupiedMultiplier
+                  }
+                  enableTextField={true}
+                  textFieldRegExp={'^\\d{0,4}(\\.\\d{0,2})?$'}
+                  tooltip={t(
+                    'CustomPhaseEditor.Adjustments.TrackLaneOccupiedMultiplier.Tooltip',
+                  )}
+                />
+                <RangeRow
+                  onChange={(value) => {
+                    setCustomPhaseDataCmd({
+                      key: UpdateCustomPhaseType.PedestrianLaneOccupiedMultiplier,
+                      value: value,
+                      index: index,
+                    })
+                  }}
+                  label={t(
+                    'CustomPhaseEditor.Adjustments.PedestrianLaneOccupiedMultiplier',
+                  )}
+                  value={customPhaseItem.pedestrianLaneOccupiedMultiplier}
+                  valuePrefix={''}
+                  valueSuffix={t('CustomPhaseEditor.Adjustments.CustomPedestrianDurationMultiplierSuffix')}
+                  min={0.1}
+                  max={10}
+                  step={0.1}
+                  defaultValue={
+                    settings.defaultCustomPhaseTemplate.m_PedestrianLaneOccupiedMultiplier
+                  }
+                  enableTextField={true}
+                  textFieldRegExp={'^\\d{0,4}(\\.\\d{0,2})?$'}
+                  tooltip={t(
+                    'CustomPhaseEditor.Adjustments.PedestrianLaneOccupiedMultiplier.Tooltip',
                   )}
                 />
                 <RangeRow

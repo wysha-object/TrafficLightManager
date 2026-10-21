@@ -1,4 +1,4 @@
-﻿using cohtml.Net;
+using cohtml.Net;
 using Game.Net;
 using TrafficLightManager.Code.Components;
 using TrafficLightManager.Code.Utils;
@@ -108,7 +108,9 @@ namespace TrafficLightManager.Code.Systems.Simulation
                             customPhaseData.m_MinimumDuration = template.m_MinimumDuration;
                             customPhaseData.m_MaximumDuration = template.m_MaximumDuration;
                             customPhaseData.m_TargetDurationMultiplier = template.m_TargetDurationMultiplier;
-                            customPhaseData.m_LaneOccupiedMultiplier = template.m_LaneOccupiedMultiplier;
+                            customPhaseData.m_CarLaneOccupiedMultiplier = template.m_CarLaneOccupiedMultiplier;
+                            customPhaseData.m_TrackLaneOccupiedMultiplier = template.m_TrackLaneOccupiedMultiplier;
+                            customPhaseData.m_PedestrianLaneOccupiedMultiplier = template.m_PedestrianLaneOccupiedMultiplier;
                             customPhaseData.m_IntervalFactor = template.m_IntervalFactor;
                             customPhaseDataBuffer[j] = customPhaseData;
                         }
@@ -425,8 +427,11 @@ namespace TrafficLightManager.Code.Systems.Simulation
                 {
                     CustomPhaseData phase = customPhaseDataBuffer[i];
                     float weightedWaiting =
-                        ((float)phase.TotalLaneOccupied())
-                        * phase.m_LaneOccupiedMultiplier
+                        (
+                            phase.m_CarLaneOccupied * phase.m_CarLaneOccupiedMultiplier
+                            + phase.m_TrackLaneOccupied * phase.m_TrackLaneOccupiedMultiplier
+                            + phase.m_PedestrianLaneOccupied * phase.m_PedestrianLaneOccupiedMultiplier
+                        )
                         * ((float)phase.m_TurnsSinceLastRun / customPhaseDataBuffer.Length)
                         * phase.m_IntervalFactor;
                     if (phase.m_Priority > maxPriority)

@@ -1,4 +1,4 @@
-﻿using Unity.Collections;
+using Unity.Collections;
 
 namespace TrafficLightManager.Code.Utils
 {
@@ -19,7 +19,11 @@ namespace TrafficLightManager.Code.Utils
 
             public float m_TargetDurationMultiplier;
 
-            public float m_LaneOccupiedMultiplier;
+            public float m_CarLaneOccupiedMultiplier;
+
+            public float m_TrackLaneOccupiedMultiplier;
+
+            public float m_PedestrianLaneOccupiedMultiplier;
 
             public float m_IntervalFactor;
 
@@ -32,7 +36,9 @@ namespace TrafficLightManager.Code.Utils
                 m_MinimumDuration = template.m_MinimumDuration;
                 m_MaximumDuration = template.m_MaximumDuration;
                 m_TargetDurationMultiplier = template.m_TargetDurationMultiplier;
-                m_LaneOccupiedMultiplier = template.m_LaneOccupiedMultiplier;
+                m_CarLaneOccupiedMultiplier = template.m_CarLaneOccupiedMultiplier;
+                m_TrackLaneOccupiedMultiplier = template.m_TrackLaneOccupiedMultiplier;
+                m_PedestrianLaneOccupiedMultiplier = template.m_PedestrianLaneOccupiedMultiplier;
                 m_IntervalFactor = template.m_IntervalFactor;
             }
         }
@@ -50,7 +56,11 @@ namespace TrafficLightManager.Code.Utils
 
         public float m_TargetDurationMultiplier;
 
-        public float m_LaneOccupiedMultiplier;
+        public float m_CarLaneOccupiedMultiplier;
+
+        public float m_TrackLaneOccupiedMultiplier;
+
+        public float m_PedestrianLaneOccupiedMultiplier;
 
         public float m_IntervalFactor;
 
@@ -63,7 +73,9 @@ namespace TrafficLightManager.Code.Utils
             m_MinimumDuration = 2,
             m_MaximumDuration = 300,
             m_TargetDurationMultiplier = 1f,
-            m_LaneOccupiedMultiplier = 1f,
+            m_CarLaneOccupiedMultiplier = 1f,
+            m_TrackLaneOccupiedMultiplier = 1f,
+            m_PedestrianLaneOccupiedMultiplier = 1f,
             m_IntervalFactor = 1f,
         };
     }

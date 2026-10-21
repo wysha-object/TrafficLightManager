@@ -77,7 +77,7 @@ export default function RangeRow(props: {
           alignItems: 'center',
         }}
       >
-        <div style={{ flex: '1', display: 'flex' }}>
+        <div style={{ flex: '1', display: 'flex', alignItems: 'center' }}>
           <div style={{ flex: '1' }}>{props.label}</div>
           {!textFieldActive
             ? t(props.valuePrefix) +

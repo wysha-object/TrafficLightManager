@@ -148,7 +148,11 @@ public static class UITypes
 
         public float targetDurationMultiplier;
 
-        public float laneOccupiedMultiplier;
+        public float carLaneOccupiedMultiplier;
+
+        public float trackLaneOccupiedMultiplier;
+
+        public float pedestrianLaneOccupiedMultiplier;
 
         public float intervalFactor;
 
@@ -193,8 +197,12 @@ public static class UITypes
             writer.Write((int)maximumDuration);
             writer.PropertyName(nameof(targetDurationMultiplier));
             writer.Write(targetDurationMultiplier);
-            writer.PropertyName(nameof(laneOccupiedMultiplier));
-            writer.Write(laneOccupiedMultiplier);
+            writer.PropertyName(nameof(carLaneOccupiedMultiplier));
+            writer.Write(carLaneOccupiedMultiplier);
+            writer.PropertyName(nameof(trackLaneOccupiedMultiplier));
+            writer.Write(trackLaneOccupiedMultiplier);
+            writer.PropertyName(nameof(pedestrianLaneOccupiedMultiplier));
+            writer.Write(pedestrianLaneOccupiedMultiplier);
             writer.PropertyName(nameof(intervalFactor));
             writer.Write(intervalFactor);
             writer.PropertyName(nameof(prioritiseTrack));
@@ -317,8 +325,12 @@ public static class UITypes
             template.m_MaximumDuration = (ushort)maximumDuration;
             reader.ReadProperty(nameof(CustomPhaseTemplate.m_TargetDurationMultiplier));
             reader.Read(out template.m_TargetDurationMultiplier);
-            reader.ReadProperty(nameof(CustomPhaseTemplate.m_LaneOccupiedMultiplier));
-            reader.Read(out template.m_LaneOccupiedMultiplier);
+            reader.ReadProperty(nameof(CustomPhaseTemplate.m_CarLaneOccupiedMultiplier));
+            reader.Read(out template.m_CarLaneOccupiedMultiplier);
+            reader.ReadProperty(nameof(CustomPhaseTemplate.m_TrackLaneOccupiedMultiplier));
+            reader.Read(out template.m_TrackLaneOccupiedMultiplier);
+            reader.ReadProperty(nameof(CustomPhaseTemplate.m_PedestrianLaneOccupiedMultiplier));
+            reader.Read(out template.m_PedestrianLaneOccupiedMultiplier);
             reader.ReadProperty(nameof(CustomPhaseTemplate.m_IntervalFactor));
             reader.Read(out template.m_IntervalFactor);
             reader.ReadMapEnd();
@@ -341,8 +353,12 @@ public static class UITypes
             writer.Write(template.m_MaximumDuration);
             writer.PropertyName(nameof(CustomPhaseTemplate.m_TargetDurationMultiplier));
             writer.Write(template.m_TargetDurationMultiplier);
-            writer.PropertyName(nameof(CustomPhaseTemplate.m_LaneOccupiedMultiplier));
-            writer.Write(template.m_LaneOccupiedMultiplier);
+            writer.PropertyName(nameof(CustomPhaseTemplate.m_CarLaneOccupiedMultiplier));
+            writer.Write(template.m_CarLaneOccupiedMultiplier);
+            writer.PropertyName(nameof(CustomPhaseTemplate.m_TrackLaneOccupiedMultiplier));
+            writer.Write(template.m_TrackLaneOccupiedMultiplier);
+            writer.PropertyName(nameof(CustomPhaseTemplate.m_PedestrianLaneOccupiedMultiplier));
+            writer.Write(template.m_PedestrianLaneOccupiedMultiplier);
             writer.PropertyName(nameof(CustomPhaseTemplate.m_IntervalFactor));
             writer.Write(template.m_IntervalFactor);
             writer.TypeEnd();
@@ -394,16 +410,18 @@ public static class UITypes
         MinimumDuration = 0,
         MaximumDuration = 1,
         TargetDurationMultiplier = 2,
-        LaneOccupiedMultiplier = 3,
-        IntervalFactor = 4,
-        PrioritiseTrack = 5,
-        PrioritisePublicCar = 6,
-        PrioritisePedestrian = 7,
-        LinkedWithNextPhase = 8,
-        EndPhasePrematurely = 9,
-        Name = 10,
-        BindWithTemplate = 11,
-        ApplyTemplate = 12,
+        CarLaneOccupiedMultiplier = 3,
+        TrackLaneOccupiedMultiplier = 4,
+        PedestrianLaneOccupiedMultiplier = 5,
+        IntervalFactor = 6,
+        PrioritiseTrack = 7,
+        PrioritisePublicCar = 8,
+        PrioritisePedestrian = 9,
+        LinkedWithNextPhase = 10,
+        EndPhasePrematurely = 11,
+        Name = 12,
+        BindWithTemplate = 13,
+        ApplyTemplate = 14,
     }
 
     public struct UpdateCustomPhaseData : IJsonReadable
@@ -436,7 +454,9 @@ public static class UITypes
                         value = (ushort)Math.Clamp(duration, 0, ushort.MaxValue);
                         break;
                     case UpdateCustomPhaseType.TargetDurationMultiplier:
-                    case UpdateCustomPhaseType.LaneOccupiedMultiplier:
+                    case UpdateCustomPhaseType.CarLaneOccupiedMultiplier:
+                    case UpdateCustomPhaseType.TrackLaneOccupiedMultiplier:
+                    case UpdateCustomPhaseType.PedestrianLaneOccupiedMultiplier:
                     case UpdateCustomPhaseType.IntervalFactor:
                         reader.Read(out float multiplier);
                         value = multiplier;

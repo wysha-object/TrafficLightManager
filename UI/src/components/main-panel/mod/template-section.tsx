@@ -59,8 +59,12 @@ export default function TemplateSection(props: {
                         m_MaximumDuration: props.item.maximumDuration,
                         m_TargetDurationMultiplier:
                           props.item.targetDurationMultiplier,
-                        m_LaneOccupiedMultiplier:
-                          props.item.laneOccupiedMultiplier,
+                        m_CarLaneOccupiedMultiplier:
+                          props.item.carLaneOccupiedMultiplier,
+                        m_TrackLaneOccupiedMultiplier:
+                          props.item.trackLaneOccupiedMultiplier,
+                        m_PedestrianLaneOccupiedMultiplier:
+                          props.item.pedestrianLaneOccupiedMultiplier,
                         m_IntervalFactor: props.item.intervalFactor,
                       })
                     }}
@@ -189,7 +193,9 @@ export default function TemplateSection(props: {
                     m_MaximumDuration: props.item.maximumDuration,
                     m_TargetDurationMultiplier:
                       props.item.targetDurationMultiplier,
-                    m_LaneOccupiedMultiplier: props.item.laneOccupiedMultiplier,
+                    m_CarLaneOccupiedMultiplier: props.item.carLaneOccupiedMultiplier,
+                    m_TrackLaneOccupiedMultiplier: props.item.trackLaneOccupiedMultiplier,
+                    m_PedestrianLaneOccupiedMultiplier: props.item.pedestrianLaneOccupiedMultiplier,
                     m_IntervalFactor: props.item.intervalFactor,
                   })
                 }}
@@ -214,7 +220,9 @@ export default function TemplateSection(props: {
                     m_MaximumDuration: props.item.maximumDuration,
                     m_TargetDurationMultiplier:
                       props.item.targetDurationMultiplier,
-                    m_LaneOccupiedMultiplier: props.item.laneOccupiedMultiplier,
+                    m_CarLaneOccupiedMultiplier: props.item.carLaneOccupiedMultiplier,
+                    m_TrackLaneOccupiedMultiplier: props.item.trackLaneOccupiedMultiplier,
+                    m_PedestrianLaneOccupiedMultiplier: props.item.pedestrianLaneOccupiedMultiplier,
                     m_IntervalFactor: props.item.intervalFactor,
                   })
                   setCustomPhaseDataCmd({

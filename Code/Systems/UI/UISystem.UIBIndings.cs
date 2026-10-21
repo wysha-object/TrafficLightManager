@@ -159,7 +159,9 @@ public partial class UISystem : UISystemBase
                     minimumDuration = item.m_MinimumDuration,
                     maximumDuration = item.m_MaximumDuration,
                     targetDurationMultiplier = item.m_TargetDurationMultiplier,
-                    laneOccupiedMultiplier = item.m_LaneOccupiedMultiplier,
+                    carLaneOccupiedMultiplier = item.m_CarLaneOccupiedMultiplier,
+                    trackLaneOccupiedMultiplier = item.m_TrackLaneOccupiedMultiplier,
+                    pedestrianLaneOccupiedMultiplier = item.m_PedestrianLaneOccupiedMultiplier,
                     intervalFactor = item.m_IntervalFactor,
                     prioritiseTrack = (item.m_Options & CustomPhaseData.Options.PrioritiseTrack) != 0,
                     prioritisePublicCar = (item.m_Options & CustomPhaseData.Options.PrioritisePublicCar) != 0,
@@ -301,8 +303,14 @@ public partial class UISystem : UISystemBase
                 case UITypes.UpdateCustomPhaseType.TargetDurationMultiplier:
                     newValue.m_TargetDurationMultiplier = (float)inputValue.value;
                     break;
-                case UITypes.UpdateCustomPhaseType.LaneOccupiedMultiplier:
-                    newValue.m_LaneOccupiedMultiplier = (float)inputValue.value;
+                case UITypes.UpdateCustomPhaseType.CarLaneOccupiedMultiplier:
+                    newValue.m_CarLaneOccupiedMultiplier = (float)inputValue.value;
+                    break;
+                case UITypes.UpdateCustomPhaseType.TrackLaneOccupiedMultiplier:
+                    newValue.m_TrackLaneOccupiedMultiplier = (float)inputValue.value;
+                    break;
+                case UITypes.UpdateCustomPhaseType.PedestrianLaneOccupiedMultiplier:
+                    newValue.m_PedestrianLaneOccupiedMultiplier = (float)inputValue.value;
                     break;
                 case UITypes.UpdateCustomPhaseType.IntervalFactor:
                     newValue.m_IntervalFactor = (float)inputValue.value;
@@ -374,7 +382,9 @@ public partial class UISystem : UISystemBase
                         newValue.m_MinimumDuration = templates[templateIndex].m_MinimumDuration;
                         newValue.m_MaximumDuration = templates[templateIndex].m_MaximumDuration;
                         newValue.m_TargetDurationMultiplier = templates[templateIndex].m_TargetDurationMultiplier;
-                        newValue.m_LaneOccupiedMultiplier = templates[templateIndex].m_LaneOccupiedMultiplier;
+                        newValue.m_CarLaneOccupiedMultiplier = templates[templateIndex].m_CarLaneOccupiedMultiplier;
+                        newValue.m_TrackLaneOccupiedMultiplier = templates[templateIndex].m_TrackLaneOccupiedMultiplier;
+                        newValue.m_PedestrianLaneOccupiedMultiplier = templates[templateIndex].m_PedestrianLaneOccupiedMultiplier;
                         if (templates[templateIndex].m_IsPrioritiseTrack)
                         {
                             newValue.m_Options |= CustomPhaseData.Options.PrioritiseTrack;
@@ -418,7 +428,9 @@ public partial class UISystem : UISystemBase
                         m_MinimumDuration = newValue.m_MinimumDuration,
                         m_MaximumDuration = newValue.m_MaximumDuration,
                         m_TargetDurationMultiplier = newValue.m_TargetDurationMultiplier,
-                        m_LaneOccupiedMultiplier = newValue.m_LaneOccupiedMultiplier,
+                        m_CarLaneOccupiedMultiplier = newValue.m_CarLaneOccupiedMultiplier,
+                        m_TrackLaneOccupiedMultiplier = newValue.m_TrackLaneOccupiedMultiplier,
+                        m_PedestrianLaneOccupiedMultiplier = newValue.m_PedestrianLaneOccupiedMultiplier,
                         m_IsPrioritiseTrack = (newValue.m_Options & CustomPhaseData.Options.PrioritiseTrack) != 0,
                         m_IsPrioritisePublicCar = (newValue.m_Options & CustomPhaseData.Options.PrioritisePublicCar) != 0,
                         m_IsPrioritisePedestrian = (newValue.m_Options & CustomPhaseData.Options.PrioritisePedestrian) != 0,
