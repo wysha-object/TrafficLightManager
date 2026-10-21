@@ -50,45 +50,8 @@ namespace TrafficLightManager.Code.Systems.Simulation
 
         protected override void OnUpdate()
         {
-            var templateList = Mod.m_Settings?.GetCustomPhaseTemplates();
-            int templateCount = templateList?.Count ?? 0;
-            NativeArray<CustomPhaseTemplate.Values> customPhaseTemplates = new NativeArray<CustomPhaseTemplate.Values>(templateCount, Allocator.TempJob);
-            for (int i = 0; i < templateCount; i++)
-            {
-                customPhaseTemplates[i] = new CustomPhaseTemplate.Values(templateList[i]);
-            }
-
             Dependency = ScheduleTrafficLightGroupValidationJob(Dependency, m_EndFrameBarrier.CreateCommandBuffer());
-            Dependency = JobChunkExtensions.ScheduleParallel(
-                new UpdateTrafficLightGroupJob
-                {
-                    m_FrameIndex = m_SimulationSystem.frameIndex,
-                    m_Settings = new Settings.Values(Mod.m_Settings),
-                    m_CustomPhaseTemplates = customPhaseTemplates,
-                    m_EntityCommandBuffer = m_EndFrameBarrier.CreateCommandBuffer().AsParallelWriter(),
-                    m_EntityStorageInfoLookup = SystemAPI.GetEntityStorageInfoLookup(),
-                    m_EntityType = SystemAPI.GetEntityTypeHandle(),
-                    m_TrafficLightGroupType = SystemAPI.GetComponentTypeHandle<TrafficLightGroup>(isReadOnly: false),
-                    m_TrafficLightsMemberRefType = SystemAPI.GetBufferTypeHandle<TrafficLightsMemberRef>(isReadOnly: false),
-                    m_CustomPhaseDataBufferType = SystemAPI.GetBufferTypeHandle<CustomPhaseData>(isReadOnly: false),
-                    m_TrafficLightsLookup = SystemAPI.GetComponentLookup<TrafficLights>(isReadOnly: false),
-                    m_CustomTrafficLightsLookup = SystemAPI.GetComponentLookup<CustomTrafficLights>(isReadOnly: false),
-                    m_ExtraLaneSignalLookup = SystemAPI.GetComponentLookup<ExtraLaneSignal>(isReadOnly: true),
-                    m_LaneFlowLookup = SystemAPI.GetComponentLookup<LaneFlow>(isReadOnly: true),
-                    m_LaneFlowHistoryLookup = SystemAPI.GetComponentLookup<LaneFlowHistory>(isReadOnly: true),
-                    m_MasterLaneLookup = SystemAPI.GetComponentLookup<MasterLane>(isReadOnly: true),
-                    m_CarLaneLookup = SystemAPI.GetComponentLookup<CarLane>(isReadOnly: true),
-                    m_TrackLaneLookup = SystemAPI.GetComponentLookup<TrackLane>(isReadOnly: true),
-                    m_PedestrianLaneLookup = SystemAPI.GetComponentLookup<PedestrianLane>(isReadOnly: true),
-                    m_LaneSignalLookup = SystemAPI.GetComponentLookup<LaneSignal>(isReadOnly: false),
-                    m_SubLaneBufferLookup = SystemAPI.GetBufferLookup<SubLane>(isReadOnly: true),
-                },
-                m_TrafficLightGroupQuery,
-                Dependency
-            );
-
-            Dependency = customPhaseTemplates.Dispose(Dependency);
-
+            Dependency = ScheduleUpdateTrafficLightGroupJob(Dependency);
             m_EndFrameBarrier.AddJobHandleForProducer(Dependency);
         }
     }

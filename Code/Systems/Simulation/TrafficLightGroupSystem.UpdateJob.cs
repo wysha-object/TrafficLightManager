@@ -1,11 +1,14 @@
-﻿using Game.Net;
+﻿using cohtml.Net;
+using Game.Net;
 using TrafficLightManager.Code.Components;
 using TrafficLightManager.Code.Utils;
 using Unity.Burst;
 using Unity.Burst.Intrinsics;
 using Unity.Collections;
 using Unity.Entities;
+using Unity.Jobs;
 using Unity.Mathematics;
+using static Colossal.IO.AssetDatabase.AtlasFrame;
 
 namespace TrafficLightManager.Code.Systems.Simulation
 {
@@ -112,29 +115,25 @@ namespace TrafficLightManager.Code.Systems.Simulation
                     }
                 }
 
-                NativeList<SubLane> allSubLanes = new NativeList<SubLane>(Allocator.Temp);
-                NativeList<Entity> allLaneSignalEntities = new NativeList<Entity>(30, Allocator.Temp);
+                NativeList<Entity> allLaneSignalEntities = new NativeList<Entity>(Allocator.Temp);
                 foreach (var item in trafficLightsMemberRefBuffer)
                 {
                     DynamicBuffer<SubLane> itemSubLaneBuffer = m_SubLaneBufferLookup[item.m_Entity];
-                    allSubLanes.AddRange(itemSubLaneBuffer.AsNativeArray());
-                }
-                foreach (var subLane in allSubLanes)
-                {
-                    Entity value = subLane.m_SubLane;
-                    if (m_LaneSignalLookup.HasComponent(value))
+                    foreach (var subLane in itemSubLaneBuffer)
                     {
-                        allLaneSignalEntities.Add(in value);
+                        if (m_LaneSignalLookup.HasComponent(subLane.m_SubLane))
+                        {
+                            allLaneSignalEntities.Add(in subLane.m_SubLane);
+                        }
                     }
                 }
 
                 CalculatePassedCarCount(ref trafficLightGroup, trafficLightsMemberRefBuffer);
-                CalculatePriority(allSubLanes, customPhaseDataBuffer);
+                CalculatePriority(allLaneSignalEntities, customPhaseDataBuffer);
                 UpdateTrafficLightState(ref trafficLightGroup, customPhaseDataBuffer);
                 UpdateLaneSignals(allLaneSignalEntities, trafficLightGroup);
 
                 allLaneSignalEntities.Dispose();
-                allSubLanes.Dispose();
 
                 foreach (var item in trafficLightsMemberRefBuffer)
                 {
@@ -172,7 +171,7 @@ namespace TrafficLightManager.Code.Systems.Simulation
                 );
             }
 
-            public void CalculatePriority(NativeList<SubLane> subLaneBuffer, DynamicBuffer<CustomPhaseData> customPhaseDataBuffer)
+            public void CalculatePriority(NativeList<Entity> allLaneSignalEntityList, DynamicBuffer<CustomPhaseData> customPhaseDataBuffer)
             {
                 for (int i = 0; i < customPhaseDataBuffer.Length; i++)
                 {
@@ -184,23 +183,18 @@ namespace TrafficLightManager.Code.Systems.Simulation
                     customPhaseData.m_Priority = 0;
                     customPhaseDataBuffer[i] = customPhaseData;
                 }
-                foreach (var subLane in subLaneBuffer)
+                foreach (var laneSignalEntity in allLaneSignalEntityList)
                 {
-                    Entity subLaneEntity = subLane.m_SubLane;
-
-                    if (!m_LaneSignalLookup.TryGetComponent(subLaneEntity, out var laneSignal))
-                    {
-                        continue;
-                    }
+                    LaneSignal laneSignal = m_LaneSignalLookup[laneSignalEntity];
 
                     Entity lanePetitioner = laneSignal.m_Petitioner;
                     int lanePriority = laneSignal.m_Priority;
 
                     laneSignal.m_Petitioner = Entity.Null;
                     laneSignal.m_Priority = laneSignal.m_Default;
-                    m_LaneSignalLookup[subLaneEntity] = laneSignal;
+                    m_LaneSignalLookup[laneSignalEntity] = laneSignal;
 
-                    if (m_MasterLaneLookup.HasComponent(subLaneEntity))
+                    if (m_MasterLaneLookup.HasComponent(laneSignalEntity))
                     {
                         continue;
                     }
@@ -218,10 +212,10 @@ namespace TrafficLightManager.Code.Systems.Simulation
 
                         CustomPhaseData customPhaseData = customPhaseDataBuffer[i];
 
-                        if (m_CarLaneLookup.HasComponent(subLaneEntity))
+                        if (m_CarLaneLookup.HasComponent(laneSignalEntity))
                         {
                             customPhaseData.m_CarLaneOccupied++;
-                            if (m_ExtraLaneSignalLookup.TryGetComponent(subLaneEntity, out var extraLaneSignal))
+                            if (m_ExtraLaneSignalLookup.TryGetComponent(laneSignalEntity, out var extraLaneSignal))
                             {
                                 if (extraLaneSignal.m_SourceSubLane != Entity.Null && m_CarLaneLookup.TryGetComponent(extraLaneSignal.m_SourceSubLane, out var sourceCarLane))
                                 {
@@ -240,7 +234,7 @@ namespace TrafficLightManager.Code.Systems.Simulation
                                 }
                             }
                         }
-                        if (m_TrackLaneLookup.HasComponent(subLaneEntity))
+                        if (m_TrackLaneLookup.HasComponent(laneSignalEntity))
                         {
                             customPhaseData.m_TrackLaneOccupied++;
                             if ((customPhaseData.m_Options & CustomPhaseData.Options.PrioritiseTrack) == 0)
@@ -253,7 +247,7 @@ namespace TrafficLightManager.Code.Systems.Simulation
                                 }
                             }
                         }
-                        if (m_PedestrianLaneLookup.TryGetComponent(subLaneEntity, out var pedestrianLane))
+                        if (m_PedestrianLaneLookup.TryGetComponent(laneSignalEntity, out var pedestrianLane))
                         {
                             if ((pedestrianLane.m_Flags & PedestrianLaneFlags.Crosswalk) != 0)
                             {
@@ -665,6 +659,47 @@ namespace TrafficLightManager.Code.Systems.Simulation
                 }
                 memberEntities.Dispose();
             }
+        }
+
+        private JobHandle ScheduleUpdateTrafficLightGroupJob(in JobHandle dependsOn)
+        {
+            JobHandle dependency = dependsOn;
+            var templateList = Mod.m_Settings?.GetCustomPhaseTemplates();
+            int templateCount = templateList?.Count ?? 0;
+            NativeArray<CustomPhaseTemplate.Values> customPhaseTemplates = new NativeArray<CustomPhaseTemplate.Values>(templateCount, Allocator.TempJob);
+            for (int i = 0; i < templateCount; i++)
+            {
+                customPhaseTemplates[i] = new CustomPhaseTemplate.Values(templateList[i]);
+            }
+            dependency = JobChunkExtensions.ScheduleParallel(
+                new UpdateTrafficLightGroupJob
+                {
+                    m_FrameIndex = m_SimulationSystem.frameIndex,
+                    m_Settings = new Settings.Values(Mod.m_Settings),
+                    m_CustomPhaseTemplates = customPhaseTemplates,
+                    m_EntityCommandBuffer = m_EndFrameBarrier.CreateCommandBuffer().AsParallelWriter(),
+                    m_EntityStorageInfoLookup = SystemAPI.GetEntityStorageInfoLookup(),
+                    m_EntityType = SystemAPI.GetEntityTypeHandle(),
+                    m_TrafficLightGroupType = SystemAPI.GetComponentTypeHandle<TrafficLightGroup>(isReadOnly: false),
+                    m_TrafficLightsMemberRefType = SystemAPI.GetBufferTypeHandle<TrafficLightsMemberRef>(isReadOnly: false),
+                    m_CustomPhaseDataBufferType = SystemAPI.GetBufferTypeHandle<CustomPhaseData>(isReadOnly: false),
+                    m_TrafficLightsLookup = SystemAPI.GetComponentLookup<TrafficLights>(isReadOnly: false),
+                    m_CustomTrafficLightsLookup = SystemAPI.GetComponentLookup<CustomTrafficLights>(isReadOnly: false),
+                    m_ExtraLaneSignalLookup = SystemAPI.GetComponentLookup<ExtraLaneSignal>(isReadOnly: true),
+                    m_LaneFlowLookup = SystemAPI.GetComponentLookup<LaneFlow>(isReadOnly: true),
+                    m_LaneFlowHistoryLookup = SystemAPI.GetComponentLookup<LaneFlowHistory>(isReadOnly: true),
+                    m_MasterLaneLookup = SystemAPI.GetComponentLookup<MasterLane>(isReadOnly: true),
+                    m_CarLaneLookup = SystemAPI.GetComponentLookup<CarLane>(isReadOnly: true),
+                    m_TrackLaneLookup = SystemAPI.GetComponentLookup<TrackLane>(isReadOnly: true),
+                    m_PedestrianLaneLookup = SystemAPI.GetComponentLookup<PedestrianLane>(isReadOnly: true),
+                    m_LaneSignalLookup = SystemAPI.GetComponentLookup<LaneSignal>(isReadOnly: false),
+                    m_SubLaneBufferLookup = SystemAPI.GetBufferLookup<SubLane>(isReadOnly: true),
+                },
+                m_TrafficLightGroupQuery,
+                dependency
+            );
+            dependency = customPhaseTemplates.Dispose(Dependency);
+            return dependency;
         }
     }
 }
