@@ -5,6 +5,7 @@ export interface BasePageProps extends DetailedHTMLProps<
   HTMLDivElement
 > {
   header?: React.ReactNode
+  footer?: React.ReactNode
   children?: React.ReactNode
 }
 
@@ -15,28 +16,48 @@ const BasePage = forwardRef<HTMLDivElement, BasePageProps>(
         ref={ref}
         {...props}
         style={{
-          maxHeight: '56em',
+          maxHeight: '50em',
           top: 'calc(10rem + var(--floatingToggleSize))',
-          borderRadius: '4rem',
+          borderRadius: '1em',
           position: 'fixed',
           zIndex: '1000',
           overflow: 'hidden',
           color: 'var(--textColor)',
+          display: 'flex',
+          flexDirection: 'column',
+          backgroundImage:
+            'linear-gradient( var(--panelGradientStart) , var(--panelGradientEnd) )',
           ...props.style,
         }}
       >
-        <div
-          style={{
-            fontSize: '1.1em',
-            padding: '6rem 10rem',
-            height: '2em',
-            backgroundColor: 'var(--panelColorDark)',
-            color: 'var(--accentColorNormal)',
-          }}
-        >
-          {props.header}
-        </div>
-        {props.children}
+        {props.header && (
+          <div
+            style={{
+              fontSize: '1.1em',
+              padding: '6rem 10rem',
+              height: '2em',
+              backgroundColor: 'var(--panelColorDark)',
+              color: 'var(--accentColorNormal)',
+            }}
+          >
+            {props.header}
+          </div>
+        )}
+        {props.children && (
+          <div style={{ flex: '1 1 0' }}>
+            {props.children}
+          </div>
+        )}
+        {props.footer && (
+          <div
+            style={{
+              height: '2em',
+              backgroundColor: 'var(--panelColorDark)',
+            }}
+          >
+            {props.footer}
+          </div>
+        )}
       </div>
     )
   },
