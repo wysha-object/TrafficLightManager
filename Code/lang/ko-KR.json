@@ -1,7 +1,7 @@
 {
-    "ClipboardPanel.DisplayPhaseCountTooltip": "Controls how many phases are displayed for each saved phase configuration",
-    "ClipboardPanel.EdgeHistory": "Edge",
-    "ClipboardPanel.SubLaneHistory": "SubLane",
+    "ClipboardPanel.DisplayPhaseCountTooltip": "저장된 각 신호등 주기 설정별로 표시할 주기 개수를 조절",
+    "ClipboardPanel.EdgeHistory": "가장자리",
+    "ClipboardPanel.SubLaneHistory": "보조 차선",
     "ClipboardPanel.Title": "Clipboard",
     "CustomPhase": "사용자 정의",
     "CustomPhaseEditor": "단계 편집기",
