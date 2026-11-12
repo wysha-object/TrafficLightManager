@@ -10,57 +10,6 @@ namespace TrafficLightManager.Code.Utils;
 
 public class PredefinedPatternsProcessor
 {
-    public static bool IsValidPattern(NativeArray<EdgeInfo> edgeInfoArray, CustomTrafficLights.Patterns pattern)
-    {
-        if (HasTrainTrack(edgeInfoArray))
-        {
-            return false;
-        }
-
-        switch ((uint)pattern & 0xFFFF)
-        {
-            case (uint)CustomTrafficLights.Patterns.SplitPhasing:
-            {
-                if (edgeInfoArray.Length > 7)
-                {
-                    return false;
-                }
-                return true;
-            }
-
-            case (uint)CustomTrafficLights.Patterns.SplitPhasingAdvancedObsolete:
-            {
-                return false;
-            }
-
-            case (uint)CustomTrafficLights.Patterns.ProtectedCentreTurn:
-            {
-                int ways = 0;
-                foreach (var edgeInfo in edgeInfoArray)
-                {
-                    if (edgeInfo.m_TrackLaneLeftCount + edgeInfo.m_TrackLaneRightCount > 0)
-                    {
-                        return false;
-                    }
-                    if (edgeInfo.m_CarLaneStraightCount + edgeInfo.m_PublicCarLaneStraightCount + edgeInfo.m_TrackLaneStraightCount > 0)
-                    {
-                        ways++;
-                    }
-                }
-                if (ways == 4 && edgeInfoArray.Length == ways)
-                {
-                    return true;
-                }
-                return false;
-            }
-
-            default:
-            {
-                return true;
-            }
-        }
-    }
-
     public static void SetupSplitPhasing(
         ref InitializeTrafficLightsJob job,
         DynamicBuffer<ConnectedEdge> connectedEdges,

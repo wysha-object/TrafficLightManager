@@ -1,0 +1,1 @@
+- Remove the limit on the number of roads connected to an intersection when applying default settings.

@@ -8,35 +8,8 @@ namespace TrafficLightManager.Code.Components;
 
 public struct CustomTrafficLights : IComponentData, IQueryTypeParameter, ISerializable
 {
-    /**
-     * 只使用CustomPhase,其他模式不直接使用,仅用于完成默认模式下的更新
-     */
-    public enum Patterns : uint
-    {
-        Vanilla = 0,
-
-        SplitPhasing = 1,
-
-        ProtectedCentreTurn = 2,
-
-        SplitPhasingAdvancedObsolete = 3,
-
-        ModDefault = 4,
-
-        CustomPhase = 5,
-
-        ExclusivePedestrian = 1 << 16,
-
-        AlwaysGreenKerbsideTurn = 1 << 17,
-
-        CentreTurnGiveWay = 1 << 18,
-    }
-
     // Schema 1
     private const int DefaultSelectedPatternLength = 16;
-
-    // Schema 2
-    private Patterns m_Pattern;
 
     // Schema 3
     public float m_PedestrianPhaseDurationMultiplier { get; private set; }
@@ -57,7 +30,7 @@ public struct CustomTrafficLights : IComponentData, IQueryTypeParameter, ISerial
     public void Serialize<TWriter>(TWriter writer)
         where TWriter : IWriter
     {
-        int schemaVersion = 7;
+        int schemaVersion = 8;
         writer.Write(uint.MaxValue);
         writer.Write(schemaVersion);
         writer.Write(uint.MaxValue);
@@ -115,11 +88,6 @@ public struct CustomTrafficLights : IComponentData, IQueryTypeParameter, ISerial
         if (schemaVersion >= 5)
         {
             reader.Read(out m_TrafficLightGroupEntity);
-            SetPatternOnly(Patterns.CustomPhase);
-        }
-        else
-        {
-            SetPatternOnly(Patterns.ModDefault);
         }
 
         if (schemaVersion == 6)
@@ -135,57 +103,11 @@ public struct CustomTrafficLights : IComponentData, IQueryTypeParameter, ISerial
 
     public CustomTrafficLights()
     {
-        m_Pattern = Patterns.ModDefault;
         m_PedestrianPhaseDurationMultiplier = 1;
         m_PedestrianPhaseGroupMask = 0;
         m_Timer = 0;
         m_ManualSignalGroup = 0;
         m_TrafficLightGroupEntity = Entity.Null;
-    }
-
-    public CustomTrafficLights(Patterns pattern)
-    {
-        m_Pattern = pattern;
-        m_PedestrianPhaseDurationMultiplier = 1;
-        m_PedestrianPhaseGroupMask = 0;
-        m_Timer = 0;
-        m_ManualSignalGroup = 0;
-        m_TrafficLightGroupEntity = Entity.Null;
-    }
-
-    public CustomTrafficLights(Patterns pattern, Entity trafficLightGroupEntity)
-    {
-        m_Pattern = pattern;
-        m_PedestrianPhaseDurationMultiplier = 1;
-        m_PedestrianPhaseGroupMask = 0;
-        m_Timer = 0;
-        m_ManualSignalGroup = 0;
-        m_TrafficLightGroupEntity = trafficLightGroupEntity;
-    }
-
-    public Patterns GetPattern()
-    {
-        return m_Pattern;
-    }
-
-    public Patterns GetPatternOnly()
-    {
-        return (Patterns)((uint)GetPattern() & 0xFFFF);
-    }
-
-    public void SetPattern(uint pattern)
-    {
-        SetPattern((Patterns)pattern);
-    }
-
-    public void SetPattern(Patterns pattern)
-    {
-        m_Pattern = pattern;
-    }
-
-    public void SetPatternOnly(Patterns pattern)
-    {
-        m_Pattern = (Patterns)(((uint)m_Pattern & 0xFFFF0000) | ((uint)pattern & 0xFFFF));
     }
 
     public void SetPedestrianPhaseDurationMultiplier(float durationMultiplier)

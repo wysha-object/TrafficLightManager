@@ -228,8 +228,7 @@ namespace TrafficLightManager.Code.Systems.Initialization
                         trafficLights.m_Flags &= ~(TrafficLightFlags.MoveableBridge | TrafficLightFlags.IsSubNode);
                     }
 
-                    CustomTrafficLights customTrafficLights =
-                        i < customTrafficLightsArray.Length ? customTrafficLights = customTrafficLightsArray[i] : new CustomTrafficLights(CustomTrafficLights.Patterns.ModDefault);
+                    CustomTrafficLights customTrafficLights = i < customTrafficLightsArray.Length ? customTrafficLightsArray[i] : new CustomTrafficLights();
                     Entity trafficLightGroupEntity = customTrafficLights.m_TrafficLightGroupEntity;
 
                     DynamicBuffer<CustomPhaseData>? customPhaseDataBuffer = null;
@@ -238,29 +237,7 @@ namespace TrafficLightManager.Code.Systems.Initialization
                         customPhaseDataBuffer = m_CustomPhaseDataLookup[trafficLightGroupEntity];
                     }
 
-                    if (customTrafficLights.GetPatternOnly() == CustomTrafficLights.Patterns.ModDefault)
-                    {
-                        uint defaultPattern = (uint)CustomTrafficLights.Patterns.Vanilla;
-                        if (m_Settings.m_DefaultSplitPhasing)
-                        {
-                            defaultPattern = (uint)CustomTrafficLights.Patterns.SplitPhasing;
-                        }
-                        if (m_Settings.m_DefaultAlwaysGreenKerbsideTurn)
-                        {
-                            defaultPattern |= (uint)CustomTrafficLights.Patterns.AlwaysGreenKerbsideTurn;
-                        }
-                        if (m_Settings.m_DefaultExclusivePedestrian)
-                        {
-                            defaultPattern |= (uint)CustomTrafficLights.Patterns.ExclusivePedestrian;
-                        }
-                        customTrafficLights.SetPattern(defaultPattern);
-                    }
                     customTrafficLights.SetPedestrianPhaseGroupMask(0);
-
-                    if ((trafficLights.m_Flags & TrafficLightFlags.MoveableBridge) != 0)
-                    {
-                        customTrafficLights.SetPattern(CustomTrafficLights.Patterns.Vanilla);
-                    }
 
                     PredefinedPatternsProcessor.ResetExtraLaneSignal(ref this, subLanes, ref trafficLights);
                     if (i < edgeGroupMaskAccessor.Length && i < subLaneGroupMaskAccessor.Length && customPhaseDataBuffer.HasValue)
@@ -290,22 +267,22 @@ namespace TrafficLightManager.Code.Systems.Initialization
                     }
                     else
                     {
+                        bool splitPhasing = false;
+                        bool alwaysGreenKerbsideTurn = false;
+                        bool exclusivePedestrian = false;
+
                         var edgeInfoArray = NodeUtils
                             .GetEdgeInfoList(Allocator.Temp, entityArray[i], ref this, subLanes, connectedEdgeAccessor[i], edgeGroupMaskAccessor[i], subLaneGroupMaskAccessor[i])
                             .AsArray();
-                        var pattern = customTrafficLights.GetPattern();
-                        if (NodeUtils.HasTrainTrack(edgeInfoArray) || !PredefinedPatternsProcessor.IsValidPattern(edgeInfoArray, pattern))
+                        if ((trafficLights.m_Flags & TrafficLightFlags.MoveableBridge) == 0 && !NodeUtils.HasTrainTrack(edgeInfoArray) && customTrafficLightsArray.Length == 0)
                         {
-                            pattern = CustomTrafficLights.Patterns.Vanilla;
-                            customTrafficLights.SetPattern(pattern);
+                            splitPhasing = m_Settings.m_DefaultSplitPhasing;
+                            alwaysGreenKerbsideTurn = m_Settings.m_DefaultAlwaysGreenKerbsideTurn;
+                            exclusivePedestrian = m_Settings.m_DefaultExclusivePedestrian;
                         }
-                        if (customTrafficLights.GetPatternOnly() == CustomTrafficLights.Patterns.SplitPhasing)
+                        if (splitPhasing)
                         {
                             PredefinedPatternsProcessor.SetupSplitPhasing(ref this, connectedEdgeAccessor[i], subLanes, out groupCount, ref trafficLights);
-                        }
-                        else if (customTrafficLights.GetPatternOnly() == CustomTrafficLights.Patterns.ProtectedCentreTurn)
-                        {
-                            PredefinedPatternsProcessor.SetupProtectedCentreTurn(ref this, connectedEdgeAccessor[i], subLanes, out groupCount, ref trafficLights);
                         }
                         else
                         {
@@ -332,15 +309,11 @@ namespace TrafficLightManager.Code.Systems.Initialization
                             InitializeTrafficLights(subLanes, groups, groupCount, flag, flag2, ref trafficLights);
                             groups.Clear();
                         }
-                        if ((customTrafficLights.GetPattern() & CustomTrafficLights.Patterns.AlwaysGreenKerbsideTurn) != 0)
+                        if (alwaysGreenKerbsideTurn)
                         {
                             PredefinedPatternsProcessor.AddAlwaysGreenKerbsideTurn(ref this, unfilteredChunkIndex, subLanes, ref groupCount, ref trafficLights);
                         }
-                        if ((customTrafficLights.GetPattern() & CustomTrafficLights.Patterns.CentreTurnGiveWay) != 0)
-                        {
-                            PredefinedPatternsProcessor.AddCentreTurnGiveWay(ref this, unfilteredChunkIndex, subLanes, ref trafficLights);
-                        }
-                        if ((customTrafficLights.GetPattern() & CustomTrafficLights.Patterns.ExclusivePedestrian) != 0)
+                        if (exclusivePedestrian)
                         {
                             PredefinedPatternsProcessor.AddExclusivePedestrianPhase(ref this, subLanes, ref groupCount, ref trafficLights, ref customTrafficLights);
                         }

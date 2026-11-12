@@ -18,7 +18,6 @@ using Unity.Entities;
 using Unity.Jobs;
 using Unity.Mathematics;
 using UnityEngine;
-using static TrafficLightManager.Code.Components.CustomTrafficLights;
 
 namespace TrafficLightManager.Code.Systems.UI;
 
@@ -185,7 +184,7 @@ public partial class UISystem : UISystemBase
         if (EntityManager.TryGetBuffer<TrafficLightsMemberRef>(m_SelectedTrafficLightGroupEntity, false, out var trafficLightsMemberRefs))
         {
             trafficLightsMemberRefs.Add(new TrafficLightsMemberRef { m_Entity = entity });
-            EntityManager.AddComponentData(entity, new CustomTrafficLights(Patterns.CustomPhase, m_SelectedTrafficLightGroupEntity));
+            EntityManager.AddComponentData(entity, new CustomTrafficLights { m_TrafficLightGroupEntity = m_SelectedTrafficLightGroupEntity });
             EntityManager.AddComponent<SubLane>(entity);
             EntityManager.AddComponent<ConnectedEdge>(entity);
             EntityManager.AddComponent<EdgeGroupMask>(entity);
@@ -247,7 +246,7 @@ public partial class UISystem : UISystemBase
             DynamicBuffer<TrafficLightsMemberRef> memberRefs = EntityManager.GetBuffer<TrafficLightsMemberRef>(groupEntity, false);
             memberRefs.Add(new TrafficLightsMemberRef { m_Entity = trafficLightsEntity });
 
-            customTrafficLights = new CustomTrafficLights(Patterns.CustomPhase, groupEntity);
+            customTrafficLights = new CustomTrafficLights { m_TrafficLightGroupEntity = groupEntity };
             EntityManager.AddComponentData(trafficLightsEntity, customTrafficLights);
             EntityManager.AddComponent<SubLane>(trafficLightsEntity);
             EntityManager.AddComponent<ConnectedEdge>(trafficLightsEntity);
