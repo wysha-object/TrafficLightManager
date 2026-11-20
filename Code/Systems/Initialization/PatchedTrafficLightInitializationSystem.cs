@@ -239,7 +239,7 @@ namespace TrafficLightManager.Code.Systems.Initialization
 
                     customTrafficLights.SetPedestrianPhaseGroupMask(0);
 
-                    PredefinedPatternsProcessor.ResetExtraLaneSignal(ref this, subLanes, ref trafficLights);
+                    PredefinedPatternsProcessor.ResetExtraLaneSignal(m_LaneSignalData, m_ExtraLaneSignalData, subLanes, ref trafficLights);
                     if (i < edgeGroupMaskAccessor.Length && i < subLaneGroupMaskAccessor.Length && customPhaseDataBuffer.HasValue)
                     {
                         CustomPhaseUtils.ValidateBuffer(
@@ -282,7 +282,7 @@ namespace TrafficLightManager.Code.Systems.Initialization
                         }
                         if (splitPhasing)
                         {
-                            PredefinedPatternsProcessor.SetupSplitPhasing(ref this, connectedEdgeAccessor[i], subLanes, out groupCount, ref trafficLights);
+                            PredefinedPatternsProcessor.SetupSplitPhasing(m_SubLaneLookup, m_LaneOverlapLookup, m_LaneLookup, m_LaneSignalData, m_MasterLaneData, m_PedestrianLaneData, m_CarLaneData, m_TrackLaneData, m_LeftHandTraffic, connectedEdgeAccessor[i], subLanes, out groupCount, ref trafficLights);
                         }
                         else
                         {
@@ -311,11 +311,11 @@ namespace TrafficLightManager.Code.Systems.Initialization
                         }
                         if (alwaysGreenKerbsideTurn)
                         {
-                            PredefinedPatternsProcessor.AddAlwaysGreenKerbsideTurn(ref this, unfilteredChunkIndex, subLanes, ref groupCount, ref trafficLights);
+                            PredefinedPatternsProcessor.AddAlwaysGreenKerbsideTurn(m_SubLaneLookup, m_LaneLookup, m_LaneSignalData, m_MasterLaneData, m_PedestrianLaneData, m_CarLaneData, m_TrackLaneData, m_LeftHandTraffic, connectedEdgeAccessor[i], unfilteredChunkIndex, subLanes, ref groupCount, ref trafficLights, commandBuffer: m_CommandBuffer);
                         }
                         if (exclusivePedestrian)
                         {
-                            PredefinedPatternsProcessor.AddExclusivePedestrianPhase(ref this, subLanes, ref groupCount, ref trafficLights, ref customTrafficLights);
+                            PredefinedPatternsProcessor.AddExclusivePedestrianPhase(m_LaneSignalData, m_PedestrianLaneData, subLanes, ref groupCount, ref trafficLights, ref customTrafficLights);
                         }
                     }
                     if (i < customTrafficLightsArray.Length)

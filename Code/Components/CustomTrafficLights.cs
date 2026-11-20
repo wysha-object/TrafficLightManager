@@ -19,8 +19,6 @@ public struct CustomTrafficLights : IComponentData, IQueryTypeParameter, ISerial
     // Schema 4
     public uint m_Timer;
 
-    public byte m_ManualSignalGroup;
-
     // Schema 5
     public Entity m_TrafficLightGroupEntity;
 
@@ -83,8 +81,6 @@ public struct CustomTrafficLights : IComponentData, IQueryTypeParameter, ISerial
         {
             reader.Read(out m_Timer);
         }
-        m_ManualSignalGroup = 0;
-
         if (schemaVersion >= 5)
         {
             reader.Read(out m_TrafficLightGroupEntity);
@@ -106,7 +102,6 @@ public struct CustomTrafficLights : IComponentData, IQueryTypeParameter, ISerial
         m_PedestrianPhaseDurationMultiplier = 1;
         m_PedestrianPhaseGroupMask = 0;
         m_Timer = 0;
-        m_ManualSignalGroup = 0;
         m_TrafficLightGroupEntity = Entity.Null;
     }
 

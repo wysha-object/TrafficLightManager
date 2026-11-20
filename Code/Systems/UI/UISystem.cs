@@ -59,12 +59,9 @@ public partial class UISystem : UISystemBase
 
     private UITypes.ScreenPoint m_MainPanelPosition;
 
-    public TypeHandle m_TypeHandle;
-
     protected override void OnCreate()
     {
         base.OnCreate();
-        m_TypeHandle.AssignHandles(ref base.CheckedStateRef);
 
         m_Camera = Camera.main;
         m_ScreenHeight = Screen.height;
@@ -153,11 +150,46 @@ public partial class UISystem : UISystemBase
         {
             return;
         }
+        var subLaneLookup = GetBufferLookup<SubLane>(isReadOnly: true);
+        var connectedEdgeLookup = GetBufferLookup<ConnectedEdge>(isReadOnly: true);
+        var edgeGroupMaskLookup = GetBufferLookup<EdgeGroupMask>(isReadOnly: true);
+        var subLaneGroupMaskLookup = GetBufferLookup<SubLaneGroupMask>(isReadOnly: true);
+        var laneOverlapLookup = GetBufferLookup<LaneOverlap>(isReadOnly: true);
+        var edgeData = GetComponentLookup<Edge>(isReadOnly: true);
+        var edgeGeometryData = GetComponentLookup<EdgeGeometry>(isReadOnly: true);
+        var laneData = GetComponentLookup<Lane>(isReadOnly: true);
+        var pedestrianLaneData = GetComponentLookup<PedestrianLane>(isReadOnly: true);
+        var masterLaneData = GetComponentLookup<MasterLane>(isReadOnly: true);
+        var trackLaneData = GetComponentLookup<TrackLane>(isReadOnly: true);
+        var carLaneData = GetComponentLookup<CarLane>(isReadOnly: true);
+        var curveData = GetComponentLookup<Curve>(isReadOnly: true);
+        var trainTrackData = GetComponentLookup<TrainTrack>(isReadOnly: true);
+        CompleteDependency();
         if (m_EdgeInfoDictionary.ContainsKey(node))
         {
             NodeUtils.Dispose(m_EdgeInfoDictionary[node]);
         }
-        m_EdgeInfoDictionary[node] = NodeUtils.GetEdgeInfoList(Allocator.Persistent, node, this).AsArray();
+        m_EdgeInfoDictionary[node] = NodeUtils
+            .GetEdgeInfoList(
+                Allocator.Persistent,
+                node,
+                subLaneLookup[node],
+                connectedEdgeLookup[node],
+                edgeGroupMaskLookup[node],
+                subLaneGroupMaskLookup[node],
+                subLaneLookup,
+                laneOverlapLookup,
+                edgeData,
+                edgeGeometryData,
+                laneData,
+                pedestrianLaneData,
+                masterLaneData,
+                trackLaneData,
+                carLaneData,
+                curveData,
+                trainTrackData
+            )
+            .AsArray();
         m_EdgeInfoBinding.Update();
     }
 

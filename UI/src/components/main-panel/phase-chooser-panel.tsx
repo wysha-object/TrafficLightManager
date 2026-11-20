@@ -1,10 +1,11 @@
-import { Button, Scrollable } from 'cs2/ui'
+import { Button, Scrollable, Tooltip } from 'cs2/ui'
 import { useTranslate } from 'hooks/translate'
 import { useState } from 'react'
 import styled from 'styled-components'
 import PhaseRow from './mod/phase-row'
 import {
   addCustomPhaseCmd,
+  generatePhasesCmd,
   setManualPhaseIndexCmd,
   useGetCustomPhaseItemsCmd,
   useGetTrafficLightGroupCmd,
@@ -12,8 +13,9 @@ import {
 import Radio from 'components/base/radio'
 
 const PanelContainer = styled.div`
-  width: 15em;
-  max-width: 15em;
+  width: 20em;
+  min-width: 20em;
+  max-width: 20em;
   background-color: var(--panelColorNormal);
   backdrop-filter: var(--panelBlur);
   color: var(--textColor);
@@ -43,6 +45,18 @@ export default function PhaseChooserPanel() {
       {!manualControl && (
         <>
           <Scrollable style={{ flex: 1 }}>
+            <div className='row' style={{ marginBottom: '0.5em' }}>
+              <Tooltip tooltip={t('CustomPhaseEditor.GeneratePhases.Tooltip')}>
+                <Button
+                  style={{ width: '100%', opacity: customPhaseItems.length ? 0.4 : 1 }}
+                  variant='flat'
+                  disabled={customPhaseItems.length !== 0}
+                  onClick={() => generatePhasesCmd()}
+                >
+                  {t('CustomPhaseEditor.GeneratePhases')}
+                </Button>
+              </Tooltip>
+            </div>
             {customPhaseItems.map((_, index) => (
               <PhaseRow
                 key={index}

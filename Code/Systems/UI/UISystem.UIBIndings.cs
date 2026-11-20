@@ -100,6 +100,7 @@ public partial class UISystem : UISystemBase
         AddBinding(new CallBinding<string, int>("TrafficLightManager", "RemoveTemplate", RemoveTemplate));
         AddBinding(new CallBinding<string, int>("TrafficLightManager", "SetTrafficLightGroupName", SetTrafficLightGroupName));
         AddBinding(new CallBinding<string, int>("TrafficLightManager", "AddCustomPhase", AddCustomPhase));
+        AddBinding(new CallBinding<int, int>("TrafficLightManager", "GeneratePhases", GeneratePhases));
         AddBinding(new CallBinding<int, int>("TrafficLightManager", "RemoveCustomPhase", RemoveCustomPhase));
         AddBinding(new CallBinding<UITypes.SwapCustomPhaseInput, int>("TrafficLightManager", "SwapCustomPhase", SwapCustomPhase));
         AddBinding(new CallBinding<UITypes.UpdateGroupMaskInput<EdgeGroupMask>, int>("TrafficLightManager", "UpdateEdgeGroupMask", UpdateEdgeGroupMask));
@@ -480,6 +481,47 @@ public partial class UISystem : UISystemBase
             ForEachTrafficLight(UpdateEdgeInfo);
             AddUpdate();
         }
+        return 0;
+    }
+
+    private int GeneratePhases(int _)
+    {
+        var subLaneLookup = GetBufferLookup<SubLane>(isReadOnly: true);
+        var connectedEdgeLookup = GetBufferLookup<ConnectedEdge>(isReadOnly: true);
+        var laneOverlapLookup = GetBufferLookup<LaneOverlap>(isReadOnly: true);
+        var laneData = GetComponentLookup<Lane>(isReadOnly: true);
+        var laneSignalData = GetComponentLookup<LaneSignal>();
+        var masterLaneData = GetComponentLookup<MasterLane>(isReadOnly: true);
+        var pedestrianLaneData = GetComponentLookup<PedestrianLane>(isReadOnly: true);
+        var carLaneData = GetComponentLookup<CarLane>(isReadOnly: true);
+        var trackLaneData = GetComponentLookup<TrackLane>(isReadOnly: true);
+        var edgeData = GetComponentLookup<Edge>(isReadOnly: true);
+        var edgeGeometryData = GetComponentLookup<EdgeGeometry>(isReadOnly: true);
+        var curveData = GetComponentLookup<Curve>(isReadOnly: true);
+        CompleteDependency();
+        PredefinedPatternsProcessor.GenerateCustomPhases(
+            EntityManager,
+            m_SelectedTrafficLightGroupEntity,
+            subLaneLookup,
+            connectedEdgeLookup,
+            laneOverlapLookup,
+            laneData,
+            laneSignalData,
+            masterLaneData,
+            pedestrianLaneData,
+            carLaneData,
+            trackLaneData,
+            edgeData,
+            edgeGeometryData,
+            curveData,
+            m_CityConfigurationSystem.leftHandTraffic,
+            new Settings.Values(Mod.m_Settings),
+            Mod.m_Settings.m_DefaultCustomPhaseTemplate);
+        ForEachTrafficLight(UpdateEdgeInfo);
+        AddUpdate();
+        m_CustomPhaseItemsBinding.Update();
+        m_TrafficLightGroupBinding.Update();
+        m_DisplayPhaseIndexBinding.Update(-1);
         return 0;
     }
 

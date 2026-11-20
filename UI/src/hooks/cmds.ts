@@ -172,6 +172,9 @@ export async function setTrafficLightGroupNameCmd(
 export async function addCustomPhaseCmd(): Promise<void> {
   return await call('TrafficLightManager', 'AddCustomPhase', '')
 }
+export async function generatePhasesCmd() {
+  return await call('TrafficLightManager', 'GeneratePhases', 0)
+}
 export async function removeCustomPhaseCmd(inputValue: number): Promise<void> {
   return await call('TrafficLightManager', 'RemoveCustomPhase', inputValue)
 }

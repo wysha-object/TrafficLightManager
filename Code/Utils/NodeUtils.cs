@@ -170,34 +170,6 @@ public partial struct NodeUtils
         return edgeInfoList;
     }
 
-    public static NativeList<EdgeInfo> GetEdgeInfoList(Allocator allocator, Entity nodeEntity, Systems.UI.UISystem uISystem)
-    {
-        uISystem.m_TypeHandle.Update(uISystem);
-        uISystem.m_TypeHandle.m_SubLane.TryGetBuffer(nodeEntity, out var nodeSubLaneBuffer);
-        uISystem.m_TypeHandle.m_ConnectedEdge.TryGetBuffer(nodeEntity, out var connectedEdgeBuffer);
-        uISystem.m_TypeHandle.m_EdgeGroupMask.TryGetBuffer(nodeEntity, out var edgeGroupMaskBuffer);
-        uISystem.m_TypeHandle.m_SubLaneGroupMask.TryGetBuffer(nodeEntity, out var subLaneGroupMaskBuffer);
-        return GetEdgeInfoList(
-            allocator,
-            nodeEntity,
-            nodeSubLaneBuffer,
-            connectedEdgeBuffer,
-            edgeGroupMaskBuffer,
-            subLaneGroupMaskBuffer,
-            uISystem.m_TypeHandle.m_SubLane,
-            uISystem.m_TypeHandle.m_LaneOverlap,
-            uISystem.m_TypeHandle.m_Edge,
-            uISystem.m_TypeHandle.m_EdgeGeometry,
-            uISystem.m_TypeHandle.m_Lane,
-            uISystem.m_TypeHandle.m_PedestrianLane,
-            uISystem.m_TypeHandle.m_MasterLane,
-            uISystem.m_TypeHandle.m_TrackLane,
-            uISystem.m_TypeHandle.m_CarLane,
-            uISystem.m_TypeHandle.m_Curve,
-            uISystem.m_TypeHandle.m_TrainTrack
-        );
-    }
-
     public static NativeList<EdgeInfo> GetEdgeInfoList(
         Allocator allocator,
         Entity nodeEntity,

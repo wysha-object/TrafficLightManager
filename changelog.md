@@ -1,1 +1,2 @@
 - Remove the limit on the number of roads connected to an intersection when applying default settings.
+- Add one-click custom phase generation.
